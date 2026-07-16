@@ -25,7 +25,7 @@
         </div>
         <div class="hero-deity" data-aura-hero>
             <div class="deity-frame">
-                <img class="varahi-slide is-active" src="/assets/images/institute/students-campus.jpg" alt="Aura Medical Institute of Electropathy and Hospital, Coimbatore" width="480" height="640" fetchpriority="high">
+                <img class="varahi-slide is-active" src="/assets/images/institute/maps1-campus.png" alt="Aura Medical Institute campus, Coimbatore" width="480" height="640" fetchpriority="high">
                 <img class="varahi-slide" src="/assets/images/institute/medical-students.jpg" alt="Aura Medical campus and hospital facilities" width="480" height="640" loading="lazy">
                 <img class="varahi-slide" src="/assets/images/institute/esic-students.jpg" alt="Acupuncture and electropathy therapy at Aura Medical" width="480" height="640" loading="lazy">
             </div>
@@ -85,6 +85,40 @@
         Hostel &amp; Placement Support
     </div>
 </div>
+
+<section class="section section--full">
+    <div class="section-header">
+        <span class="eyebrow serif-accent">Electropathy · Acupuncture · Allied Health</span>
+        <h2 class="section-title">Why Choose Aura Medical</h2>
+        <p class="lede">A practice-oriented institute and hospital where electropathy, acupuncture, and allied therapies are taught alongside real clinical exposure.</p>
+    </div>
+    <div class="astro-carousel" aria-label="Aura Medical focus areas">
+        <div class="astro-carousel-track">
+        <?php foreach([
+            ['title'=>'Electropathy','body'=>'Electro-medical sciences rooted in alternative-medicine practice and hospital training.'],
+            ['title'=>'Acupuncture','body'=>'Traditional needle therapy integrated with modern electropathy assessment methods.'],
+            ['title'=>'Allied Health','body'=>'Supportive therapies, nutrition guidance, and rehabilitative practice for whole-person care.'],
+            ['title'=>'Clinical Training','body'=>'Hands-on hospital rotation so students learn care where it is delivered.'],
+        ] as $focus): ?>
+            <article class="astro-market-card reveal">
+                <div class="astro-market-info">
+                    <a href="/education" class="astro-market-name"><?= e($focus['title']) ?></a>
+                    <p class="astro-market-speciality"><?= e($focus['body']) ?></p>
+                </div>
+                <div class="astro-market-actions">
+                    <div class="astro-action-row">
+                        <a href="/education" class="astro-action">Learn more</a>
+                        <a href="/contact" class="astro-action astro-action--primary">Enquire now</a>
+                    </div>
+                </div>
+            </article>
+        <?php endforeach; ?>
+        </div>
+    </div>
+    <div style="text-align:center;">
+        <a href="/education" class="btn btn-primary">View B.E.M.S. Programme</a>
+    </div>
+</section>
 
 <section class="category-section section">
     <div class="section-header">
@@ -163,40 +197,6 @@
             </article>
         <?php endforeach; ?>
     </div>
-    </div>
-</section>
-
-<section class="section section--full">
-    <div class="section-header">
-        <span class="eyebrow serif-accent">Electropathy · Acupuncture · Allied Health</span>
-        <h2 class="section-title">Why Choose Aura Medical</h2>
-        <p class="lede">A practice-oriented institute and hospital where electropathy, acupuncture, and allied therapies are taught alongside real clinical exposure.</p>
-    </div>
-    <div class="astro-carousel" aria-label="Aura Medical focus areas">
-        <div class="astro-carousel-track">
-        <?php foreach([
-            ['title'=>'Electropathy','body'=>'Electro-medical sciences rooted in alternative-medicine practice and hospital training.'],
-            ['title'=>'Acupuncture','body'=>'Traditional needle therapy integrated with modern electropathy assessment methods.'],
-            ['title'=>'Allied Health','body'=>'Supportive therapies, nutrition guidance, and rehabilitative practice for whole-person care.'],
-            ['title'=>'Clinical Training','body'=>'Hands-on hospital rotation so students learn care where it is delivered.'],
-        ] as $focus): ?>
-            <article class="astro-market-card reveal">
-                <div class="astro-market-info">
-                    <a href="/education" class="astro-market-name"><?= e($focus['title']) ?></a>
-                    <p class="astro-market-speciality"><?= e($focus['body']) ?></p>
-                </div>
-                <div class="astro-market-actions">
-                    <div class="astro-action-row">
-                        <a href="/education" class="astro-action">Learn more</a>
-                        <a href="/contact" class="astro-action astro-action--primary">Enquire now</a>
-                    </div>
-                </div>
-            </article>
-        <?php endforeach; ?>
-        </div>
-    </div>
-    <div style="text-align:center;">
-        <a href="/education" class="btn btn-primary">View B.E.M.S. Programme</a>
     </div>
 </section>
 

@@ -257,10 +257,14 @@ gtag('js', new Date());
                 <a href="/courses/dhm">D.H.M. &amp; C.T. — Hotel Mgmt</a>
             </div>
         </div>
-        <a href="/eligibility"<?= str_starts_with($currentPath, '/eligibility') ? ' aria-current="page"' : '' ?>>Eligibility</a>
-        <a href="/scope"<?= str_starts_with($currentPath, '/scope') ? ' aria-current="page"' : '' ?>>Scope</a>
+        <div class="nav-dropdown">
+            <a href="#" class="nav-dropdown__trigger"<?= str_starts_with($currentPath, '/eligibility') || str_starts_with($currentPath, '/scope') ? ' aria-current="page"' : '' ?>>Admissions <span class="nav-dropdown__arrow">▾</span></a>
+            <div class="nav-dropdown__menu">
+                <a href="/eligibility">Eligibility &amp; Requirements</a>
+                <a href="/scope">Career Scope</a>
+            </div>
+        </div>
         <a href="/gallery"<?= str_starts_with($currentPath, '/gallery') ? ' aria-current="page"' : '' ?>>Gallery</a>
-        <a href="/faculty"<?= str_starts_with($currentPath, '/faculty') ? ' aria-current="page"' : '' ?>>Faculty</a>
         <a href="/shop"<?= str_starts_with($currentPath, '/shop') ? ' aria-current="page"' : '' ?>>Shop</a>
         <a href="/consult"<?= str_starts_with($currentPath, '/consult') ? ' aria-current="page"' : '' ?>>Therapies</a>
         <a href="/temples"<?= str_starts_with($currentPath, '/temples') ? ' aria-current="page"' : '' ?>>Hospital</a>
@@ -273,7 +277,13 @@ gtag('js', new Date());
                 <?php endforeach; ?>
             </div>
         </div>
-        <a href="/about"<?= str_starts_with($currentPath, '/about') ? ' aria-current="page"' : '' ?>>About</a>
+        <div class="nav-dropdown">
+            <a href="/about" class="nav-dropdown__trigger"<?= str_starts_with($currentPath, '/about') || str_starts_with($currentPath, '/faculty') ? ' aria-current="page"' : '' ?>>About <span class="nav-dropdown__arrow">▾</span></a>
+            <div class="nav-dropdown__menu">
+                <a href="/about">About Institute</a>
+                <a href="/faculty">Faculty &amp; Administration</a>
+            </div>
+        </div>
         <a href="/contact"<?= str_starts_with($currentPath, '/contact') ? ' aria-current="page"' : '' ?>>Contact</a>
         <?php if(!empty($_SESSION['user'])): ?>
             <a href="/account/dashboard"<?= str_starts_with($currentPath, '/account/dashboard') ? ' aria-current="page"' : '' ?>>Dashboard</a>

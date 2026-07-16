@@ -3,11 +3,11 @@
         <div style="text-align:center; margin-bottom:var(--space-2xl);">
             <span class="eyebrow serif-accent">Contact</span>
             <h1 class="section-title" style="margin-bottom:var(--space-sm);">AuraEdu</h1>
-            <p class="lede" style="margin:0 auto;">Shop education products online. For medical guidance, use Consult for regular sessions or contact us for VIP direct visits.</p>
+            <p class="lede" style="margin:0 auto;">Aura Medical Institute of Electropathy and Hospital, Coimbatore. Visit our campus or get in touch for admissions, hospital services, and product inquiries.</p>
         </div>
         <div class="contact-form-card reveal" id="contact-form" style="scroll-margin-top:110px;">
             <h2 style="font-family:var(--font-serif); text-align:center; margin:0 0 var(--space-sm);">Contact Us</h2>
-            <p style="text-align:center; color:var(--color-text-muted); margin:0 auto var(--space-lg); max-width:620px;">Use this form for consultation & enquiry requests, product questions, hospital guidance, or store support.</p>
+            <p style="text-align:center; color:var(--color-text-muted); margin:0 auto var(--space-lg); max-width:620px;">Use this form for admission enquiries, product questions, hospital guidance, or general support.</p>
             <?php if(!empty($success)): ?>
                 <script>document.addEventListener('DOMContentLoaded',function(){showToast('Thank you. AuraEdu will contact you soon.','success');});</script>
             <?php endif; ?>
@@ -86,6 +86,19 @@
                     <a class="contact-direct-link contact-direct-link--mail" href="mailto:support@auraedu.co.in">
                         <span class="contact-direct-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg></span>
                         <span>support@auraedu.co.in</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="contact-info-grid" style="margin-top:var(--space-2xl);">
+            <div class="contact-card reveal" style="grid-column:1/-1;">
+                <div class="contact-card__body" style="text-align:center;">
+                    <span class="contact-card__eyebrow">Visit Us</span>
+                    <h3>Our Campus &amp; Hospital</h3>
+                    <p style="color:var(--color-text-muted); margin-bottom:var(--space-md);">Aura Medical Institute of Electropathy and Hospital, Kalapatti, Coimbatore.</p>
+                    <a href="https://maps.app.goo.gl/ipJSYLJxdokpJt6T8" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="display:inline-flex;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:var(--space-xs);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        View on Google Maps
                     </a>
                 </div>
             </div>
