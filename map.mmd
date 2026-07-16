@@ -7,20 +7,20 @@ flowchart LR
   classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b
   classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12
 
-  subgraph ARCH["Architecture Overview — 133 routes, 15 controllers, 43 services, 56 views, 0 data files, 24 tools"]
-    arch_routes["> Routes: 133 (Public + Auth + Payment + Admin + Support)"]:::arch
-    arch_ctrl["> Controllers: 15"]:::arch
-    arch_svc["> Services: 43"]:::arch
-    arch_views["> Views: 56"]:::arch
-    arch_data["> Collections: 22 schema | 0 files"]:::arch
+  subgraph ARCH["Architecture Overview — 125 routes, 14 controllers, 41 services, 52 views, 0 data files, 24 tools"]
+    arch_routes["> Routes: 125 (Public + Auth + Payment + Admin + Support)"]:::arch
+    arch_ctrl["> Controllers: 14"]:::arch
+    arch_svc["> Services: 41"]:::arch
+    arch_views["> Views: 52"]:::arch
+    arch_data["> Collections: 19 schema | 0 files"]:::arch
     arch_tools["> Tools: 24"]:::arch
-    arch_gaps["> Gaps: 1"]:::arch
+    arch_gaps["> Gaps: 0"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
 
   subgraph ROUTES_PUBLIC["PUBLIC Routes"]
-    route_get["GET / — Home page — hero, categories, featured products, astrologers"]:::route
+    route_get["GET / — Home page — hero, categories, featured products"]:::route
     route_get_about["GET /about — About AuraEdu — story, values, CTA"]:::route
     route_get_sri_panchami_education["GET /sri-panchami-education — AuraEdu landing page"]:::route
     route_get_education["GET /education — Short education landing redirect-equivalent page"]:::route
@@ -32,8 +32,7 @@ flowchart LR
     route_get_faculty["GET /faculty"]:::route
     route_get_terms["GET /terms — Terms of Service — 15 sections, legal"]:::route
     route_get_privacy["GET /privacy — Privacy Policy — 14 sections, data handling"]:::route
-    route_get_consult["GET /consult — Astrologer marketplace — browse and book"]:::route
-    route_get_consult_slug["GET /consult/{slug} — Consultant profile — request a scheduled appointment"]:::route
+    route_get_consult["GET /consult — Therapies & treatments overview"]:::route
     route_get_temples["GET /temples — Temple listing page"]:::route
     route_get_temples_slug["GET /temples/{slug} — Temple detail page"]:::route
     route_get_shop["GET /shop — Product shop — grid with pill actions"]:::route
@@ -50,14 +49,11 @@ flowchart LR
     route_post_contact["POST /contact — Contact form POST submission"]:::route
     route_get_account_dashboard["GET /account/dashboard — Account dashboard entry — redirects to orders"]:::route
     route_get_account_dashboard_orders["GET /account/dashboard/orders — My Orders — product reviews"]:::route
-    route_get_account_dashboard_sessions["GET /account/dashboard/sessions — My Sessions — astrologer bookings"]:::route
+    route_get_account_dashboard_sessions["GET /account/dashboard/sessions — My Sessions — appointment bookings"]:::route
     route_get_account_dashboard_install["GET /account/dashboard/install — Install App — customer installation guidance"]:::route
     route_get_account_orders["GET /account/orders — Legacy account orders redirect"]:::route
     route_get_account_orders_orderid_invoice["GET /account/orders/{orderId}/invoice"]:::route
     route_get_account_bookings["GET /account/bookings — Legacy account sessions redirect"]:::route
-    route_post_api_consultations_id_status["POST /api/consultations/{id}/status — API — update appointment status"]:::route
-    route_post_consultation_initiate["POST /consultation/initiate — Request a scheduled consultant appointment"]:::route
-    route_post_reviews_astrologer["POST /reviews/astrologer — Submit astrologer review"]:::route
     route_post_reviews_product["POST /reviews/product — Submit product review"]:::route
     route_get_docs["GET /docs — Documentation landing — blog categories overview"]:::route
     route_get_help_slug["GET /help/{slug}"]:::route
@@ -122,9 +118,7 @@ flowchart LR
     route_get_admin_orders_id["GET /admin/orders/{id} — Admin — order detail, status update"]:::route
     route_post_admin_orders_id_status["POST /admin/orders/{id}/status — Admin — update order status + email"]:::route
     route_get_admin_shipping["GET /admin/shipping — Admin — shipping settings"]:::route
-    route_get_admin_astrologers["GET /admin/astrologers — Admin — manage astrologers"]:::route
     route_get_admin_appointments["GET /admin/appointments — Admin — session list"]:::route
-    route_get_admin_consultation_analytics["GET /admin/consultation-analytics — Admin — consultation metrics"]:::route
     route_get_admin_tax_report["GET /admin/tax-report"]:::route
     route_get_admin_temples["GET /admin/temples — Admin — manage temples"]:::route
     route_get_admin_settings["GET /admin/settings — Admin — site settings"]:::route
@@ -155,8 +149,6 @@ flowchart LR
     route_post_admin_categories_delete["POST /admin/categories/delete — Admin — delete category"]:::route
     route_post_admin_coupons_save["POST /admin/coupons/save — Admin — create/update coupon"]:::route
     route_post_admin_coupons_delete["POST /admin/coupons/delete — Admin — delete coupon"]:::route
-    route_post_admin_astrologers_save["POST /admin/astrologers/save — Admin — create/update astrologer"]:::route
-    route_post_admin_astrologers_delete["POST /admin/astrologers/delete — Admin — delete astrologer"]:::route
     route_post_admin_temples_save["POST /admin/temples/save — Admin — create/update temple"]:::route
     route_post_admin_temples_delete["POST /admin/temples/delete — Admin — delete temple"]:::route
     route_post_admin_integrations_save["POST /admin/integrations/save — Admin — save integration secrets"]:::route
@@ -185,7 +177,6 @@ flowchart LR
     controller_blogcontroller["BlogController"]:::code
     controller_browseragentcontroller["BrowserAgentController"]:::code
     controller_commercecontroller["CommerceController"]:::code
-    controller_consultationcontroller["ConsultationController"]:::code
     controller_publiccontroller["PublicController"]:::code
     controller_remotedbcontroller["RemoteDbController"]:::code
     controller_reviewcontroller["ReviewController"]:::code
@@ -197,7 +188,6 @@ flowchart LR
     service_addressservice["AddressService"]:::code
     service_agentcontextservice["AgentContextService"]:::code
     service_appointmentservice["AppointmentService"]:::code
-    service_astrologerservice["AstrologerService"]:::code
     service_auditlogservice["AuditLogService"]:::code
     service_authservice["AuthService"]:::code
     service_blogdraftservice["BlogDraftService"]:::code
@@ -205,7 +195,6 @@ flowchart LR
     service_browsersession["BrowserSession"]:::code
     service_cartservice["CartService"]:::code
     service_categoryservice["CategoryService"]:::code
-    service_consultationservice["ConsultationService"]:::code
     service_contactservice["ContactService"]:::code
     service_couponservice["CouponService"]:::code
     service_databaseservice["DatabaseService"]:::code
@@ -247,9 +236,7 @@ flowchart LR
     view_account_orders["account/orders"]:::code
     view_admin_agent["admin/agent"]:::code
     view_admin_appearance["admin/appearance"]:::code
-    view_admin_astrologer_form["admin/astrologer-form"]:::code
     view_admin_blog["admin/blog"]:::code
-    view_admin_consultation_analytics["admin/consultation-analytics"]:::code
     view_admin_dashboard["admin/dashboard"]:::code
     view_admin_detail["admin/detail"]:::code
     view_admin_environment["admin/environment"]:::code
@@ -267,7 +254,6 @@ flowchart LR
     view_layouts_app["layouts/app"]:::code
     view_public_404["public/404"]:::code
     view_public_about["public/about"]:::code
-    view_public_astrologer["public/astrologer"]:::code
     view_public_blog["public/blog"]:::code
     view_public_blog_post["public/blog-post"]:::code
     view_public_cart["public/cart"]:::code
@@ -291,7 +277,6 @@ flowchart LR
     view_public_scope["public/scope"]:::code
     view_public_shop["public/shop"]:::code
     view_public_sitemap["public/sitemap"]:::code
-    view_public_spiritual["public/spiritual"]:::code
     view_public_support["public/support"]:::code
     view_public_temple["public/temple"]:::code
     view_public_temples["public/temples"]:::code
@@ -310,12 +295,9 @@ flowchart LR
     collection_users["users"]:::data
     collection_addresses["addresses"]:::data
     collection_products["products"]:::data
-    collection_astrologers["astrologers"]:::data
     collection_temples["temples"]:::data
     collection_orders["orders"]:::data
     collection_appointments["appointments"]:::data
-    collection_consultation_messages["consultation_messages"]:::data
-    collection_consultation_signals["consultation_signals"]:::data
     collection_wallet_transactions["wallet_transactions"]:::data
     collection_support_tickets["support_tickets"]:::data
     collection_categories["categories"]:::data
@@ -359,12 +341,11 @@ flowchart LR
   end
 
   subgraph GAPS["Gaps & Missing Links"]
-    gap_a852d47145["unwired_views: public/spiritual"]:::gap
+    no_gaps["No detected gaps"]:::data
   end
 
   route_get --> controller_publiccontroller
   controller_publiccontroller --> service_productservice
-  controller_publiccontroller --> service_astrologerservice
   controller_publiccontroller --> service_templeservice
   controller_publiccontroller --> service_categoryservice
   controller_publiccontroller -. renders .-> view_public_home
@@ -391,11 +372,8 @@ flowchart LR
   route_get_privacy --> controller_publiccontroller
   controller_publiccontroller -. renders .-> view_public_privacy
   route_get_consult --> controller_publiccontroller
-  controller_publiccontroller --> service_astrologerservice
+  controller_publiccontroller --> service_reviewservice
   controller_publiccontroller -. renders .-> view_public_consult
-  route_get_consult_slug --> controller_publiccontroller
-  controller_publiccontroller --> service_astrologerservice
-  controller_publiccontroller -. renders .-> view_public_astrologer
   route_get_temples --> controller_publiccontroller
   controller_publiccontroller --> service_templeservice
   controller_publiccontroller -. renders .-> view_public_temples
@@ -510,10 +488,6 @@ flowchart LR
   route_get_account_bookings --> controller_accountcontroller
   controller_accountcontroller --> service_authservice
   controller_accountcontroller -. renders .-> view_account_bookings
-  route_post_api_consultations_id_status --> controller_consultationcontroller
-  controller_consultationcontroller --> service_authservice
-  controller_consultationcontroller --> service_consultationservice
-  controller_consultationcontroller -. renders .-> view_admin_list
   route_get_admin --> controller_admincontroller
   controller_admincontroller --> service_orderservice
   controller_admincontroller --> service_appointmentservice
@@ -552,19 +526,10 @@ flowchart LR
   controller_admincontroller --> service_settingsservice
   controller_admincontroller --> service_authservice
   controller_admincontroller -. renders .-> view_admin_settings
-  route_get_admin_astrologers --> controller_admincontroller
-  controller_admincontroller --> service_astrologerservice
-  controller_admincontroller --> service_schemaservice
-  controller_admincontroller --> service_authservice
-  controller_admincontroller -. renders .-> view_admin_astrologer_form
   route_get_admin_appointments --> controller_admincontroller
   controller_admincontroller --> service_appointmentservice
   controller_admincontroller --> service_authservice
   controller_admincontroller -. renders .-> view_admin_list
-  route_get_admin_consultation_analytics --> controller_admincontroller
-  controller_admincontroller --> service_consultationservice
-  controller_admincontroller --> service_authservice
-  controller_admincontroller -. renders .-> view_admin_consultation_analytics
   route_get_admin_tax_report --> controller_admincontroller
   controller_admincontroller --> service_orderservice
   controller_admincontroller --> service_taxservice
@@ -705,16 +670,6 @@ flowchart LR
   controller_admincontroller --> service_auditlogservice
   controller_admincontroller --> service_authservice
   controller_admincontroller -. renders .-> view_admin_resource
-  route_post_admin_astrologers_save --> controller_admincontroller
-  controller_admincontroller --> service_resourceservice
-  controller_admincontroller --> service_auditlogservice
-  controller_admincontroller --> service_authservice
-  controller_admincontroller -. renders .-> view_admin_astrologer_form
-  route_post_admin_astrologers_delete --> controller_admincontroller
-  controller_admincontroller --> service_resourceservice
-  controller_admincontroller --> service_auditlogservice
-  controller_admincontroller --> service_authservice
-  controller_admincontroller -. renders .-> view_admin_astrologer_form
   route_post_admin_temples_save --> controller_admincontroller
   controller_admincontroller --> service_resourceservice
   controller_admincontroller --> service_auditlogservice
@@ -762,16 +717,6 @@ flowchart LR
   controller_commercecontroller --> service_taxservice
   controller_commercecontroller --> service_settingsservice
   controller_commercecontroller -. renders .-> view_public_checkout
-  route_post_consultation_initiate --> controller_consultationcontroller
-  controller_consultationcontroller --> service_authservice
-  controller_consultationcontroller --> service_astrologerservice
-  controller_consultationcontroller --> service_resourceservice
-  controller_consultationcontroller --> service_mailqueueservice
-  controller_consultationcontroller -. renders .-> view_public_astrologer
-  route_post_reviews_astrologer --> controller_reviewcontroller
-  controller_reviewcontroller --> service_reviewservice
-  controller_reviewcontroller --> service_authservice
-  controller_reviewcontroller -. renders .-> view_account_bookings
   route_post_reviews_product --> controller_reviewcontroller
   controller_reviewcontroller --> service_reviewservice
   controller_reviewcontroller --> service_authservice
@@ -874,7 +819,6 @@ flowchart LR
   controller_blogcontroller --> controller_basecontroller
   controller_browseragentcontroller --> controller_basecontroller
   controller_commercecontroller --> controller_basecontroller
-  controller_consultationcontroller --> controller_basecontroller
   controller_publiccontroller --> controller_basecontroller
   controller_remotedbcontroller --> controller_basecontroller
   controller_reviewcontroller --> controller_basecontroller
@@ -893,12 +837,8 @@ flowchart LR
   service_agentcontextservice --> collection_appointments
   service_agentcontextservice --> collection_support_tickets
   service_appointmentservice --> collection_appointments
-  service_astrologerservice --> collection_astrologers
   service_auditlogservice --> collection_audit_events
   service_categoryservice --> collection_categories
-  service_consultationservice --> collection_appointments
-  service_consultationservice --> collection_consultation_messages
-  service_consultationservice --> collection_consultation_signals
   service_contactservice --> collection_contact_submissions
   service_couponservice --> collection_coupons
   service_mailqueueservice --> collection_mail_queue
@@ -908,7 +848,6 @@ flowchart LR
   service_passwordresetservice --> collection_users
   service_productservice --> collection_products
   service_reviewservice --> collection_reviews
-  service_reviewservice --> collection_appointments
   service_reviewservice --> collection_orders
   service_settingsservice --> collection_settings
   service_supportticketservice --> collection_support_tickets
@@ -917,14 +856,11 @@ flowchart LR
   service_resourceservice --> collection_orders
   service_resourceservice --> collection_appointments
   service_resourceservice --> collection_categories
-  service_resourceservice --> collection_astrologers
   service_databaseservice --> collection_users
   service_databaseservice --> collection_addresses
   service_databaseservice --> collection_products
   service_databaseservice --> collection_orders
   service_databaseservice --> collection_appointments
-  service_databaseservice --> collection_consultation_messages
-  service_databaseservice --> collection_consultation_signals
   service_databaseservice --> collection_secrets
   service_databaseservice --> collection_mail_inbox
   service_databaseservice --> collection_mail_outbox
@@ -944,4 +880,3 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
-  gap_a852d47145 -. missing .-> view_public_spiritual

@@ -9,10 +9,6 @@ sections:
       - /shop: Browse All Products
       - /cart: View Cart
       - /checkout: Checkout
-  - section: Consultations
-    links:
-      - /consult: Browse Consultants
-      - /temples: Temple Guide
   - section: Help & Support
     links:
       - /contact: Contact Form

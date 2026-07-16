@@ -1,7 +1,7 @@
 {
   "name": "AuraEdu",
   "short_name": "AuraEdu",
-  "description": "Authentic education products, online astrology consultation, and temple guides.",
+  "description": "Authentic education products.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

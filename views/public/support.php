@@ -27,7 +27,7 @@
             </article>
             <article class="support-card">
                 <h2>Consultant bookings</h2>
-                <p>Browse consultants on the <a href="/consult">consultation marketplace</a>, choose a profile, and request your preferred appointment date and time.</p>
+                <p>Browse consultants on the <a href="/consult">therapy listing</a>, choose a profile, and request your preferred appointment date and time.</p>
             </article>
             <article class="support-card">
                 <h2>Orders &amp; shipping</h2>
@@ -35,11 +35,11 @@
             </article>
             <article class="support-card">
                 <h2>Products &amp; returns</h2>
-                <p>Shop authentic rudraksha, pooja items, and sacred jewellery in the <a href="/shop">store</a>. Reach out through the contact form for product or return questions.</p>
+                <p>Shop wellness and therapy products in the <a href="/shop">store</a>. Reach out through the contact form for product or return questions.</p>
             </article>
             <article class="support-card">
-                <h2>Temples &amp; guidance</h2>
-                <p>Explore the <a href="/temples">temple guide</a> for temple details, timings, and directions.</p>
+                <h2>Hospital &amp; care</h2>
+                <p>Explore the <a href="/temples">hospital guide</a> for hospital details, timings, and directions.</p>
             </article>
             <article class="support-card">
                 <h2>Talk to a person</h2>

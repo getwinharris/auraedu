@@ -17,7 +17,7 @@
                     <input type="text" name="name" id="field-name" placeholder="Product name" required>
                 </label>
                 <label>Category
-                    <input type="text" name="category" id="field-category" placeholder="e.g. puja-items" style="margin-bottom:var(--space-xs);">
+                    <input type="text" name="category" id="field-category" placeholder="e.g. acupuncture-needles" style="margin-bottom:var(--space-xs);">
                     <div id="category-chips" style="display:flex; flex-wrap:wrap; gap:0.3rem;">
                     <?php $catValue = ''; ?>
                     <?php if (!empty($categories)): ?>

@@ -66,39 +66,27 @@ final class SeoService {
                 'og_type' => 'product',
                 'robots' => 'index, follow',
             ],
-            'consult' => [
-                'title' => 'Book a Vedic Astrology Consultation Online',
-                'description' => 'Request a scheduled appointment with a verified Vedic astrology consultant for personalised guidance.',
+            'therapies' => [
+                'title' => 'Therapies & Hospital Services – ' . $short,
+                'description' => 'Explore therapy and hospital services at ' . $short . ', Coimbatore — clinical training, acupuncture, and allied-health care.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
-            'astrologer' => [
-                'title' => 'Vedic Astrologer Online Consultation',
-                'description' => 'Request a scheduled appointment with an experienced Vedic astrology consultant.',
-                'og_type' => 'profile',
-                'robots' => 'index, follow',
-            ],
-            'temples' => [
-                'title' => 'Temples in Coimbatore – Temple Guide, Timings, Address & Pooja Services',
-                'description' => 'Explore temples in Coimbatore with detailed guides including timings, addresses, and available pooja services. Plan your temple visit with ' . $brand . '.',
-                'og_type' => 'website',
-                'robots' => 'index, follow',
-            ],
-            'temple' => [
-                'title' => 'Temple Guide – Timings, Address, Pooja & Darshan',
-                'description' => 'View temple details including timings, address, location map, and available pooja services.',
+            'hospital' => [
+                'title' => 'Hospital Facilities – ' . $short,
+                'description' => 'Learn about hospital facilities and patient care at ' . $short . ', Coimbatore.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'about' => [
-                'title' => 'About ' . $brand . ' – Coimbatore\'s Trusted education Store & Astrology Platform',
-                'description' => 'Learn about ' . $brand . ', Coimbatore\'s trusted destination for authentic education products, Vedic astrology consultations, and temple guidance since 2020.',
+                'title' => 'About ' . $brand . ' – Coimbatore\'s Medical Education & Hospital',
+                'description' => 'Learn about ' . $brand . ', Coimbatore\'s trusted destination for electropathy medical education, hospital care, and wellness products.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'contact' => [
-                'title' => 'Contact ' . $brand . ' – Get in Touch for education Products & Astrology',
-                'description' => 'Reach out to ' . $brand . ' for inquiries about education products, astrology consultations, temple pooja services, or bulk orders. Call or email us.',
+                'title' => 'Contact ' . $brand . ' – Medical Education & Hospital',
+                'description' => 'Reach out to ' . $brand . ' for inquiries about education programmes, hospital services, or bulk orders. Call or email us.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
@@ -146,37 +134,37 @@ final class SeoService {
             ],
             'cart' => [
                 'title' => 'Shopping Cart – ' . $brand,
-                'description' => 'Review your shopping cart at ' . $brand . '. Proceed to checkout for authentic education products and sacred items.',
+                'description' => 'Review your shopping cart at ' . $brand . '. Proceed to checkout for quality education products and wellness items.',
                 'og_type' => 'website',
                 'robots' => 'noindex, follow',
             ],
             'checkout' => [
                 'title' => 'Checkout – ' . $brand,
-                'description' => 'Complete your purchase at ' . $brand . '. Secure payment for education products, rudraksha, pooja items, and sacred jewellery.',
+                'description' => 'Complete your purchase at ' . $brand . '. Secure payment for education products and wellness items.',
                 'og_type' => 'website',
                 'robots' => 'noindex, follow',
             ],
             'privacy' => [
                 'title' => 'Privacy Policy – ' . $brand,
-                'description' => 'Read the privacy policy of ' . $brand . '. Learn how we collect, use, and protect your personal information when you use our education products and astrology services.',
+                'description' => 'Read the privacy policy of ' . $brand . '. Learn how we collect, use, and protect your personal information when you use our education programmes and hospital services.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'terms' => [
                 'title' => 'Terms & Conditions – ' . $brand,
-                'description' => 'Read the terms and conditions of ' . $brand . '. Understand the guidelines for using our astrology consultation services and purchasing education products.',
+                'description' => 'Read the terms and conditions of ' . $brand . '. Understand the guidelines for using our education programmes and purchasing products.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'login' => [
                 'title' => 'Sign In – ' . $brand,
-                'description' => 'Sign in to your ' . $brand . ' account to manage orders, saved delivery addresses, and consultation bookings.',
+                'description' => 'Sign in to your ' . $brand . ' account to manage orders, saved addresses, and appointments.',
                 'og_type' => 'website',
                 'robots' => 'noindex, follow',
             ],
             'register' => [
                 'title' => 'Create Account – ' . $brand,
-                'description' => 'Create your ' . $brand . ' account to save delivery addresses, order education products, and book consultations.',
+                'description' => 'Create your ' . $brand . ' account to save addresses, order products, and book appointments.',
                 'og_type' => 'website',
                 'robots' => 'noindex, follow',
             ],
@@ -194,7 +182,7 @@ final class SeoService {
             ],
             'account' => [
                 'title' => 'My Account – ' . $brand,
-                'description' => 'Manage your ' . $brand . ' account, view product orders, and track consultation bookings.',
+                'description' => 'Manage your ' . $brand . ' account, view orders and track appointments.',
                 'og_type' => 'website',
                 'robots' => 'noindex, nofollow',
             ],
@@ -203,14 +191,14 @@ final class SeoService {
                 'description' => 'Read the latest blog posts, feature updates, and education guides from ' . $brand . '.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
-                'keywords' => 'education blog, astrology articles, vedic astrology blog, rudraksha guide, pooja tips',
+                'keywords' => 'electropathy, medical education, acupuncture, allied health, BEMS',
             ],
             'blog.post' => [
                 'title' => 'Blog Post – ' . $brand,
                 'description' => 'Read articles, guides, and updates from ' . $brand . '.',
                 'og_type' => 'article',
                 'robots' => 'index, follow',
-                'keywords' => 'astrology, educationity, vedic astrology, education products',
+                'keywords' => 'electropathy, medical education, acupuncture, allied health',
             ],
             'blog.category' => [
                 'title' => 'Blog Category – ' . $brand,
@@ -288,23 +276,12 @@ final class SeoService {
         ];
     }
 
-    public function personSchema(array $astrologer): array {
-        return [
-            '@context' => 'https://schema.org',
-            '@type' => 'Person',
-            'name' => $astrologer['name'] ?? '',
-            'description' => ($astrologer['speciality'] ?? '') . ' astrologer with ' . ($astrologer['experience_years'] ?? '') . ' years of experience.',
-            'image' => $astrologer['photo_url'] ?? $this->defaultOgImage,
-            'knowsLanguage' => $astrologer['languages'] ?? [],
-        ];
-    }
-
     public function aboutPageSchema(): array {
         return [
             '@context' => 'https://schema.org',
             '@type' => 'AboutPage',
             'name' => 'About ' . $this->siteName,
-            'description' => 'Learn about ' . $this->siteName . ', Coimbatore\'s trusted destination for authentic education products and Vedic astrology consultations.',
+            'description' => 'Learn about ' . $this->siteName . ', Coimbatore\'s trusted destination for electropathy medical education and hospital care.',
             'mainEntity' => $this->organizationSchema(),
         ];
     }
@@ -314,7 +291,7 @@ final class SeoService {
             '@context' => 'https://schema.org',
             '@type' => 'ContactPage',
             'name' => 'Contact ' . $this->siteName,
-            'description' => 'Get in touch with ' . $this->siteName . ' for education products, astrology consultations, and temple pooja services.',
+            'description' => 'Get in touch with ' . $this->siteName . ' for education programmes, hospital services, and wellness products.',
             'mainEntity' => $this->organizationSchema(),
         ];
     }

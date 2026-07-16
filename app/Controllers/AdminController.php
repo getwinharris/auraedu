@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-use App\Services\{AuditLogService,AuthService,BlogDraftService,ConsultationService,EnvService,MailStorageService,MarkdownRenderer,MediaService,OrderService,ResourceService,SchemaService,SecretService,SettingsService,StoragePermissionService};
+use App\Services\{AuditLogService,AuthService,BlogDraftService,EnvService,MailStorageService,MarkdownRenderer,MediaService,OrderService,ResourceService,SchemaService,SecretService,SettingsService,StoragePermissionService};
 final class AdminController extends BaseController {
     protected string $layout = 'admin';
     public function __construct() {
@@ -37,16 +37,7 @@ final class AdminController extends BaseController {
     }
     public function saveOrderStatus(string $id): void{try{(new OrderService())->updateStatus($id, $_POST['status'] ?? 'confirmed'); (new AuditLogService())->record('save','order.status',$id,['status'=>$_POST['status'] ?? 'confirmed']); $this->flash('Order status updated.','success');}catch(\Throwable){$this->flash('Unable to update order status.','error');} $this->redirect('/admin/orders/'.$id);}
     public function shipping(): void{$this->render('admin/settings',['pageTitle' => 'Shipping', 'title' => 'Shipping']);}
-    public function astrologers(): void{
-        $this->render('admin/astrologer-form',['pageTitle'=>'Astrologers','title'=>'Astrologers','collection'=>'astrologers','items'=>(new ResourceService('astrologers'))->all(),'mediaFiles'=>$this->mediaFor('astrologers')]);
-    }
-    public function saveAstrologer(): void{$this->save('astrologers');}
-    public function deleteAstrologer(): void{
-        $id=(string)($_POST['id']??'');
-        (new ResourceService('astrologers'))->delete($id); (new AuditLogService())->record('delete','astrologers',$id); $this->flash('Deleted.','info'); $this->redirect('/admin/astrologers');
-    }
     public function appointments(): void{$this->list('Sessions','appointments');}
-    public function consultationAnalytics(): void{$this->render('admin/consultation-analytics',['pageTitle'=>'Consultation Analytics','metrics'=>(new ConsultationService())->analytics()]);}
     public function temples(): void{$this->resource('Temples','temples',$this->schemaFields('temples',['name','description','image_url','address','map_url']));}
     public function saveTemple(): void{$this->save('temples');}
     public function deleteTemple(): void{$this->delete('temples');}
@@ -70,7 +61,7 @@ final class AdminController extends BaseController {
             $userCount = count($db->read('users'));
             $orderCount = count($db->read('orders'));
             $productCount = count($db->read('products'));
-            $astrologerCount = count($db->read('astrologers'));
+            $practitionerCount = count($db->read('appointments'));
             $appointmentCount = count($db->read('appointments'));
             $ticketCount = count($db->read('support_tickets'));
             $revenue = array_sum(array_column($db->read('orders'), 'total'));
@@ -80,7 +71,7 @@ final class AdminController extends BaseController {
                 $files = array_diff(scandir($tempDir), ['.','..']);
                 if (!empty($files)) $attachments = "\n\nAttachments available in .agents/temp/: " . implode(', ', $files);
             }
-            $context = "Site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Astrologers: {$astrologerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue (sum of totals): ₹" . number_format($revenue, 2) . $attachments;
+            $context = "Site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Appointments: {$practitionerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue (sum of totals): ₹" . number_format($revenue, 2) . $attachments;
             if (!empty($modelConfig['apiKey'])) {
                 $answer = $this->callAiApi($modelConfig, $message, $context);
             } else {
@@ -313,22 +304,12 @@ final class AdminController extends BaseController {
         if(isset($data['modes']))$data['modes']=$this->splitList($data['modes']);
         if(isset($data['languages']))$data['languages']=$this->splitList($data['languages']);
         $uploaded=$this->uploadedMedia($collection);
-        if ($collection === 'astrologers') {
-            $photos=$this->splitList((string)($data['photo_urls'] ?? ''));
-            if (!empty($data['photo_url'])) array_unshift($photos, (string)$data['photo_url']);
-            $uploadedPaths=array_column($uploaded, 'url');
-            $photos=array_values(array_unique(array_filter(array_merge($photos, $uploadedPaths))));
-            if (!empty($photos)) {
-                $data['photo_url']=$photos[0];
-                $data['photo_urls']=$photos;
-            }
-        }
         if ($collection === 'temples' && $uploaded && empty($data['image_url'])) $data['image_url']=$uploaded[0]['url'];
         $record=(new ResourceService($collection))->save($data);
         $entityName = (string)($record['name'] ?? $record['slug'] ?? '');
         if ($uploaded) (new MediaService())->recordUsage($uploaded, $collection, (string)($record['id'] ?? ''), $entityName);
         (new AuditLogService())->record('save',$collection,(string)($record['id'] ?? ''),['fields'=>array_keys($data),'uploaded_media'=>count($uploaded)]);
-        $this->flash($collection==='astrologers'?'Consultant profile saved.':'Saved.','success');
+        $this->flash('Saved.','success');
         $this->redirect('/admin/'.$collection);
     }
     private function saveProductRecord(): void{
@@ -372,8 +353,8 @@ final class AdminController extends BaseController {
         return array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', $value) ?: [])));
     }
     private function uploadedMedia(string $collection): array { return (new MediaService())->upload($_FILES['media_files'] ?? [], $this->mediaContext($collection)); }
-    private function mediaFor(string $collection): array { return in_array($collection, ['products','temples','astrologers'], true) ? (new MediaService())->all($this->mediaContext($collection)) : []; }
-    private function mediaContext(string $collection): string { return match($collection){'products'=>'products','temples'=>'temples','astrologers'=>'astrologers',default=>'shared'}; }
+    private function mediaFor(string $collection): array { return in_array($collection, ['products','temples'], true) ? (new MediaService())->all($this->mediaContext($collection)) : []; }
+    private function mediaContext(string $collection): string { return match($collection){'products'=>'products','temples'=>'temples',default=>'shared'}; }
     private function schemaFields(string $collection, array $fallback): array { return (new SchemaService())->adminFields($collection, $fallback); }
     private static function contrast(string $hex1, string $hex2): float {
         $l1 = self::luminance($hex1); $l2 = self::luminance($hex2);

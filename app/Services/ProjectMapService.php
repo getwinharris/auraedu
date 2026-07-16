@@ -7,12 +7,12 @@ final class ProjectMapService {
 
     public const SHARED_CONTROLLERS = ['BaseController'];
     public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter', 'KnowledgeGraphService', 'BrowserSession'];
-    public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'public/_consultation-pricing', 'admin/environment'];
+    public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'admin/environment'];
     public const KNOWN_UNWIRED_COLLECTIONS = ['wallet_transactions', 'media_files'];
 
     public static function registry(): array {
         $routes = [
-            ['method'=>'GET','path'=>'/','name'=>'home','page'=>'public/home','controller'=>'PublicController@home','services'=>['ProductService','AstrologerService','TempleService','CategoryService']],
+            ['method'=>'GET','path'=>'/','name'=>'home','page'=>'public/home','controller'=>'PublicController@home','services'=>['ProductService','TempleService','CategoryService']],
             ['method'=>'GET','path'=>'/about','name'=>'about','page'=>'public/about','controller'=>'PublicController@about','services'=>[]],
             ['method'=>'GET','path'=>'/sri-panchami-education','name'=>'education','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
             ['method'=>'GET','path'=>'/education','name'=>'education.short','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
@@ -25,8 +25,7 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/terms','name'=>'terms','page'=>'public/terms','controller'=>'PublicController@terms','services'=>[]],
             ['method'=>'GET','path'=>'/privacy','name'=>'privacy','page'=>'public/privacy','controller'=>'PublicController@privacy','services'=>[]],
 
-            ['method'=>'GET','path'=>'/consult','name'=>'consult','page'=>'public/consult','controller'=>'PublicController@consult','services'=>['AstrologerService']],
-            ['method'=>'GET','path'=>'/consult/{slug}','name'=>'consult.show','page'=>'public/astrologer','controller'=>'PublicController@consultant','services'=>['AstrologerService']],
+            ['method'=>'GET','path'=>'/consult','name'=>'therapies','page'=>'public/consult','controller'=>'PublicController@therapies','services'=>['ReviewService']],
             ['method'=>'GET','path'=>'/temples','name'=>'temples','page'=>'public/temples','controller'=>'PublicController@temples','services'=>['TempleService']],
             ['method'=>'GET','path'=>'/temples/{slug}','name'=>'temple.show','page'=>'public/temple','controller'=>'PublicController@temple','services'=>['TempleService']],
             ['method'=>'GET','path'=>'/shop','name'=>'shop','page'=>'public/shop','controller'=>'PublicController@shop','services'=>['ProductService','CategoryService']],
@@ -61,7 +60,6 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/account/orders','name'=>'account.orders.legacy','page'=>'account/orders','controller'=>'AccountController@legacyOrders','services'=>['AuthService']],
             ['method'=>'GET','path'=>'/account/orders/{orderId}/invoice','name'=>'account.invoice','page'=>'account/invoice','controller'=>'AccountController@invoice','services'=>['AuthService','OrderService','SettingsService','TaxService']],
             ['method'=>'GET','path'=>'/account/bookings','name'=>'account.bookings.legacy','page'=>'account/bookings','controller'=>'AccountController@legacyBookings','services'=>['AuthService']],
-            ['method'=>'POST','path'=>'/api/consultations/{id}/status','name'=>'api.consultation.status','page'=>'admin/list','controller'=>'ConsultationController@status','services'=>['AuthService','ConsultationService']],
             ['method'=>'GET','path'=>'/admin','name'=>'admin.dashboard','page'=>'admin/dashboard','controller'=>'AdminController@dashboard','services'=>['OrderService','AppointmentService']],
             ['method'=>'GET','path'=>'/admin/products','name'=>'admin.products','page'=>'admin/product-form','controller'=>'AdminController@products','services'=>['ProductService','SchemaService']],
             ['method'=>'GET','path'=>'/admin/categories','name'=>'admin.categories','page'=>'admin/resource','controller'=>'AdminController@categories','services'=>['CategoryService']],
@@ -70,9 +68,7 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/admin/orders/{id}','name'=>'admin.order.show','page'=>'admin/detail','controller'=>'AdminController@order','services'=>['OrderService','ShippingService']],
             ['method'=>'POST','path'=>'/admin/orders/{id}/status','name'=>'admin.order.status','page'=>'admin/detail','controller'=>'AdminController@saveOrderStatus','services'=>['OrderService','MailQueueService','AuditLogService']],
             ['method'=>'GET','path'=>'/admin/shipping','name'=>'admin.shipping','page'=>'admin/settings','controller'=>'AdminController@shipping','services'=>['ShippingService','SettingsService']],
-            ['method'=>'GET','path'=>'/admin/astrologers','name'=>'admin.astrologers','page'=>'admin/astrologer-form','controller'=>'AdminController@astrologers','services'=>['AstrologerService','SchemaService']],
             ['method'=>'GET','path'=>'/admin/appointments','name'=>'admin.appointments','page'=>'admin/list','controller'=>'AdminController@appointments','services'=>['AppointmentService']],
-            ['method'=>'GET','path'=>'/admin/consultation-analytics','name'=>'admin.consultation-analytics','page'=>'admin/consultation-analytics','controller'=>'AdminController@consultationAnalytics','services'=>['ConsultationService']],
             ['method'=>'GET','path'=>'/admin/tax-report','name'=>'admin.tax-report','page'=>'admin/tax-report','controller'=>'AdminController@taxReport','services'=>['OrderService','TaxService']],
             ['method'=>'GET','path'=>'/admin/temples','name'=>'admin.temples','page'=>'admin/resource','controller'=>'AdminController@temples','services'=>['TempleService','SchemaService']],
             ['method'=>'GET','path'=>'/admin/settings','name'=>'admin.settings','page'=>'admin/settings','controller'=>'AdminController@settings','services'=>['SettingsService']],
@@ -103,8 +99,6 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/admin/categories/delete','name'=>'admin.categories.delete','page'=>'admin/resource','controller'=>'AdminController@deleteCategory','services'=>['ResourceService','AuditLogService']],
             ['method'=>'POST','path'=>'/admin/coupons/save','name'=>'admin.coupons.save','page'=>'admin/resource','controller'=>'AdminController@saveCoupon','services'=>['ResourceService','AuditLogService']],
             ['method'=>'POST','path'=>'/admin/coupons/delete','name'=>'admin.coupons.delete','page'=>'admin/resource','controller'=>'AdminController@deleteCoupon','services'=>['ResourceService','AuditLogService']],
-            ['method'=>'POST','path'=>'/admin/astrologers/save','name'=>'admin.astrologers.save','page'=>'admin/astrologer-form','controller'=>'AdminController@saveAstrologer','services'=>['ResourceService','AuditLogService']],
-            ['method'=>'POST','path'=>'/admin/astrologers/delete','name'=>'admin.astrologers.delete','page'=>'admin/astrologer-form','controller'=>'AdminController@deleteAstrologer','services'=>['ResourceService','AuditLogService']],
             ['method'=>'POST','path'=>'/admin/temples/save','name'=>'admin.temples.save','page'=>'admin/resource','controller'=>'AdminController@saveTemple','services'=>['ResourceService','AuditLogService']],
             ['method'=>'POST','path'=>'/admin/temples/delete','name'=>'admin.temples.delete','page'=>'admin/resource','controller'=>'AdminController@deleteTemple','services'=>['ResourceService','AuditLogService']],
             ['method'=>'POST','path'=>'/admin/integrations/save','name'=>'admin.integrations.save','page'=>'admin/integrations','controller'=>'AdminController@saveIntegrations','services'=>['SecretService','AuditLogService']],
@@ -115,8 +109,6 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/payment/verify','name'=>'payment.verify','page'=>'public/checkout','controller'=>'CommerceController@verifyPayment','services'=>['SecretService','PaymentService','DatabaseService','TaxService','SettingsService']],
             ['method'=>'POST','path'=>'/create-order','name'=>'api.checkout.create-order','page'=>'public/checkout','controller'=>'CommerceController@createOrder','services'=>['SecretService','PaymentService']],
             ['method'=>'POST','path'=>'/verify-payment','name'=>'api.payment.verify','page'=>'public/checkout','controller'=>'CommerceController@verifyPayment','services'=>['SecretService','PaymentService','DatabaseService','TaxService','SettingsService']],
-            ['method'=>'POST','path'=>'/consultation/initiate','name'=>'consultation.initiate','page'=>'public/astrologer','controller'=>'ConsultationController@initiate','services'=>['AuthService','AstrologerService','ResourceService','MailQueueService']],
-            ['method'=>'POST','path'=>'/reviews/astrologer','name'=>'reviews.astrologer','page'=>'account/bookings','controller'=>'ReviewController@saveAstrologer','services'=>['ReviewService']],
             ['method'=>'POST','path'=>'/reviews/product','name'=>'reviews.product','page'=>'account/orders','controller'=>'ReviewController@saveProduct','services'=>['ReviewService']],
             ['method'=>'GET','path'=>'/support','name'=>'support.page','page'=>'public/support','controller'=>'SupportController@page','services'=>['SeoService']],
             ['method'=>'POST','path'=>'/support/ask','name'=>'support.ask','page'=>'public/support','controller'=>'SupportController@ask','services'=>['SupportBotService','AgentContextService','SupportTicketService']],
@@ -245,14 +237,13 @@ final class ProjectMapService {
             '/blog'           => 'Blog listing — all posts with category filters',
             '/blog/{slug}'    => 'Blog post — rendered from GitHub-sourced markdown',
             '/blog/category/{slug}' => 'Blog listing filtered by category',
-            '/'                => 'Home page — hero, categories, featured products, astrologers',
+            '/'                => 'Home page — hero, categories, featured products',
             '/about'           => 'About AuraEdu — story, values, CTA',
             '/sri-panchami-education' => 'AuraEdu landing page',
             '/education'        => 'Short education landing redirect-equivalent page',
             '/terms'           => 'Terms of Service — 15 sections, legal',
             '/privacy'         => 'Privacy Policy — 14 sections, data handling',
-            '/consult'         => 'Astrologer marketplace — browse and book',
-            '/consult/{slug}'  => 'Consultant profile — request a scheduled appointment',
+            '/consult'         => 'Therapies & treatments overview',
             '/temples'         => 'Temple listing page',
             '/temples/{slug}'  => 'Temple detail page',
             '/shop'            => 'Product shop — grid with pill actions',
@@ -282,13 +273,11 @@ final class ProjectMapService {
             '/verify-payment'  => 'API checkout — verify payment',
             '/account/dashboard' => 'Account dashboard entry — redirects to orders',
             '/account/dashboard/orders' => 'My Orders — product reviews',
-            '/account/dashboard/sessions' => 'My Sessions — astrologer bookings',
+            '/account/dashboard/sessions' => 'My Sessions — appointment bookings',
             '/account/dashboard/install' => 'Install App — customer installation guidance',
             '/account/orders'  => 'Legacy account orders redirect',
             '/account/bookings' => 'Legacy account sessions redirect',
-            '/api/consultations/{id}/status|POST' => 'API — update appointment status',
-            '/consultation/initiate|POST' => 'Request a scheduled consultant appointment',
-            '/reviews/astrologer|POST' => 'Submit astrologer review',
+            '/reviews/product|POST'    => 'Submit product review',
             '/reviews/product|POST'    => 'Submit product review',
             '/support/ask|POST' => 'Support bot — AI-powered Q&A',
             '/api/support/latest-message|GET' => 'Support — latest ticket message for TTS polling',
@@ -301,9 +290,7 @@ final class ProjectMapService {
             '/admin/orders/{id}' => 'Admin — order detail, status update',
             '/admin/orders/{id}/status|POST' => 'Admin — update order status + email',
             '/admin/shipping'   => 'Admin — shipping settings',
-            '/admin/astrologers' => 'Admin — manage astrologers',
             '/admin/appointments' => 'Admin — session list',
-            '/admin/consultation-analytics' => 'Admin — consultation metrics',
             '/admin/temples'    => 'Admin — manage temples',
             '/admin/settings'   => 'Admin — site settings',
             '/admin/settings/save|POST' => 'Admin — save settings',
@@ -328,8 +315,6 @@ final class ProjectMapService {
             '/admin/categories/delete|POST' => 'Admin — delete category',
             '/admin/coupons/save|POST' => 'Admin — create/update coupon',
             '/admin/coupons/delete|POST' => 'Admin — delete coupon',
-            '/admin/astrologers/save|POST' => 'Admin — create/update astrologer',
-            '/admin/astrologers/delete|POST' => 'Admin — delete astrologer',
             '/admin/temples/save|POST' => 'Admin — create/update temple',
             '/admin/temples/delete|POST' => 'Admin — delete temple',
             '/admin/integrations/save|POST' => 'Admin — save integration secrets',
@@ -610,7 +595,7 @@ final class ProjectMapService {
     private static function applyManualOverrides(array &$mapping): void {
         $overrides = [
             'AgentContextService' => ['users', 'orders', 'appointments', 'support_tickets'],
-            'DatabaseService' => ['users', 'addresses', 'products', 'orders', 'appointments', 'consultation_messages', 'consultation_signals', 'secrets', 'mail_inbox', 'mail_outbox', 'contact_submissions'],
+            'DatabaseService' => ['users', 'addresses', 'products', 'orders', 'appointments', 'secrets', 'mail_inbox', 'mail_outbox', 'contact_submissions'],
         ];
         foreach ($overrides as $service => $cols) {
             $existing = $mapping[$service] ?? [];

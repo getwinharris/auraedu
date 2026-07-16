@@ -1,0 +1,69 @@
+{
+  "issue": 2,
+  "role": "cto",
+  "next_role": "worker",
+  "objectives": [
+    {
+      "id": "OBJ-CLEANUP-1",
+      "status": "gap",
+      "evidence": ["📁 routes: GET /consult, GET /consult/{slug} in index.php", "📄 controllers: PublicController@consultant(), ConsultationController, ReviewController@saveAstrologer()", "📄 services: AstrologerService.php (entire file), ConsultationService.php", "📄 views: consult.php, astrologer.php, account/bookings.php, admin/astrologer-form.php", "📄 schema: astrologers collection (26 fields), astrologer_slug on users/appointments", "🎨 CSS: .astrologer-* (68 lines) + .astro-market-* (263 lines) in band.css", "🖼️ images: assets/images/astrologers/ (60+ files)"],
+      "browser_evidence": [],
+      "unresolved": ["Need to decide: remove or repurpose consultation system for medical therapy booking?"]
+    },
+    {
+      "id": "OBJ-CLEANUP-2",
+      "status": "gap",
+      "evidence": ["📁 routes: GET /temples, GET /temples/{slug} in index.php", "📄 views: temples.php, temple.php", "📄 schema: temples collection (12 fields)", "🖼️ images: assets/images/temples/, hero-temple-bg.*"],
+      "browser_evidence": [],
+      "unresolved": ["Repurpose temples → hospital. Change route from /temples to /hospital. Update views, schema, images."]
+    },
+    {
+      "id": "OBJ-CLEANUP-3",
+      "status": "gap",
+      "evidence": ["📄 views: spiritual.php (entire page)", "📄 copy on: about.php, contact.php, support.php, login.php, register.php, reset-password.php", "📄 copy on: shop.php, product.php (devotional references)"],
+      "browser_evidence": [],
+      "unresolved": ["Rewrite all devotional/spiritual copy to medical education language"]
+    },
+    {
+      "id": "OBJ-CLEANUP-4",
+      "status": "gap",
+      "evidence": ["📄 content/legal/terms.md — 'entertainment-oriented guidance' inappropriate for medical institute"],
+      "browser_evidence": [],
+      "unresolved": ["Rewrite terms for medical education institute"]
+    },
+    {
+      "id": "OBJ-CLEANUP-5",
+      "status": "gap",
+      "evidence": ["🎨 band.css: ~400 lines of .astrologer-* and .astro-* CSS classes", "🖼️ assets/images/astrologers/ (60+ files)", "🖼️ assets/images/temples/ + hero-temple-bg.*"],
+      "browser_evidence": [],
+      "unresolved": ["Remove astrologer images, remove/replace temple images, rewrite CSS classes"]
+    },
+    {
+      "id": "OBJ-CLEANUP-6",
+      "status": "gap",
+      "evidence": ["📄 docs/systematic-map.mmd has stale references", "📄 docs/map.mmd has stale references"],
+      "browser_evidence": [],
+      "unresolved": ["Run map generation, validate, commit"]
+    },
+    {
+      "id": "OBJ-CLEANUP-7",
+      "status": "gap",
+      "evidence": ["Need to verify no legacy text on live site"],
+      "browser_evidence": [],
+      "unresolved": ["Run smoke test, browser check live site"]
+    }
+  ],
+  "files_changed": [],
+  "commands_run": [
+    "php cli/bapXaura map",
+    "php cli/bapXaura schema list",
+    "comprehensive grep/glob search across all files for astrologer, temple, spiritual, pooja, rudraksha, vedic references"
+  ],
+  "risks": [
+    "Removing astrologer schema may break existing user references (astrologer_slug field on users table)",
+    "Existing appointment/consultation data references astrologers — need data migration strategy",
+    "CSS class renaming may cause layout breaks if some .astro-* classes are reused",
+    "Legal terms rewrite must maintain legal validity",
+    "Routes changes need index.php update + .htaccess if applicable"
+  ]
+}

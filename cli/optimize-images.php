@@ -54,14 +54,6 @@ echo "\n=== PRODUCT IMAGES (resize 800x800) ===\n";
 $prodDir = __DIR__ . '/../assets/images/products';
 convertDir($opt, $prodDir, ['png', 'jpg', 'jpeg'], ['max_width' => 800, 'max_height' => 800, 'quality' => 80]);
 
-echo "\n=== TEMPLE IMAGES (resize 1200x800) ===\n";
-$templeDir = __DIR__ . '/../assets/images/temples';
-convertDir($opt, $templeDir, ['png', 'jpg', 'jpeg'], ['max_width' => 1200, 'max_height' => 800, 'quality' => 80]);
-
-echo "\n=== ASTROLOGER CLIENT IMAGES (resize 480x640) ===\n";
-$astroDir = __DIR__ . '/../assets/images/astrologers/client';
-convertDir($opt, $astroDir, ['png', 'jpg', 'jpeg'], ['max_width' => 480, 'max_height' => 640, 'quality' => 80]);
-
 echo "\n=== MEDIA LIBRARY IMAGES (resize 1200x1200) ===\n";
 $mediaDir = __DIR__ . '/../assets/images/media';
 if (is_dir($mediaDir)) {
@@ -91,7 +83,6 @@ if (is_dir($mediaDir)) {
 
 echo "\n=== LARGE ROOT IMAGES ===\n";
 $rootImages = [
-    __DIR__ . '/../assets/images/hero-temple-bg.png',
     __DIR__ . '/../assets/images/varahi-amman.png',
     __DIR__ . '/../assets/images/logo.jpeg',
     __DIR__ . '/../assets/images/logo-square.jpeg',

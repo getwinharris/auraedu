@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-use App\Services\{BlogService,ProductService,AstrologerService,TempleService,CategoryService,SecretService,SeoService,ContactService,ReviewService,MarkdownRenderer};
+use App\Services\{BlogService,ProductService,CategoryService,SecretService,SeoService,ContactService,ReviewService,MarkdownRenderer};
 final class PublicController extends BaseController {
     
     public function home(): void {
@@ -8,11 +8,9 @@ final class PublicController extends BaseController {
         $this->seoKey = 'home';
         try { $categories = (new CategoryService())->all(); } catch (\Throwable $e) { $categories = []; }
         try { $products = (new ProductService())->all(); } catch (\Throwable $e) { $products = []; }
-        try { $astrologers = (new AstrologerService())->all(); } catch (\Throwable $e) { $astrologers = []; }
         try { $temples = (new TempleService())->all(); } catch (\Throwable $e) { $temples = []; }
         $this->render('public/home', [
             'products' => $products,
-            'astrologers' => $astrologers,
             'temples' => $temples,
             'categories' => $categories,
         ]);
@@ -129,27 +127,13 @@ final class PublicController extends BaseController {
         $this->render('public/privacy', ['document' => $this->markdownDocument('content/legal/privacy.md')]);
     }
     
-    public function consult(): void {
+    public function therapies(): void {
         $this->detectApiRequest();
         $this->seoKey = 'consult';
         $reviews = new ReviewService();
-        $this->render('public/consult', ['items' => (new AstrologerService())->all(), 'reviews' => $reviews]);
+        $this->render('public/consult', ['items' => [], 'reviews' => $reviews]);
     }
-    
-    public function consultant(string $slug): void {
-        $this->detectApiRequest();
-        $astrologer = (new AstrologerService())->findBySlug($slug);
-        $this->seoKey = 'astrologer';
-        $exp = !empty($astrologer['experience_years']) ? ' with ' . $astrologer['experience_years'] . ' years of experience' : '';
-        $this->seoOverrides = [
-            'title' => ($astrologer['name'] ?? 'Astrologer') . ' – Vedic Astrologer Online Consultation at AuraEdu',
-            'description' => 'Request a scheduled appointment with ' . ($astrologer['name'] ?? 'an experienced consultant') . '.' . (!empty($astrologer['speciality']) ? ' ' . $astrologer['speciality'] . '.' : '') . $exp,
-            'og_image' => $astrologer['photo_url'] ?? '',
-        ];
-        $reviewSummary = (new ReviewService())->summary('astrologer', $slug);
-        $this->render('public/astrologer', compact('slug', 'astrologer', 'reviewSummary'));
-    }
-    
+
     public function temples(): void { 
         $this->detectApiRequest();
         $this->seoKey = 'temples';

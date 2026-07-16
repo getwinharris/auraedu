@@ -8,7 +8,7 @@
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto var(--space-md);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     <h3 style="font-family:var(--font-serif); margin:0 0 var(--space-sm);">No Bookings Yet</h3>
                     <p style="color:var(--color-text-muted); margin-bottom:var(--space-lg);">Request a private appointment with one of our consultants.</p>
-                    <a href="/consult" class="btn btn-primary">Browse Consultants</a>
+                    <a href="/consult" class="btn btn-primary">Browse Services</a>
                 </div>
             <?php else: ?>
                 <div class="table-wrap">
@@ -19,7 +19,7 @@
                             <?php $status = $booking['status'] ?? ''; ?>
                             <tr>
                                 <td><?= e(trim(($booking['date'] ?? '') . ' ' . ($booking['time'] ?? ''))) ?></td>
-                                <td><?= e($booking['astrologer_name'] ?? $booking['astrologer_slug'] ?? '') ?></td>
+                                <td><?= e($booking['practitioner_name'] ?? $booking['practitioner_slug'] ?? '') ?></td>
                                 <td><?= e($booking['phone'] ?? '') ?></td>
                                 <td><?= e($booking['notes'] ?? '') ?></td>
                                 <td>
@@ -28,15 +28,15 @@
                                 <td>
                                     <?php if(in_array($status, ['session_ended', 'completed'], true)): ?>
                                         <?php $reviewRowId = $booking['id'] ?? bin2hex(random_bytes(4)); ?>
-                                        <form class="review-inline-form" action="/reviews/astrologer" method="post">
-                                            <input type="hidden" name="target_type" value="astrologer">
-                                            <input type="hidden" name="target_slug" value="<?= e($booking['astrologer_slug'] ?? '') ?>">
+                                        <form class="review-inline-form" action="/reviews/product" method="post">
+                                            <input type="hidden" name="target_type" value="product">
+                                            <input type="hidden" name="target_slug" value="<?= e($booking['practitioner_slug'] ?? '') ?>">
                                             <input type="hidden" name="source_id" value="<?= e($booking['id'] ?? '') ?>">
                                             <input type="hidden" name="redirect" value="/account/dashboard/sessions">
-                                            <div class="star-rating-input" aria-label="Rate astrologer out of 5">
+                                            <div class="star-rating-input" aria-label="Rate practitioner out of 5">
                                                 <?php for($i=5;$i>=1;$i--): ?>
-                                                    <input id="astro-<?= e($reviewRowId) ?>-<?= $i ?>" type="radio" name="rating" value="<?= $i ?>" required>
-                                                    <label for="astro-<?= e($reviewRowId) ?>-<?= $i ?>" title="<?= $i ?> stars">★</label>
+                                                    <input id="prac-<?= e($reviewRowId) ?>-<?= $i ?>" type="radio" name="rating" value="<?= $i ?>" required>
+                                                    <label for="prac-<?= e($reviewRowId) ?>-<?= $i ?>" title="<?= $i ?> stars">★</label>
                                                 <?php endfor; ?>
                                             </div>
                                             <textarea name="review" placeholder="Write a short review"></textarea>

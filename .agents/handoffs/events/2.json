@@ -1,0 +1,74 @@
+{
+  "event_type": "issues.opened",
+  "issue": 2,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "cleanup: remove all legacy astrologer/temple/spiritual content — reposition for Aura Medical Institute",
+    "body": "Codebase audit reveals ~150+ legacy references to astrology, temples, pooja, rudraksha, and Vedic spirituality throughout the AuraEdu codebase. Full evidence in issue #2.",
+    "labels": ["enhancement"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-CLEANUP-1",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-2",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-3",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-4",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-5",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-6",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    },
+    {
+      "id": "OBJ-CLEANUP-7",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": ["Handoff created — awaiting CTO analysis and routing"]
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

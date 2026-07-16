@@ -7,7 +7,7 @@
             <div class="not-found-copy">
                 <span class="eyebrow serif-accent">Page not found</span>
                 <h1>The path you opened is not available.</h1>
-                <p class="lede">Return to the education store, browse consultations, or contact AuraEdu for help finding the right page.</p>
+                <p class="lede">Return to the education store, browse services, or contact AuraEdu for help finding the right page.</p>
                 <div class="not-found-actions">
                     <a href="/" class="btn btn-primary">Home</a>
                     <a href="/shop" class="btn btn-outline">Shop</a>
