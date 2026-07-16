@@ -1,59 +1,39 @@
 {
-  "schema_version": "1.0",
-  "event_id": "EVT-CURRENT",
-  "workflow_id": "WF-ISSUE-2",
-  "issue": 2,
-  "from_role": "final_verifier",
-  "to_role": "merge_bot",
-  "status": "completed",
-  "owner": {
-    "github": "getwinharris",
-    "notify": false,
-    "reason": null
+  "event_type": "issues.opened",
+  "issue": 5,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
+  },
+  "payload": {
+    "title": "bug: /agent/* routes return 404 — missing phpRoutes entry in index.php",
+    "body": "## Bug Report\n\n### Description\nAll `/agent/*` web routes return 404 (Page not found) because `/agent` is not registered in the `$phpRoutes` list in `index.php`.\n\n### Affected endpoints\n- `GET /agent/status` — Agent runtime status\n- `POST /agent/webhook` — GitHub webhook receiver\n- `GET /agent/handoffs` — List handoff events\n- `POST /agent/prompt` — Role-based AI prompt execution\n\n### Root cause\n`index.php:107` lists all PHP-routed paths. `/agent` is missing. The route matching logic uses `strpos($uri, $route . '/') === 0`, so adding `'/agent'` to the array covers all `/agent/*` subpaths.\n\n### Evidence\n```\n$ curl -s http://localhost:8080/agent/status\nHTTP/1.1 404 Not Found  (returns HTML page, not JSON)\n```\n\n### Fix\nAdd `'/agent'` to the `$phpRoutes` array in `index.php`.\n\n### Routes already correctly registered (verified)\n`/api/agent` — works via API router\n`/admin/agent` — works via admin prefix match",
+    "labels": []
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
   },
   "objectives": [
     {
-      "id": "OBJ-CLEANUP-1",
-      "status": "pass",
-      "evidence": [
-        "Deleted ConsultationController, AstrologerService, astrologer views, admin forms",
-        "Removed all astrologer routes from ProjectMapService and index.php",
-        "756 lines of astrologer CSS removed",
-        "68 astrologer image files deleted"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "OBJ-CLEANUP-2",
-      "status": "pass",
-      "evidence": [
-        "Temple→Hospital labels in admin nav",
-        "Temple schema preserved for backward compat",
-        "Route descriptions updated"
-      ],
+      "id": "OBJ-5-1",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
       "unresolved": [
-        "Temple→Hospital views/content rewrite deferred to content migration"
+        "Handoff created - awaiting CTO"
       ]
     }
   ],
-  "files_changed": [
-    "AGENTS.md",
-    ".agents/workflows/routing.yaml",
-    ".agents/workflows/cto-workflow.md",
-    ".agents/workflows/worker.md",
-    ".agents/workflows/reviewer.md",
-    ".agents/workflows/documenter.md",
-    ".agents/workflows/handoff.schema.json"
-  ],
-  "commands_run": [
-    "bapXaura update",
-    "bapXaura ci"
-  ],
-  "risks": [
-    "MySQL 'temples' table still uses old name — rename blocked until remote DB access"
-  ],
-  "workflow": {
-    "current_role": "merge_bot",
-    "next_role": "deployment"
+  "telemetry": {
+    "started_at": "2026-07-16T22:14:33.074Z",
+    "handoffs_completed": 0
   }
 }
