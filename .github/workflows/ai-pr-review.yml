@@ -49,16 +49,19 @@ jobs:
             $apiKey = getenv("BAPX_AI_API_KEY") ?: "";
             $model = getenv("BAPX_AI_MODEL") ?: "";
             if ($endpoint === "" || $apiKey === "") {
+              $appUrl = getenv("APP_URL");
+              if ($appUrl === "") { echo "Skip: APP_URL not set, no AI endpoint configured.\n"; exit(0); }
               $payload = json_encode(["message" => $msg, "source" => "pr-review"]);
-              $ch = curl_init(getenv("APP_URL") . "/api/agent");
+              $ch = curl_init($appUrl . "/api/agent");
               curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
                 CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
-                CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 60
+                CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 15
               ]);
               $resp = curl_exec($ch);
               $body = curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200 ? json_decode($resp, true)["answer"] ?? "" : "";
               curl_close($ch);
+              if ($body === "") { echo "Skip: empty AI response.\n"; exit(0); }
               echo $body;
             } else {
               $provider = str_contains($endpoint, "googleapis") ? "google" : "openai";
