@@ -1,25 +1,28 @@
 ---
 type: blog
-title: New Features at Sri Panchami Spiritual — July 2026 Update
+title: "Aura Medical — July 2026 Update"
 slug: new-features-july-2026
 category: news
-author: Sri Panchami Spiritual
+author: Aura Medical Institute
 published: true
-published_at: 2026-07-05
-excerpt: We have simplified consultations to scheduled bookings, improved saved delivery addresses, and expanded customer Help inside the blog.
+published_at: 2026-07-06
+excerpt: New course pages, an admissions guide, and a refreshed campus gallery are now live on the Aura Medical site.
+image_alt: Indian medical students on campus
 ---
-## Scheduled Consultation Bookings
+We have refreshed the Aura Medical website to better serve prospective students and patients.
 
-Choose a consultant and request an appointment with your preferred date, time, phone number, and notes. The consultant can review and manage the request from their panel.
+## New course pages
 
-## Saved Delivery Addresses
+Detailed pages are now available for **B.E.M.S., M.D.E.H., D.Acu, M.Acu, and D.H.M. & C.T.**, with duration, eligibility, and what you will learn.
 
-New accounts include a default delivery address. At checkout, signed-in customers can reuse that address, add more saved addresses, choose a new default, or enter a one-time delivery address.
+## Admissions & eligibility
 
-## Help in the Blog
+A dedicated [Eligibility](/eligibility) page and an [Admissions Guide](/blog/admissions-guide) explain documents, the no-NEET / no-age-bar policy, and how to apply.
 
-Customer guides now appear in the Help category alongside articles and updates. Guides cover account creation, ordering products, booking consultants, payments, and order tracking.
+## Campus gallery
 
-## Faster Shopping
+The [Gallery](/gallery) now shows representative photographs of Indian medical students and campuses, with attribution to free-license sources.
 
-Cart quantities update without a full page reload, checkout uses secure Razorpay payments, and product orders remain available from the account dashboard.
+## Talk to us
+
+Have a question about a programme or a hospital visit? Use the [contact page](/contact) to reach the admissions desk.

@@ -1,13 +1,13 @@
 ---
 type: doc
-title: Temples Module
-description: Owns temple catalog pages and admin temple records.
+title: Hospital Module
+description: Owns hospital/campus pages repurposed from the legacy temples module.
 category: module
 ---
-# Temples Module
+# Hospital Module
 
-Owns temple catalog pages and admin temple records.
+Owns the hospital/campus pages, repurposed from the legacy temples module to present Aura Medical's hospital and facilities.
 
-Main files: `TempleService.php`, `views/public/temples.php`, `views/public/temple.php`, admin resource views.
+Main files: `TempleService.php`, `views/public/temples.php` (rendered as Hospital), admin resource views.
 
-Key checks: temple list/detail pages render real JSON data, no placeholder temple cards are emitted, and configured external map links are safe.
+Key checks: hospital list/detail pages render real data, no placeholder cards are emitted, and configured external map links are safe. Content is framed as hospital care and campus facilities, not religious sites.

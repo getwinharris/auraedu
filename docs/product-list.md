@@ -1,12 +1,12 @@
 ---
 type: doc
 title: Product List
-description: This catalog is based on the product details supplied for the ecommerce store.
+description: Illustrative therapy-product catalog for the Aura Medical shop (acupuncture and electropathy therapy products).
 category: docs
 ---
 # Product List
 
-This catalog is based on the product details supplied for the ecommerce store.
+This catalog is illustrative of the therapy products offered in the Aura Medical shop (acupuncture and electropathy therapy products). Live products are managed in the admin and stored in remote MySQL.
 
 ## Sri Karuppasamy Pendant
 

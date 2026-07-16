@@ -16,7 +16,7 @@ $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png'
 ?>
 <link rel="icon" type="<?= e($__faviconMime) ?>" href="<?= e($__favicon) ?>">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#3a0003">
+<meta name="theme-color" content="#08A900">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AuraEdu">
@@ -43,20 +43,20 @@ $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png'
 <?php
 // Inline critical CSS for instant first paint — header, nav, hero, product cards, mobile nav
 $critical = '
-:root{--color-ink:#222222;--color-ink-light:#3f3f3f;--color-gold:#d1b368;--color-gold-light:#f3e8c9;--color-gold-dark:#b89440;--color-maroon:#3a0003;--color-maroon-deep:#240002;--color-accent:#7a4a35;--color-accent-light:#a67a64;--color-bg:#faf7f0;--color-bg-alt:#f7f0e4;--color-bg-warm:#f6ede4;--color-border:#d8ccb7;--color-border-light:#eadfcd;--color-text-muted:#6a6259;--color-white:#ffffff;--color-success:#2d8a4e;--color-error:#d64045;--color-rating:#d68641;--font-display:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-serif:Georgia,"Times New Roman",serif;--font-accent:"Playfair Display",Georgia,serif;--shadow-sm:0 1px 2px rgba(0,0,0,0.08);--shadow-md:0 2px 8px rgba(0,0,0,0.12);--shadow-lg:0 2px 8px rgba(0,0,0,0.12);--radius-md:8px;--radius-lg:8px;--radius-xl:8px;--radius-pill:999px;--space-xs:0.5rem;--space-sm:0.75rem;--space-md:1rem;--space-lg:1.5rem;--space-xl:2rem;--space-2xl:3rem}
+:root{--color-ink:#454545;--color-ink-light:#5f5f5f;--color-gold:#EF6900;--color-gold-light:#FDEFE2;--color-gold-dark:#C75600;--color-maroon:#08A900;--color-maroon-deep:#00610A;--color-maroon-light:#00A816;--color-accent:#087E82;--color-accent-light:#3FA9AD;--color-bg:#F1F1F1;--color-bg-alt:#FFFFFF;--color-bg-warm:#EAF6F6;--color-border:#D9DEDB;--color-border-light:#ECEFED;--color-text-muted:#5f6b68;--color-white:#ffffff;--color-success:#08A900;--color-error:#d64045;--color-rating:#EF6900;--font-display:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-serif:Georgia,"Times New Roman",serif;--font-accent:"Playfair Display",Georgia,serif;--shadow-sm:0 1px 2px rgba(0,0,0,0.08);--shadow-md:0 2px 8px rgba(0,0,0,0.12);--shadow-lg:0 2px 8px rgba(0,0,0,0.12);--radius-md:8px;--radius-lg:8px;--radius-xl:8px;--radius-pill:999px;--space-xs:0.5rem;--space-sm:0.75rem;--space-md:1rem;--space-lg:1.5rem;--space-xl:2rem;--space-2xl:3rem}
 *,*::before,*::after{box-sizing:border-box;-webkit-font-smoothing:antialiased}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--color-bg);color:var(--color-ink);line-height:1.55;overflow-x:hidden}
 a{color:var(--color-maroon);text-decoration:none}
 img{max-width:100%;height:auto;display:block}
-.site-header{position:relative;top:auto;z-index:100;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--space-lg);min-height:80px;padding:12px 24px;background:rgba(250,247,240,0.98);border-bottom:1px solid rgba(209,179,104,0.45);transition:box-shadow 0.25s ease}
+.site-header{position:relative;top:auto;z-index:100;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--space-lg);min-height:80px;padding:12px 24px;background:rgba(241,241,241,0.98);border-bottom:1px solid rgba(239,105,0,0.35);transition:box-shadow 0.25s ease}
 .site-header.scrolled{box-shadow:var(--shadow-md)}
 .brand{display:flex;align-items:center;gap:var(--space-xs);color:var(--color-ink);font-weight:700;font-size:1rem;text-decoration:none}
- .brand img{width:40px;height:40px;border-radius:50%;border:2px solid var(--color-gold);object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,0.9) inset}
+ .brand img{width:40px;height:40px;border-radius:50%;border:2px solid var(--color-maroon);object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,0.9) inset}
 nav{display:flex;gap:var(--space-lg);font-size:0;justify-content:center}
 nav a{position:relative;font-weight:500;color:var(--color-ink);padding:var(--space-xs) 0;font-size:0.9rem;text-decoration:none}
 nav a:hover,nav a[aria-current="page"]{color:var(--color-ink)}
-nav a[aria-current="page"]::after{position:absolute;right:0;bottom:-7px;left:0;height:2px;border-radius:999px;background:var(--color-gold);content:""}
+nav a[aria-current="page"]::after{position:absolute;right:0;bottom:-7px;left:0;height:2px;border-radius:999px;background:var(--color-maroon);content:""}
 .nav-dropdown{position:relative;display:inline-flex}
 .nav-dropdown__trigger{padding-right:4px!important;cursor:default}
 .nav-dropdown__arrow{font-size:0.65rem;margin-left:2px;opacity:0.6}
@@ -76,7 +76,7 @@ main{padding-bottom:0}
 .container{max-width:1300px;margin:0 auto;padding:0 var(--space-xl)}
 .section{padding:64px 0}
 .section--alt{background:var(--color-bg-alt)}
-.home-hero{position:relative;min-height:90vh;padding:64px 5vw;background:var(--color-maroon-deep);color:var(--color-white);overflow:hidden}
+.home-hero{position:relative;min-height:90vh;padding:64px 5vw;background:linear-gradient(135deg,var(--color-maroon) 0%,var(--color-accent) 100%);color:var(--color-white);overflow:hidden}
 .hero-copy h1{font-family:Inter,system-ui,sans-serif;font-size:1.75rem;line-height:1.2;margin:0 0 var(--space-md);color:var(--color-ink)}
 .lede{font-size:1rem;line-height:1.7;color:var(--color-text-muted);margin-bottom:var(--space-lg)}
  .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-xs);min-height:48px;padding:0 24px;border-radius:8px;font-weight:600;cursor:pointer;border:0;text-decoration:none;font-size:0.85rem;white-space:nowrap;line-height:1.4;transition:background 0.2s ease,border-color 0.2s ease}
@@ -116,14 +116,14 @@ main{padding-bottom:0}
 .panel:hover{box-shadow:var(--shadow-md)}
 .astrologer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-xl)}
  .astrologer-card{background:var(--color-white);border:1px solid var(--color-border);border-radius:18px;overflow:hidden;transition:all 0.3s ease;box-shadow:var(--shadow-sm)}
-.astrologer-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-xl);border-color:rgba(58, 0, 3,0.65)}
-.astrologer-card__media{position:relative;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(180deg,rgba(34, 34, 34,0.02),rgba(34, 34, 34,0.08)),linear-gradient(135deg,rgba(58, 0, 3,0.12),rgba(255,255,255,0.2))}
+.astrologer-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-xl);border-color:rgba(8, 169, 0,0.65)}
+.astrologer-card__media{position:relative;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(180deg,rgba(69, 69, 69,0.02),rgba(69, 69, 69,0.08)),linear-gradient(135deg,rgba(8, 169, 0,0.12),rgba(255,255,255,0.2))}
  .astrologer-card__photo{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transform:scale(1.01)}
 .astrologer-card__media::after{content:\'\';position:absolute;inset:auto 0 0 0;height:42%;background:linear-gradient(180deg,rgba(18,12,8,0),rgba(18,12,8,0.28));pointer-events:none}
 .astrologer-card__media-badge{position:absolute;left:var(--space-sm);bottom:var(--space-sm);z-index:1;padding:0.3rem 0.65rem;border-radius:var(--radius-pill);background:rgba(34, 34, 34,0.78);color:var(--color-white);font-size:0.64rem;letter-spacing:0.08em;text-transform:uppercase;backdrop-filter:blur(8px)}
 .astrologer-card__body--portrait{padding:var(--space-md) var(--space-md) var(--space-sm);display:grid;gap:var(--space-xs)}
 .astrologer-card__title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-sm)}
-.astrologer-card__status{padding:0.22rem 0.55rem;border-radius:var(--radius-pill);background:rgba(58, 0, 3,0.16);color:var(--color-maroon);font-size:0.64rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.astrologer-card__status{padding:0.22rem 0.55rem;border-radius:var(--radius-pill);background:rgba(8, 169, 0,0.16);color:var(--color-maroon);font-size:0.64rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
 .astrologer-card__speciality{margin:0;color:var(--color-text-muted);font-size:0.84rem}
 .astrologer-card__bio{margin:0;color:var(--color-ink);font-size:0.83rem;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .astrologer-card__meta{display:flex;flex-wrap:wrap;gap:var(--space-xs);font-size:0.72rem;color:var(--color-text-muted)}
@@ -138,7 +138,7 @@ main{padding-bottom:0}
 .btn-message{background:#3b82f6;color:white;border:none;padding:0.5rem 1rem;border-radius:var(--radius-pill);font-weight:600;cursor:pointer;font-size:0.85rem}
  .category-grid{grid-template-columns:repeat(auto-fit,minmax(180px,220px));justify-content:center;gap:var(--space-xl);max-width:760px;margin:0 auto}
  .category-card{cursor:pointer;transition:all 0.3s ease;text-align:center;text-decoration:none;color:var(--color-ink)}
- .category-img-wrap{width:clamp(124px,14vw,178px);height:clamp(124px,14vw,178px);border-radius:50%;overflow:hidden;margin:0 auto var(--space-xs);border:4px solid var(--color-white);background:radial-gradient(circle at 50% 50%,rgba(224, 11, 65,0.92),rgba(34, 34, 34,0.96));box-shadow:0 4px 15px rgba(34, 34, 34,0.1)}
+  .category-img-wrap{width:clamp(124px,14vw,178px);height:clamp(124px,14vw,178px);border-radius:50%;overflow:hidden;margin:0 auto var(--space-xs);border:4px solid var(--color-white);background:radial-gradient(circle at 50% 50%,rgba(8,169,0,0.92),rgba(69,69,69,0.96));box-shadow:0 4px 15px rgba(69, 69, 69,0.1)}
  .category-img-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .temple-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(720px,82vw);gap:var(--space-xl);max-width:1300px;margin:0 auto;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 0 var(--space-md)}
 .temple-slide{display:grid;grid-template-columns:minmax(280px,0.85fr) minmax(320px,1fr);align-items:stretch;gap:var(--space-xl);scroll-snap-align:center;min-height:320px}
@@ -156,7 +156,7 @@ main{padding-bottom:0}
 .astrologer-card,.panel{border-color:var(--color-border-light);border-radius:var(--radius-md);box-shadow:none}
 .astrologer-card:hover,.panel:hover{transform:none;border-color:var(--color-border);box-shadow:var(--shadow-md)}
 .support-fab{background:var(--color-maroon);box-shadow:var(--shadow-md)}
-.site-footer{background:var(--color-maroon);color:var(--color-gold-light);padding:var(--space-2xl) 0 var(--space-md);font-size:0.85rem;border-top:1px solid var(--color-gold)}
+.site-footer{background:var(--color-maroon-deep);color:var(--color-gold-light);padding:var(--space-2xl) 0 var(--space-md);font-size:0.85rem;border-top:1px solid var(--color-gold)}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:var(--space-xl);margin-bottom:var(--space-xl)}
 .footer-brand{font-family:Inter,system-ui,sans-serif;font-size:1.2rem;color:var(--color-gold);font-weight:600;display:block;margin-bottom:var(--space-xs)}
 .footer-desc{font-size:0.85rem;line-height:1.6;opacity:0.7}
@@ -226,11 +226,11 @@ echo $critical;
 <style>
 <?php
 $__palette_semantic = [
-    '--color-primary' => ['set' => ($__settings['palette_primary'] ?? '#3A0003'), 'alias' => '--color-maroon'],
-    '--color-secondary' => ['set' => ($__settings['palette_secondary'] ?? '#D1B368'), 'alias' => '--color-gold'],
-    '--color-canvas' => ['set' => ($__settings['palette_canvas'] ?? '#FAF7F0'), 'alias' => '--color-bg'],
-    '--color-text-primary' => ['set' => ($__settings['palette_text'] ?? '#222222'), 'alias' => '--color-ink'],
-    '--color-link' => ['set' => ($__settings['palette_link'] ?? '#3A0003'), 'alias' => ''],
+    '--color-primary' => ['set' => ($__settings['palette_primary'] ?? '#08A900'), 'alias' => '--color-maroon'],
+    '--color-secondary' => ['set' => ($__settings['palette_secondary'] ?? '#EF6900'), 'alias' => '--color-gold'],
+    '--color-canvas' => ['set' => ($__settings['palette_canvas'] ?? '#F1F1F1'), 'alias' => '--color-bg'],
+    '--color-text-primary' => ['set' => ($__settings['palette_text'] ?? '#454545'), 'alias' => '--color-ink'],
+    '--color-link' => ['set' => ($__settings['palette_link'] ?? '#08A900'), 'alias' => ''],
 ];
 $__palette_css = ':root{';
 foreach ($__palette_semantic as $__n => $__c) {

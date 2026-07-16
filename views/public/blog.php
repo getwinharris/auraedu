@@ -1,9 +1,9 @@
 <section class="blog-page blog-editorial">
   <div class="container">
     <header class="blog-editorial__header">
-      <span class="eyebrow serif-accent">Ideas, rituals and guidance</span>
-      <h1 class="page-title"><?= e($categoryName ?? 'AuraEdu Journal') ?></h1>
-      <p>Practical education guidance, astrology explainers, and thoughtful updates from our consultants and team.</p>
+      <span class="eyebrow serif-accent">Electropathy · Acupuncture · Allied Health</span>
+      <h1 class="page-title"><?= e($categoryName ?? 'Aura Medical Journal') ?></h1>
+      <p>Programme insights, admissions guidance, and campus updates from Aura Medical Institute of Electropathy and Hospital, Coimbatore.</p>
     </header>
 
     <?php if (!empty($categories)): ?>

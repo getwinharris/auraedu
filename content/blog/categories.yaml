@@ -1,13 +1,19 @@
 categories:
   - slug: news
     name: News & Updates
-    description: Platform news, feature releases, and announcements
-  - slug: spirituality
-    name: Spirituality
-    description: Spiritual guidance, practices, and wisdom
-  - slug: astrology
-    name: Astrology
-    description: Vedic astrology insights and consultations
+    description: Aura Medical announcements, admissions calendar, and campus updates
+  - slug: electropathy
+    name: Electropathy
+    description: Electro-medical sciences, B.E.M.S. and M.D.E.H. programme insights
+  - slug: acupuncture
+    name: Acupuncture
+    description: Acupuncture theory, training, and clinical practice at Aura Medical
+  - slug: admissions
+    name: Admissions
+    description: Eligibility, how to apply, documents, and fees guidance
+  - slug: student-life
+    name: Student Life
+    description: Campus, hostel, hospital training, and student experiences
   - slug: help
     name: Help
-    description: Customer guides for accounts, orders, delivery, payments, and consultant bookings
+    description: Guides for accounts, orders, delivery, payments, and appointments

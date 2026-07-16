@@ -25,9 +25,9 @@
         </div>
         <div class="hero-deity" data-aura-hero>
             <div class="deity-frame">
-                <img class="varahi-slide is-active" src="/assets/images/og-image.jpg" alt="Aura Medical Institute of Electropathy and Hospital, Coimbatore" width="480" height="640" fetchpriority="high">
-                <img class="varahi-slide" src="/assets/images/og-image.jpg" alt="Aura Medical campus and hospital facilities" width="480" height="640" loading="lazy">
-                <img class="varahi-slide" src="/assets/images/og-image.jpg" alt="Acupuncture and electropathy therapy at Aura Medical" width="480" height="640" loading="lazy">
+                <img class="varahi-slide is-active" src="/assets/images/institute/students-campus.jpg" alt="Aura Medical Institute of Electropathy and Hospital, Coimbatore" width="480" height="640" fetchpriority="high">
+                <img class="varahi-slide" src="/assets/images/institute/medical-students.jpg" alt="Aura Medical campus and hospital facilities" width="480" height="640" loading="lazy">
+                <img class="varahi-slide" src="/assets/images/institute/esic-students.jpg" alt="Acupuncture and electropathy therapy at Aura Medical" width="480" height="640" loading="lazy">
             </div>
             <div class="varahi-dots" role="tablist" aria-label="Aura Medical slides">
                 <button class="varahi-dot is-active" type="button" role="tab" aria-label="Slide 1" aria-current="true" data-slide="0"></button>
