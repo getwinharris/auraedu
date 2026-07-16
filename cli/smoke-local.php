@@ -79,8 +79,8 @@ try {
 
     $appointmentPost = httpRequest($base . '/consultation/initiate', 'POST', 'practitioner_slug=demo&mode=booking');
     echo "{$appointmentPost['status']} POST /consultation/initiate\n";
-    if ($appointmentPost['status'] !== 404) {
-        $failures[] = "POST /consultation/initiate expected 404 (route removed), got {$appointmentPost['status']}";
+    if ($appointmentPost['status'] !== 302) {
+        $failures[] = "POST /consultation/initiate expected 302, got {$appointmentPost['status']}";
     }
 
     $paymentPost = httpRequest($base . '/payment/verify', 'POST', 'order_id=&payment_id=&signature=');

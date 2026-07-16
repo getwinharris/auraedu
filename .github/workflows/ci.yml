@@ -26,4 +26,4 @@ jobs:
           php-version: '8.2'
           extensions: curl, json, mbstring, pdo_mysql
       - name: Validate code, tests, maps, and routes
-        run: php cli/bapXaura ci
+        run: ./bapXaura ci
