@@ -43,9 +43,9 @@ try {
         '/checkout' => 200,
         '/contact' => 200,
         '/consult' => 200,
-        '/consult/shrikanth-purushothaman' => 200,
+        '/consult/shrikanth-purushothaman' => 404,
         '/temples' => 200,
-        '/sri-panchami-education' => 200,
+        '/sri-panchami-education' => 301,
         '/forgot-password' => 200,
         '/reset-password' => 200,
         '/auth/google' => 302,
@@ -77,10 +77,10 @@ try {
         $failures[] = "POST /admin/orders/test/status expected 302, got {$post['status']}";
     }
 
-    $appointmentPost = httpRequest($base . '/consultation/initiate', 'POST', 'astrologer_slug=pandit-shastri&mode=text_session');
+    $appointmentPost = httpRequest($base . '/consultation/initiate', 'POST', 'practitioner_slug=demo&mode=booking');
     echo "{$appointmentPost['status']} POST /consultation/initiate\n";
-    if ($appointmentPost['status'] !== 302) {
-        $failures[] = "POST /consultation/initiate expected guest login redirect 302, got {$appointmentPost['status']}";
+    if ($appointmentPost['status'] !== 404) {
+        $failures[] = "POST /consultation/initiate expected 404 (route removed), got {$appointmentPost['status']}";
     }
 
     $paymentPost = httpRequest($base . '/payment/verify', 'POST', 'order_id=&payment_id=&signature=');
