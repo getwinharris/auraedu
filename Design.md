@@ -132,6 +132,20 @@ Keep the existing PHP templates, routes, forms, and JSON-backed behavior. Design
 - Two type families (English + Tamil equivalent) maximum. Reserve orange strictly for CTAs and critical admission info.
 - Labels/metadata: `12px`–`14px`, weight 500-600.
 
+### Scale
+
+| Token | Font | Size | Weight | Line Height | Use |
+|---|---|---|---|---|---|
+| `display` | Bebas Neue | 2.5rem (40px) | 400 | 1.1 | Hero/H1 display |
+| `h2` | Oswald | 1.5rem (24px) | 600 | 1.2 | Section headlines |
+| `h3` | Oswald | 1.2rem (19px) | 600 | 1.25 | Subsection / card titles |
+| `body-md` | Montserrat | 1rem (16px) | 400 | 1.7 | Primary body text |
+| `body-sm` | Montserrat | 0.875rem (14px) | 400 | 1.5 | Secondary body, labels |
+| `label` | Montserrat | 0.8rem (13px) | 600 | 1.4 | Eyebrows, metadata, badges |
+| `tamil` | Noto Sans Tamil | — | 800 | — | Tamil headings |
+
+Principles: display headings keep tight leading (1.05–1.1) for magazine-grade impact; body stays at 1.5–1.7 for long-form readability; weight (500/600) and color shift carry emphasis — no italics on UI text except the decorative `serif-accent` accent.
+
 ## Layout
 
 - Spacing scale: `2, 4, 8, 16, 24, 32, 48, 64px`.
@@ -164,18 +178,18 @@ Rules:
 
 ## Shapes
 
-The radius scale expresses a calm, rounded-but-not-playful geometry:
+The radius scale expresses a calm, rounded-but-not-playful geometry. The scale is tightly disciplined: buttons and inputs use `rounded.md` (14px) or `rounded.pill` (999px); cards and panels use `rounded.lg` (20px); large media frames use `rounded.xl` (32px). Do not soften a card corner to a value between `md` and `lg` for the same component family.
 
 | Token | Value | Use |
 |---|---|---|
-| `rounded.xs` | 4px | Chips, tags, small badges |
-| `rounded.sm` | 8px | Buttons, inputs, standard controls (48px tall) |
-| `rounded.md` | 8px | Repeated photo cards, product cards |
-| `rounded.lg` | 8px | Feature cards, panels |
-| `rounded.xl` | 8px | Hero panels and large media when a radius is needed |
-| `rounded.pill` | 999px | Search bars, filter pills, status badges |
+| `rounded.xs` | 4px | Chips, tags, small badges, inline code |
+| `rounded.sm` | 8px | Sidebar nav items, type badges, compact UI |
+| `rounded.md` | 14px | Buttons, inputs, search pill, product/media cards |
+| `rounded.lg` | 20px | Feature cards, panels, hero image frame, value cards |
+| `rounded.xl` | 32px | Large media frames and featured showcase tiles |
+| `rounded.pill` | 999px | Buttons (primary/secondary/CTA), filter pills, status badges, dots |
 
-Shape should stay consistent within a component family -- don't mix `sm` and `lg` radii on sibling elements of the same card.
+Shape should stay consistent within a component family -- don't mix `md` and `lg` radii on sibling elements of the same card.
 
 ## Components
 
@@ -183,12 +197,14 @@ Shape should stay consistent within a component family -- don't mix `sm` and `lg
 - **Navigation:** the linked brand mark and name are the sole home control. Do not repeat a separate Home item in desktop or mobile navigation.
 - **Mobile commerce tray:** after the cart becomes non-empty, show one fixed green tray above the bottom navigation with item count and a direct View cart action. Use an 8px radius and stable 56px minimum height; update it without page reload.
 - **Editorial media:** every blog post uses one intentional 16:9 image for both its listing thumbnail and article hero. UI guides use a legible screenshot of the exact page, cropped around the relevant interface rather than a decorative stock image, and link the represented page below the article.
-- **Buttons (`button-primary` / `button-secondary` / `button-cta`):** `48px` minimum height, `8px` radius, no uppercase, no letter-spacing. Primary is solid Aura Green; Secondary is teal; CTA is orange for admission/urgent actions. Hover moves from `shadow-md` to `shadow-lg` and lifts 2px, no more. Hover states never shift layout.
+- **Buttons (`button-primary` / `button-secondary` / `button-cta`):** `48px` minimum height, `14px` radius (`rounded.md`) — or `pill` for the marketing CTA row, no uppercase, no letter-spacing. Primary is solid Aura Green (`gradient-gold` via orange CTA variant for admission urgency); Secondary is teal outline; CTA is orange for admission/urgent actions. Hover moves one elevation step and lifts 2–3px, no more. Hover states never shift layout. On the dark hero, `btn-outline` becomes a white-bordered glass pill.
 - **Forms:** white fields (`on-primary`), `8px` radius, `48px` height, clear labels, a single-value focus ring (`--shadow-focus`) -- no glow.
 - **Search/filter:** one rounded (`pill`) search control, or a quiet grouped filter row. No nested cards for filters.
-- **Product cards (`card-product`):** white, `8px` radius, 1px quiet border, stable 1:1 media, concise title and price, then the `- 0 +` quantity control. Do not add a second cart button.
-- **Therapist / faculty cards (`card-therapist`):** white, `8px` radius, face-forward portrait, name, speciality, language/experience metadata, and one clear profile/booking action. Every card uses equal media and content tracks so rows align.
-- **Hero:** institute-led offer — B.E.M.S., admissions, and hospital care over actual campus/hospital imagery. The primary action is `Explore B.E.M.S. Admissions`; therapy shop is secondary. Desktop text is left aligned. Mobile uses one column, a compact image, and must reveal the next content band without requiring a full-screen scroll.
+- **Product cards (`card-product`):** white, `14px` radius (`rounded.md`), 1px quiet border, stable 1:1 media, concise title and price, then the `- 0 +` quantity control. Do not add a second cart button.
+- **Therapist / faculty cards (`card-therapist`):** white, `14px` radius (`rounded.md`), face-forward portrait, name, speciality, language/experience metadata, and one clear profile/booking action. Every card uses equal media and content tracks so rows align.
+- **Hero (`home-hero`):** institute-led offer — B.E.M.S., admissions, and hospital care over actual campus/hospital imagery. The primary action is `Explore B.E.M.S. Admissions`; therapy shop is secondary. Desktop text is left aligned, two-column (copy left, framed student photo right). Mobile uses one column, a compact image, and must reveal the next content band without requiring a full-screen scroll.
+- **Hero band (`hero-band`):** reusable atmospheric gradient band for interior pages (Courses, Eligibility, Scope, Gallery, Faculty). Green→teal gradient (`maroon-deep` → `maroon` → `accent`) with layered radial glows + a soft 26px dot texture for depth. White display headline (`font-display`), gold eyebrow, lede in 92% white. Keep the gradient as the mood and let it breathe — no competing accents inside the band.
+- **Hero image frame:** the student photo sits in a `rounded.lg` (20px) framed panel with a 1px white hairline and a deep diffuse drop shadow (`0 24px 48px -8px rgba(0,0,0,0.35)`), `object-fit: cover` so it reads as a featured panel, not a floating logo.
 - **Authentication:** login and registration are task pages, not marketing pages. Use a centered form surface, suppress the public footer, and keep the complete form visible on common mobile heights.
 - **Consultation discovery:** search and language controls form one quiet toolbar. Results render immediately without reveal animations or low-opacity loading states. Empty and filtered states explain the next action.
 - **Account:** use a persistent internal menu and one unframed content region. Orders, sessions, addresses, and installation are tasks, not promotional cards.
@@ -204,7 +220,8 @@ Shape should stay consistent within a component family -- don't mix `sm` and `lg
 - **Do** use `accent-italic` (Playfair Display) sparingly, as a decorative highlight.
 - **Do** keep shape consistent per component family (see Shapes).
 - **Don't** use uppercase or letter-spacing on buttons or headings -- reserve it for short operational labels only.
-- **Don't** add glow, colored blur, gradients-as-decoration, or stacked shadow tiers.
+- **Don't** add glow, colored blur, or stacked shadow tiers on flat cards. The hero band's atmospheric gradient and dot texture are the single allowed decorative-depth treatment; keep it to the home hero and `hero-band` interior pages only.
+- **Don't** use decorative gradients, oversized pills, or large-radius containers to manufacture hierarchy. Use spacing, typography, borders, and real media.
 - **Don't** introduce a second frontend, second routing scheme, or a component library that bypasses the existing PHP templates.
 - **Don't** copy reference-product navigation labels or routes that don't exist in this app -- keep the real routes.
 - **Don't** let hover/focus states shift layout or reflow siblings.

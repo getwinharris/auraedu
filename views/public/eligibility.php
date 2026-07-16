@@ -1,4 +1,4 @@
-<section class="section section--warm">
+<section class="hero-band">
     <div class="container">
         <div class="section-header">
             <span class="eyebrow serif-accent">Admissions</span>

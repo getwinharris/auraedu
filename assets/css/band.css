@@ -489,32 +489,46 @@ nav a:hover { color: var(--color-maroon); }
 /* ── Home Page ── */
 .home-hero {
     position: relative;
-    min-height: 700px;
-    padding: 56px 0;
-    background: linear-gradient(135deg, var(--color-maroon-deep), var(--color-maroon));
+    min-height: 720px;
+    padding: 72px 0;
+    background: linear-gradient(135deg, var(--color-maroon-deep) 0%, var(--color-maroon) 45%, var(--color-accent) 100%);
     color: var(--color-white);
     overflow: hidden;
 }
 
+/* Atmospheric depth: layered radial glows + soft dot texture */
 .home-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(60% 60% at 18% 22%, rgba(255,255,255,0.18), transparent 60%),
+        radial-gradient(50% 50% at 85% 12%, rgba(239,105,0,0.30), transparent 62%),
+        radial-gradient(70% 70% at 78% 90%, rgba(8,169,0,0.35), transparent 60%),
+        radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 26px 26px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.home-hero::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: var(--gradient-gold);
-    z-index: 1;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-accent), var(--color-gold));
+    z-index: 2;
 }
 
 .home-hero-inner {
+    position: relative;
+    z-index: 3;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.05fr 0.95fr;
     align-items: center;
-    gap: var(--space-xl);
+    gap: var(--space-2xl);
 }
-
-.hero-copy { max-width: 750px; z-index: 2; }
 
 .eyebrow {
     font-size: 0.85rem;
@@ -584,13 +598,16 @@ nav a:hover { color: var(--color-maroon); }
 
 .deity-frame {
     position: relative;
-    width: min(380px, 32vw);
-    aspect-ratio: 3 / 4;
-    overflow: visible;
-    border-radius: var(--radius-md);
+    width: min(420px, 34vw);
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
     margin: 0 auto;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 24px 48px -8px rgba(0,0,0,0.35);
+    background: rgba(255,255,255,0.06);
 }
-.hero-deity .varahi-slide { position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:contain; object-position:center; opacity:0; visibility:hidden; filter:none; }
+.hero-deity .varahi-slide { position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:center top; opacity:0; visibility:hidden; }
 .hero-deity .varahi-slide.is-active { opacity:1; visibility:visible; }
 .varahi-dots {
     display: flex;
@@ -610,6 +627,38 @@ nav a:hover { color: var(--color-maroon); }
 }
 .varahi-dot:hover { background: rgba(255,255,255,0.7); transform: scale(1.25); }
 .varahi-dot.is-active { background: var(--color-gold); transform: scale(1.15); }
+
+/* Reusable atmospheric hero band for interior institute pages */
+.hero-band {
+    position: relative;
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(135deg, var(--color-maroon-deep) 0%, var(--color-maroon) 55%, var(--color-accent) 100%);
+    color: var(--color-white);
+    overflow: hidden;
+}
+.hero-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(55% 60% at 20% 18%, rgba(255,255,255,0.16), transparent 60%),
+        radial-gradient(50% 50% at 88% 14%, rgba(239,105,0,0.28), transparent 62%),
+        radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 26px 26px;
+    pointer-events: none;
+}
+.hero-band > .container { position: relative; z-index: 2; }
+.hero-band .eyebrow { color: var(--color-gold); }
+.hero-band h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1.05;
+    margin: 0 0 var(--space-md);
+    color: var(--color-white);
+    text-shadow: 0 6px 30px rgba(0,0,0,0.35);
+}
+.hero-band .lede { color: rgba(255,255,255,0.92); max-width: 640px; }
+.hero-band .section-header { text-align: left; }
+.hero-band .section-header .lede { margin-left: 0; }
 
 .hero-stats {
     display: flex;
