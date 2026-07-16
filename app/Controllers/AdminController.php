@@ -49,7 +49,9 @@ final class AdminController extends BaseController {
     public function agent(): void{
         $secrets = new SecretService();
         $modelConfig = $secrets->getModelConfig();
-        $this->render('admin/agent',['pageTitle'=>'AI Agent','modelConfig'=>$modelConfig]);
+        $allSecrets = $secrets->all();
+        $agentName = $allSecrets['agent_name'] ?? $modelConfig['model'] ?? 'bapXcli';
+        $this->render('admin/agent',['pageTitle'=>'AI Agent','modelConfig'=>$modelConfig,'agentName'=>$agentName]);
     }
     public function agentAsk(): void{
         $message = trim((string)($_POST['message'] ?? ''));
@@ -474,12 +476,20 @@ final class AdminController extends BaseController {
         $inProgressCount = count($columns['in_progress']);
         $totalCount = count($columns['backlog']) + count($columns['todo']) + $inProgressCount + count($columns['review']) + $doneCount;
         $triageItems = array_slice($agentEvents, 0, 10);
-        $initiatives = [
-            ['title' => 'Cloud Agent Runtime', 'category' => 'Infrastructure', 'status' => 'on_track', 'count' => 4],
-            ['title' => 'Admin UI Overhaul', 'category' => 'Frontend', 'status' => 'in_progress', 'count' => 3],
-            ['title' => 'MCP Tool Integration', 'category' => 'Platform', 'status' => 'on_track', 'count' => 8],
-            ['title' => 'Testing & QA', 'category' => 'Quality', 'status' => 'at_risk', 'count' => 2],
-        ];
+        $initiativesFile = app_path('.agents/workflows/initiatives.json');
+        $initiatives = [];
+        if (is_file($initiativesFile)) {
+            $decoded = json_decode((string)file_get_contents($initiativesFile), true);
+            if (is_array($decoded)) $initiatives = $decoded;
+        }
+        if (empty($initiatives)) {
+            $initiatives = [
+                ['title' => 'Cloud Agent Runtime', 'category' => 'Infrastructure', 'status' => 'on_track', 'count' => 4],
+                ['title' => 'Admin UI Overhaul', 'category' => 'Frontend', 'status' => 'in_progress', 'count' => 3],
+                ['title' => 'MCP Tool Integration', 'category' => 'Platform', 'status' => 'on_track', 'count' => 8],
+                ['title' => 'Testing & QA', 'category' => 'Quality', 'status' => 'at_risk', 'count' => 2],
+            ];
+        }
 
         $pulseItems = array_merge(
             array_map(fn($a) => $a + ['detail' => ''], array_slice($activity, 0, 15)),

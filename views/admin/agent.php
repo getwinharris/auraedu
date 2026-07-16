@@ -4,7 +4,7 @@
 
 <div class="admin-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm);">
-        <h2 style="font-size:1.1rem; margin:0;">AI Agent (bapXcli)</h2>
+        <h2 style="font-size:1.1rem; margin:0;">AI Agent (<?= e($agentName) ?>)</h2>
         <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer;">
             <input type="checkbox" id="tts-mute-toggle" onchange="ttsMuted = this.checked" style="width:16px;height:16px;">
             Mute TTS
