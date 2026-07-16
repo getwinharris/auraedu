@@ -26,6 +26,8 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/privacy','name'=>'privacy','page'=>'public/privacy','controller'=>'PublicController@privacy','services'=>[]],
 
             ['method'=>'GET','path'=>'/consult','name'=>'therapies','page'=>'public/consult','controller'=>'PublicController@therapies','services'=>['ReviewService']],
+            ['method'=>'POST','path'=>'/consultation/initiate','name'=>'consultation.initiate','page'=>'public/consult','controller'=>'ConsultationController@initiate','services'=>['ConsultationService','ResourceService','MailQueueService','SecretService']],
+            ['method'=>'POST','path'=>'/api/consultations/{id}/status','name'=>'consultation.status','page'=>'public/404','controller'=>'ConsultationController@status','services'=>['ConsultationService']],
             ['method'=>'GET','path'=>'/hospitals','name'=>'hospitals','page'=>'public/hospitals','controller'=>'PublicController@hospitals','services'=>['TempleService']],
             ['method'=>'GET','path'=>'/hospitals/{slug}','name'=>'hospital.show','page'=>'public/hospital','controller'=>'PublicController@hospital','services'=>['TempleService']],
             ['method'=>'GET','path'=>'/shop','name'=>'shop','page'=>'public/shop','controller'=>'PublicController@shop','services'=>['ProductService','CategoryService']],

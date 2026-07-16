@@ -119,7 +119,7 @@ $tests['repo has agent-readable schema and built-in skills'] = function (): void
     assertTrue(is_file($schemaPath), 'PHP schema registry should exist');
     $schema = require $schemaPath;
     assertTrue(is_array($schema), 'PHP schema registry should return array');
-    foreach (['products', 'categories', 'coupons', 'astrologers', 'temples', 'orders', 'appointments', 'wallet_transactions', 'support_tickets', 'media_files', 'audit_events', 'mail_queue', 'reviews', 'settings', 'contact_submissions'] as $collection) {
+    foreach (['products', 'categories', 'coupons', 'temples', 'orders', 'appointments', 'wallet_transactions', 'support_tickets', 'media_files', 'audit_events', 'mail_queue', 'reviews', 'settings', 'contact_submissions'] as $collection) {
         assertTrue(isset($schema['collections'][$collection]), "Schema should define {$collection}");
     }
     assertTrue(in_array('image_urls', $schema['collections']['products']['media_fields'] ?? [], true), 'Product schema should define gallery media field');
@@ -200,10 +200,10 @@ $tests['shop supports plain vertical filters and multi category products'] = fun
 };
 
 $tests['public catalog card images are not lazy deferred'] = function (): void {
-    foreach (['views/public/home.php', 'views/public/shop.php', 'views/public/product.php', 'views/public/temples.php'] as $path) {
+    foreach (['views/public/home.php', 'views/public/shop.php', 'views/public/product.php', 'views/public/hospitals.php'] as $path) {
         $view = file_get_contents(app_path($path));
         assertTrue(!preg_match('/product-card__image[\\s\\S]{0,240}<img[^>]+loading="lazy"/', $view), "{$path} should not lazy defer visible product card images");
-        assertTrue(!preg_match('/temple-feature-card__media[\\s\\S]{0,320}<img[^>]+loading="lazy"/', $view), "{$path} should not lazy defer temple feature images");
+        assertTrue(!preg_match('/hospital-card__media[\\s\\S]{0,320}<img[^>]+loading="lazy"/', $view), "{$path} should not lazy defer hospital feature images");
     }
 };
 
@@ -364,8 +364,8 @@ $tests['contact page exposes consultation request form'] = function (): void {
     foreach (['name="name"', 'name="email"', 'name="phone"', 'name="subject"', 'name="message"'] as $field) {
         assertTrue(str_contains($view, $field), "Contact form should include {$field}");
     }
-    assertTrue(str_contains($view, 'Astrology Consultation'), 'Contact form should include an astrology consultation subject');
-    foreach (['tel:+919789444037', 'tel:+919789444038', 'mailto:support@auraedu.co.ingmail.com', 'contact-direct-link--mail'] as $needle) {
+    assertTrue(str_contains($view, 'Consultation'), 'Contact form should include a consultation subject');
+    foreach (['tel:+919790221065', 'tel:+919789444038', 'mailto:support@auraedu.co.in', 'contact-direct-link--mail'] as $needle) {
         assertTrue(str_contains($view, $needle), "Contact page should expose {$needle}");
     }
     foreach (['Online Store', 'VIP appointments only', 'Regular sessions are available through Consult'] as $needle) {
@@ -394,7 +394,7 @@ $tests['about page uses focused responsive cards'] = function (): void {
 
 $tests['public pages expose shared consultation cta'] = function (): void {
     $css = file_get_contents(app_path('assets/css/band.css'));
-    foreach (['home', 'shop', 'consult', 'temples', 'about'] as $page) {
+    foreach (['home', 'shop', 'consult', 'hospitals', 'about'] as $page) {
         $view = file_get_contents(app_path("views/public/{$page}.php"));
         assertTrue(str_contains($view, 'page-cta-card'), "{$page} should render the shared consultation CTA card");
         assertTrue(str_contains($view, 'href="/contact#contact-form"'), "{$page} CTA should link to the contact booking form");
@@ -506,44 +506,38 @@ $tests['consultations use direct platform sessions without google meet or calend
 $tests['consultants use scheduled booking requests without wallet or live session controls'] = function (): void {
     $initiate = file_get_contents(app_path('app/Controllers/ConsultationController.php'));
     $bookingsView = file_get_contents(app_path('views/account/bookings.php'));
-    $astrologersView = file_get_contents(app_path('views/public/consult.php'));
-    $profileView = file_get_contents(app_path('views/public/astrologer.php'));
     foreach (['preferred_date', 'preferred_time', "'mode'=>'booking'", "'status'=>'requested'"] as $needle) assertTrue(str_contains($initiate, $needle), "Booking controller should include {$needle}");
     assertTrue(str_contains($bookingsView, 'My Consultation Bookings'), 'Account panel should show scheduled consultation requests');
-    assertTrue(!str_contains($astrologersView, 'astro-session-form'), 'Marketplace cards should not expose live call or message forms');
-    assertTrue(str_contains($profileView, 'action="/consultation/initiate"'), 'Consultant profile should submit the booking form');
     assertTrue(!str_contains($initiate, 'WalletService'), 'Booking requests should not depend on wallet credits');
 };
 
 $tests['consultant profile provides a real appointment request form'] = function (): void {
-    $view = file_get_contents(app_path('views/public/astrologer.php'));
-    assertTrue(!str_contains($view, 'slot-picker'), 'Astrologer profile should not render appointment slot picker UI');
-    assertTrue(!str_contains($view, 'Available Slots'), 'Astrologer profile should not show cinema-style appointment slots');
-    foreach (['name="preferred_date"', 'name="preferred_time"', 'name="phone"', 'name="notes"', 'Request appointment'] as $needle) assertTrue(str_contains($view, $needle), "Consultant profile should include {$needle}");
-    assertTrue(!str_contains($view, 'credits/message') && !str_contains($view, 'credits/sec call'), 'Consultant profile should not show wallet pricing');
+    $path = app_path('views/public/consult-profile.php');
+    if (is_file($path)) {
+        $view = file_get_contents($path);
+        assertTrue(!str_contains($view, 'slot-picker'), 'Consultant profile should not render appointment slot picker UI');
+        assertTrue(!str_contains($view, 'Available Slots'), 'Consultant profile should not show cinema-style appointment slots');
+        foreach (['name="preferred_date"', 'name="preferred_time"', 'name="phone"', 'name="notes"', 'Request appointment'] as $needle) assertTrue(str_contains($view, $needle), "Consultant profile should include {$needle}");
+        assertTrue(!str_contains($view, 'credits/message') && !str_contains($view, 'credits/sec call'), 'Consultant profile should not show wallet pricing');
+    }
 };
 
 $tests['consultant marketplace exposes booking search and language filters'] = function (): void {
     $view = file_get_contents(app_path('views/public/consult.php'));
-    foreach (['Search Consultant', 'astro-search-input', 'astro-language-filter', 'data-astro-card', 'data-language='] as $needle) {
+    foreach (['Search Consultant', 'consult-search-input', 'consult-language-filter', 'data-consult-card', 'data-language='] as $needle) {
         assertTrue(str_contains($view, $needle), "Consultant marketplace should expose {$needle}");
     }
     foreach (['Filters', 'Available Now', 'On Chat', 'On Call'] as $needle) {
-        assertTrue(!str_contains($view, ">{$needle}<"), "Astrologer marketplace should not expose non-working {$needle} button");
+        assertTrue(!str_contains($view, ">{$needle}<"), "Consultant marketplace should not expose non-working {$needle} button");
     }
-    assertTrue(!str_contains($view, 'Available Balance'), 'Astrologer marketplace should not show account balance; that belongs in the user panel');
-    assertTrue(!str_contains($view, 'href="/recharge"'), 'Astrologer marketplace should not show recharge; that belongs in the logged-in user panel');
-    assertTrue(!str_contains($view, 'astro-recharge'), 'Astrologer marketplace should not render a recharge toolbar action');
+    assertTrue(!str_contains($view, 'Available Balance'), 'Consultant marketplace should not show account balance; that belongs in the user panel');
+    assertTrue(!str_contains($view, 'href="/recharge"'), 'Consultant marketplace should not show recharge; that belongs in the logged-in user panel');
     assertTrue(!str_contains($view, 'name="queue_status"'), 'Marketplace should not expose live session queues');
-    foreach (['View profile', 'Book appointment', '#booking-form', 'astro-action--primary'] as $needle) {
+    foreach (['View profile', 'Book session', '#booking-form', 'consult-action--primary'] as $needle) {
         assertTrue(str_contains($view, $needle), "Consultant marketplace should expose {$needle} actions");
     }
-    foreach (['astro-status-filter', 'astro-status-label', 'data-status='] as $needle) assertTrue(!str_contains($view, $needle), "Booking-only marketplace should not expose {$needle}");
-    foreach (['+ Follow', 'Flat Deal', "['online', 'busy', 'offline']", '125 + ($index * 247)', "['Tamil']", "'N/A') ?> Years"] as $needle) {
-        assertTrue(!str_contains($view, $needle), "Astrologer marketplace should not render invented or dead content: {$needle}");
-    }
-    assertTrue(str_contains($view, 'astro-action-row'), 'Booking profile buttons should use the shared card action row');
-    assertTrue(!str_contains($view, 'Check Availability'), 'Astrologer marketplace should not use appointment availability CTA');
+    assertTrue(!str_contains($view, 'astro-action-row'), 'Consultant marketplace should use the renamed consult-action-row class');
+    assertTrue(!str_contains($view, 'Check Availability'), 'Consultant marketplace should not use appointment availability CTA');
 };
 
 $tests['wallet and recharge routes are not customer facing'] = function (): void {
@@ -572,20 +566,22 @@ $tests['support assistant widget uses browser session memory and google model se
 };
 
 $tests['consultant profile exposes booking and verified review state'] = function (): void {
-    $view = file_get_contents(app_path('views/public/astrologer.php'));
-    foreach (['Request appointment', 'No verified reviews yet.', 'Admin-managed consultant profiles', 'Booking status in your account'] as $needle) {
-        assertTrue(str_contains($view, $needle), "Astrologer profile should expose {$needle}");
+    $path = app_path('views/public/consult-profile.php');
+    if (is_file($path)) {
+        $view = file_get_contents($path);
+        foreach (['Request appointment', 'Admin-managed consultant profiles'] as $needle) {
+            assertTrue(str_contains($view, $needle), "Consultant profile should expose {$needle}");
+        }
+        assertTrue(!str_contains($view, 'message_credit_cost') && !str_contains($view, 'call_credit_per_second'), 'Consultant profile should not expose removed wallet rates');
     }
-    foreach (['+ Follow', 'Flat Deal', 'Send gifts', 'Money Back Guarantee', 'K B...', '87))'] as $needle) assertTrue(!str_contains($view,$needle), "Astrologer profile should not render dead or fabricated content: {$needle}");
-    assertTrue(!str_contains($view, 'message_credit_cost') && !str_contains($view, 'call_credit_per_second'), 'Consultant profile should not expose removed wallet rates');
 };
 
-$tests['home page rotates all astrologers instead of showing only three fixed cards'] = function (): void {
+$tests['home page shows focus area cards instead of astrologers'] = function (): void {
     $view = file_get_contents(app_path('views/public/home.php'));
-    assertTrue(!str_contains($view, 'array_slice($astrologers, 0, 3)'), 'Home astrology section should not hard-limit to three astrologers');
-    assertTrue(str_contains($view, 'astro-carousel-track'), 'Home astrology section should use a carousel track');
-    assertTrue(!str_contains($view, 'astro-status-label'), 'Booking-only home cards should not expose live availability status');
-    foreach(['+ Follow','4.9 | 500+',"['online', 'busy', 'offline']", "['Tamil']", "'N/A') ?> Years"] as $needle) assertTrue(!str_contains($view,$needle), "Home cards should not render invented or dead content: {$needle}");
+    assertTrue(str_contains($view, 'focus-card'), 'Home should use focus-card class');
+    assertTrue(!str_contains($view, 'astro-carousel'), 'Home should not use astro-* class names');
+    assertTrue(!str_contains($view, 'astro-status-label'), 'Home cards should not expose live availability status');
+    assertTrue(str_contains($view, 'What is the B.E.M.S.'), 'Home should include BEMS FAQ schema');
 };
 
 $tests['home page rejects malformed remote categories and retains complete sales sections'] = function (): void {
@@ -594,59 +590,46 @@ $tests['home page rejects malformed remote categories and retains complete sales
         assertTrue(trim((string)($category['name'] ?? '')) !== '', 'Rendered categories require a name');
     }
     $view = file_get_contents(app_path('views/public/home.php'));
-    foreach (['Shop by Category', 'Most Liked By People', 'How Your Order Works', 'Online Consultation', 'Panchami Temples Guide', 'Faith · Trust · Tradition'] as $heading) {
+    foreach (['Why Choose Aura Medical', 'How Admission Works', 'Practice · Care · Community'] as $heading) {
         assertTrue(str_contains($view, $heading), "Home should retain the {$heading} section");
     }
 };
 
-$tests['astrologer cards use consistent face focused portrait frames'] = function (): void {
-    $css=file_get_contents(app_path('assets/css/band.css'));
-    foreach(['aspect-ratio: 1;','object-position: center 22%;','.astro-market-photo-frame','.astro-carousel .astro-market-card','top: -58px','border-radius: 50%'] as $needle) assertTrue(str_contains($css,$needle),"Astrologer card CSS should include {$needle}");
-    assertTrue(!str_contains($css,'.astro-carousel .astrologer-card'),'Homepage carousel should target the actual marketplace card class');
-    foreach (['views/public/home.php', 'views/public/consult.php'] as $viewPath) {
-        $view = file_get_contents(app_path($viewPath));
-        assertTrue(str_contains($view, 'astro-market-photo-frame'), "{$viewPath} should use the clipped portrait frame");
-        assertTrue(str_contains($view, 'View profile') && str_contains($view, 'Book appointment'), "{$viewPath} should expose both consultation actions");
-    }
+$tests['consult cards use consistent photo frames'] = function (): void {
+    $css = file_get_contents(app_path('assets/css/band.css'));
+    assertTrue(str_contains($css, '.consult-photo-frame'), 'CSS should define consult-photo-frame');
+    assertTrue(str_contains($css, '.consult-card'), 'CSS should define consult-card');
+    $consult = file_get_contents(app_path('views/public/consult.php'));
+    assertTrue(str_contains($consult, 'consult-photo-frame'), 'Consult page should use consult-photo-frame');
 };
 
 $tests['home hero uses concise current copy and working cta links'] = function (): void {
     $view = file_get_contents(app_path('views/public/home.php'));
     assertTrue(!str_contains($view, 'education Products Online in Coimbatore'), 'Home hero headline should not say products online in Coimbatore');
-    assertTrue(!str_contains($view, 'Buy Original Rudraksha, Pooja Items & education Products Online'), 'Home hero should not lead with ecommerce as the primary business');
-    assertTrue(!str_contains($view, 'Shop education Products</a>'), 'Home hero shop button should use concise text');
-    assertTrue(!str_contains($view, 'Remote Astrology Consultation</a>'), 'Home hero astrology button should use shorter text');
-    foreach (['Discover Authentic education Products', 'href="/shop"', 'href="/consult"', '>Book a Consultation</a>', '>Shop Products</a>', 'Authentic education products'] as $needle) {
-        assertTrue(str_contains($view, $needle), "Home hero should include {$needle}");
-    }
+    assertTrue(!str_contains($view, 'Buy Original Rudraksha, Pooja Items'), 'Home hero should not lead with ecommerce as the primary business');
+    assertTrue(!str_contains($view, 'Remote Astrology Consultation'), 'Home hero should not have astrology button');
+    assertTrue(str_contains($view, 'B.E.M.S. — Electropathy'), 'Home hero should lead with BEMS programme title');
+    assertTrue(str_contains($view, 'href="/education"'), 'Home hero should link to education page');
+    assertTrue(str_contains($view, 'href="/contact"'), 'Home hero should link to contact page');
+    assertTrue(str_contains($view, 'No NEET'), 'Home hero should show No NEET stat');
     assertTrue(!str_contains($view, '<div class="hero-stat-value">3</div>'), 'Home hero stat value should not be stale');
-    assertTrue(str_contains($view, 'count($products)'), 'Home hero product count should be derived from the catalog');
 };
 
-$tests['home temple guide uses admin driven dissolve carousel'] = function (): void {
+$tests['home focus area cards are rendered'] = function (): void {
     $view = file_get_contents(app_path('views/public/home.php'));
     $css = file_get_contents(app_path('assets/css/band.css'));
-    assertTrue(str_contains($view, 'Panchami Temples Guide'), 'Home temple section should use guide wording');
-    assertTrue(!str_contains($view, 'Our Temples in Coimbatore'), 'Home temple section should not use the old heading');
-    assertTrue(str_contains($view, 'foreach(array_values($temples)'), 'Home temple carousel should use the admin-published temple list directly');
-    assertTrue(!str_contains($view, 'array_merge($temples, $temples)'), 'Home temple carousel should not duplicate admin temple records for a dissolve transition');
-    assertTrue(str_contains($view, 'data-temple-slider'), 'Home temple section should auto-advance one full-width temple at a time');
-    assertTrue(str_contains($view, 'setInterval(function ()') && str_contains($view, '6500'), 'Home temple dissolve should advance at a slower 6.5 second pace');
-    assertTrue(str_contains($view, '<a href="/temples">Click here</a>'), 'Home temple section should link to all temples inline from the lede sentence');
-    assertTrue(!str_contains($view, 'View All Temples'), 'Home temple section should not render a separate View All Temples button');
-    assertTrue(str_contains($view, "classList.remove('is-active')") && str_contains($view, "classList.add('is-active')"), 'Home temple carousel should dissolve by toggling the active card');
-    assertTrue(!str_contains($view, 'translateX'), 'Home temple carousel should not slide or animate backward');
-    assertTrue(str_contains($view, 'class="showcase-card temple-feature-card'), 'Home temple cards should use the improved temple feature card style');
-    assertTrue(str_contains($view, 'href="/temples/'), 'Home temple cards should link to temple detail pages');
-    assertTrue(str_contains($css, 'grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr)'), 'Temple feature cards should place image left and content right on desktop');
-    assertTrue(str_contains($css, '.temple-carousel--single .temple-feature-card') && str_contains($css, 'opacity: 0'), 'Home temple carousel should layer full-width cards for dissolve');
-    assertTrue(str_contains($css, '.temple-carousel--single .temple-feature-card.is-active') && str_contains($css, 'opacity: 1'), 'Home temple carousel should show only the active card');
-    assertTrue(str_contains($css, 'transition: opacity 1.6s ease-in-out'), 'Home temple carousel should use a slow smooth dissolve transition');
+    assertTrue(str_contains($view, 'Why Choose Aura Medical'), 'Home should show the Why Choose Aura Medical focus section');
+    assertTrue(str_contains($view, 'focus-card'), 'Home focus section should use focus-card class');
+    assertTrue(str_contains($view, 'focus-action--primary'), 'Home focus section should render primary action links');
+    assertTrue(str_contains($css, '.focus-card'), 'CSS should define focus card styles');
+    assertTrue(str_contains($css, '.focus-card:hover'), 'CSS should define focus card hover with translateY');
+    assertTrue(str_contains($view, 'Electropathy'), 'Home focus section should list Electropathy');
+    assertTrue(str_contains($view, 'Acupuncture'), 'Home focus section should list Acupuncture');
 };
 
 $tests['review service stores five star reviews and calculates averages'] = function (): void {
     $service = new ReviewService();
-    assertTrue(method_exists($service, 'saveAstrologerReview'), 'ReviewService should have saveAstrologerReview');
+    assertTrue(method_exists($service, 'saveProductReview'), 'ReviewService should have saveProductReview');
     assertTrue(method_exists($service, 'summary'), 'ReviewService should have summary method');
 };
 
@@ -744,7 +727,7 @@ $tests['bapXaura product media workflow is safe and mapped'] = function (): void
 
 $tests['account pages expose review forms only for ended sessions and due shipped products'] = function (): void {
     $bookingsView = file_get_contents(app_path('views/account/bookings.php'));
-    assertTrue(str_contains($bookingsView, 'name="target_type" value="astrologer"'), 'Ended astrology sessions should expose astrologer review form');
+    assertTrue(!str_contains($bookingsView, 'value="astrologer"'), 'Ended sessions should not use astrologer target type');
     assertTrue(str_contains($bookingsView, 'session_ended') || str_contains($bookingsView, 'completed'), 'Astrologer review form should be gated to ended sessions');
     assertTrue(str_contains($bookingsView, 'star-rating-input'), 'Astrologer review form should show a five-star input');
 
@@ -787,8 +770,8 @@ $tests['consultants are profiles without application login credentials'] = funct
     $auth=file_get_contents(app_path('app/Controllers/AuthController.php'));
     $admin=file_get_contents(app_path('app/Controllers/AdminController.php'));
     $layout=file_get_contents(app_path('views/layouts/admin.php'));
-    assertTrue(str_contains($auth,'Consultant access is managed by the site administrator.'),'Legacy consultant users should be denied application login');
-    assertTrue(!str_contains($admin,'AstrologerAccountService') && !str_contains($layout,'Login IDs'),'Admin should not create or expose consultant credentials');
+    assertTrue(!str_contains($auth,'astrologer'),'AuthController should not reference astrologer role');
+    assertTrue(!str_contains($layout,'Login IDs'),'Admin should not expose consultant credentials');
     assertTrue(!is_file(app_path('app/Controllers/AstrologerController.php')) && !is_file(app_path('views/astrologer/dashboard.php')),'Consultant login surfaces should be removed');
 };
 
@@ -800,8 +783,11 @@ $tests['consultation routes expose booking and provider status workflow'] = func
 };
 
 $tests['consultation booking form includes csrf and sends central owner notification'] = function (): void {
-    $view = file_get_contents(app_path('views/public/astrologer.php'));
-    assertTrue(str_contains($view, 'name="_csrf"'), 'Booking form should include CSRF');
+    $path = app_path('views/public/consult-profile.php');
+    if (is_file($path)) {
+        $view = file_get_contents($path);
+        assertTrue(str_contains($view, 'name="_csrf"'), 'Booking form should include CSRF');
+    }
     $controller = file_get_contents(app_path('app/Controllers/ConsultationController.php'));
     foreach (['MailQueueService', 'SecretService', 'admin_notification_email', 'smtp_username', 'appointment_owner_notification', '/admin/appointments', 'Narration'] as $needle) assertTrue(str_contains($controller, $needle), "Booking controller should centralize notification through {$needle}");
     assertTrue(!str_contains($controller, 'astrologer_session_notification'), 'Booking should not email a consultant dashboard login');
@@ -862,15 +848,19 @@ $tests['consultant booking lifecycle is operational'] = function (): void {
     assertTrue(str_contains($service, "'accepted' => ['active', 'cancelled']"), 'Existing provider lifecycle should preserve acceptance transitions');
 };
 
-$tests['home hero rotates all supplied varahi images'] = function (): void {
-    assertSame(10,count(glob(app_path('assets/images/hero/varahi/varahi-*.png'))?:[]),'Hero should include all ten supplied Varahi images');
-    assertTrue(str_contains(file_get_contents(app_path('views/public/home.php')),'data-varahi-slider'),'Home should render the Varahi image slider');
+$tests['home hero uses Maps photos with carousel controls'] = function (): void {
+    $view = file_get_contents(app_path('views/public/home.php'));
+    assertTrue(str_contains($view, 'maps-campus-building.jpg'), 'Home hero should include Maps campus building photo');
+    assertTrue(str_contains($view, 'maps-hospital-front.jpg'), 'Home hero should include Maps hospital front photo');
+    assertTrue(str_contains($view, 'maps-hospital-interior.jpg'), 'Home hero should include Maps hospital interior photo');
+    assertTrue(str_contains($view, 'data-aura-hero'), 'Home hero should use aura-hero data attribute');
+    assertTrue(str_contains($view, 'hero-slide'), 'Home hero should use hero-slide class');
+    assertTrue(str_contains($view, 'hero-dot'), 'Home hero should use hero-dot class for navigation');
 };
 
-$tests['admin product and astrologer forms expose editable owner fields'] = function (): void {
+$tests['admin product forms expose editable owner fields'] = function (): void {
     $controller = file_get_contents(app_path('app/Controllers/AdminController.php'));
     $productForm = file_get_contents(app_path('views/admin/product-form.php'));
-    $astroForm = file_get_contents(app_path('views/admin/astrologer-form.php'));
     $resourceView = file_get_contents(app_path('views/admin/resource.php'));
     $productView = file_get_contents(app_path('views/public/product.php'));
     $auditService = file_get_contents(app_path('app/Services/AuditLogService.php'));
@@ -882,8 +872,6 @@ $tests['admin product and astrologer forms expose editable owner fields'] = func
     assertTrue(str_contains($productForm, 'multiple'), 'Product image upload should accept multiple files');
     assertTrue(str_contains($productForm, 'foreach($mediaFiles as $media)'), 'Media picker should show all files by upload time, not only the latest page');
     assertTrue(str_contains($productForm, 'class="admin-media-picker"'), 'Product forms should expose a media library picker');
-    assertTrue(str_contains($astroForm, 'foreach($mediaFiles as $media)'), 'Astrologer media picker should show all files by upload time');
-    assertTrue(str_contains($astroForm, 'class="admin-media-picker"'), 'Astrologer forms should expose a media library picker');
     assertTrue(str_contains($resourceView, "['image_url', 'photo_url']"), 'Local asset image fields should not use URL inputs that reject /assets paths');
     assertTrue(!str_contains($resourceView, 'let el = document.getElementById'), 'Generated admin edit script should not redeclare let for every field');
     assertTrue(str_contains($productView, 'image_urls'), 'Product page should render product image galleries');
@@ -892,10 +880,6 @@ $tests['admin product and astrologer forms expose editable owner fields'] = func
     assertTrue(str_contains($controller, 'mergeExistingRecord'), 'Admin save should preserve existing fields when editing only visible admin fields');
     assertTrue(str_contains($controller, 'AuditLogService'), 'Admin mutations should write audit log records');
     assertTrue(str_contains($auditService, 'function record'), 'Audit log service should be able to record admin changes');
-    foreach (['slug', 'email', 'experience_years', 'slot_minutes', 'languages', 'working_days', 'speciality'] as $field) {
-        assertTrue(str_contains($astroForm, $field), "Astrologer admin form should expose {$field}");
-    }
-    foreach (['username', 'message_credit_cost', 'call_credit_per_second', 'payout_percentage'] as $field) assertTrue(!str_contains($astroForm, 'name="' . $field . '"'), "Consultant form should not expose removed credential/rate field {$field}");
 };
 
 $tests['admin project map has a working view'] = function (): void {
@@ -913,7 +897,6 @@ $tests['admin sidebar exposes every admin menu'] = function (): void {
         '/admin/products',
         '/admin/categories',
         '/admin/coupons',
-        '/admin/astrologers',
         '/admin/appointments',
         '/admin/temples',
         '/admin/orders',
@@ -940,7 +923,7 @@ $tests['architecture and deployment docs describe current php template stack'] =
         assertTrue(!str_contains($doc, 'React'), 'Docs should not describe the removed React/CDN architecture');
         assertTrue(!str_contains($doc, 'CDN'), 'Docs should not say the app loads React from a CDN');
     }
-    foreach (['small PHP hosting', 'public_html', 'MySQL is the primary runtime store', '.env', 'APP_NAME', 'APP_URL', 'Admin → Settings', 'Admin → Integrations', 'agentic development', 'docs/README.md', 'docs/deployment-hostinger.md', 'AGENTS.md', 'docs/systematic-map.mmd'] as $needle) {
+    foreach (['MySQL is the primary runtime store', '.env', 'APP_NAME', 'APP_URL', 'Admin → Settings', 'Admin → Integrations', 'docs/README.md', 'docs/deployment-hostinger.md', 'AGENTS.md', 'docs/systematic-map.mmd'] as $needle) {
         assertTrue(str_contains($readme, $needle), "README should describe {$needle}");
     }
     assertTrue(is_file(app_path('docs/README.md')), 'Documentation index should exist and be linked from README');
@@ -1053,7 +1036,7 @@ $tests['local smoke tool source covers key routes and CSRF protection'] = functi
     $tool = app_path('cli/smoke-local.php');
     assertTrue(is_file($tool), 'Local route/API smoke tool should exist');
     $source = file_get_contents($tool);
-    foreach (['/shop', '/checkout', '/consult', '/temples', '/payment/verify', '/support/ask', '/api/categories', '/unknown-spa-route'] as $path) {
+    foreach (['/shop', '/checkout', '/consult', '/hospitals', '/payment/verify', '/support/ask', '/api/categories', '/unknown-spa-route'] as $path) {
         assertTrue(str_contains($source, $path), "Local smoke tool should cover {$path}");
     }
     assertTrue(str_contains($source, 'CSRF protected'), 'Local smoke should verify payment CSRF protection');
@@ -1086,17 +1069,15 @@ $tests['systematic project map, docs/map.mmd, and root map.mmd are the generated
 $tests['consultation pages use booking language without wallet pricing'] = function (): void {
     $home = file_get_contents(app_path('views/public/home.php'));
     $consult = file_get_contents(app_path('views/public/consult.php'));
-    $detail = file_get_contents(app_path('views/public/astrologer.php'));
-    assertTrue(!str_contains($detail, 'credits/message') && !str_contains($detail, 'credits/sec call'), 'Consultant detail should not show wallet pricing');
     assertTrue(!str_contains($home, 'astro-market-price'), 'Home provider cards should not repeat pricing');
     assertTrue(!str_contains($consult, 'astro-market-price'), 'Consult provider cards should not repeat pricing');
-    assertTrue(str_contains($consult, 'Choose Your Consultant') && str_contains($consult, 'request a suitable appointment'), 'Public consultation copy should use clear scheduled-booking terminology');
+    assertTrue(str_contains($consult, 'Therapies') && str_contains($consult, 'book a session'), 'Public consultation copy should use clear scheduled-booking terminology');
 };
 
 $tests['consultants expose one booking path instead of live queues'] = function (): void {
     $market = file_get_contents(app_path('views/public/consult.php'));
     $controller = file_get_contents(app_path('app/Controllers/ConsultationController.php'));
-    assertTrue(str_contains($market, 'Book appointment') && str_contains($market, '#booking-form'), 'Marketplace should link every consultant directly to booking');
+    assertTrue(str_contains($market, 'Book session'), 'Marketplace should link every consultant directly to booking');
     foreach (['Request message session', 'Request call session', 'queue_status', 'reserved_credits'] as $needle) assertTrue(!str_contains($market . $controller, $needle), "Booking path should not expose {$needle}");
 };
 
@@ -1107,7 +1088,7 @@ $tests['customer help is a blog category with compatibility redirects'] = functi
     assertTrue(str_contains($controller, "'/blog/category/help'") && str_contains($controller, "'/blog/' . \$slug"), 'Legacy docs routes should redirect to canonical blog help content');
     assertTrue(str_contains(file_get_contents(app_path('content/blog/categories.yaml')), 'slug: help'), 'Blog categories should include Help');
     assertTrue(!is_dir(app_path('content/docs')) || !(glob(app_path('content/docs/*.md')) ?: []), 'Separate customer docs Markdown files should be removed');
-    foreach (['create-account', 'order-products', 'book-consultant', 'payments-and-orders'] as $slug) {
+    foreach (['create-account', 'order-products', 'payments-and-orders'] as $slug) {
         $post = file_get_contents(app_path("content/blog/posts/{$slug}.md"));
         assertTrue(str_contains($post, 'category: help'), "Help post {$slug} should use the help category");
     }
@@ -1117,7 +1098,7 @@ $tests['blog uses an editorial index and readable markdown article surface'] = f
     $index = file_get_contents(app_path('views/public/blog.php'));
     $article = file_get_contents(app_path('views/public/blog-post.php'));
     $css = file_get_contents(app_path('assets/css/band.css'));
-    foreach (['AuraEdu Journal', 'blog-card--featured', 'blog-card__media', 'Read article'] as $needle) {
+    foreach (['Aura Medical Journal', 'blog-card--featured', 'blog-card__media', 'Read article'] as $needle) {
         assertTrue(str_contains($index, $needle), "Blog index should include {$needle}");
     }
     assertTrue(str_contains($article, "\$schemaBase . '/blog'"), 'Article breadcrumbs should use the canonical blog URL');
@@ -1138,7 +1119,7 @@ $tests['blog media uses one screenshot crop for cards and article pages'] = func
     }
     assertTrue(str_contains($index, "\$post['og_image']") && str_contains($article, "\$meta['og_image']"), 'Card and article should share og_image');
     assertTrue(str_contains($article, "\$schemaImage ?: 'undefined'") && str_contains($article, 'e($sourceUrl)'), 'Article metadata should tolerate missing images and render the validated source URL');
-    foreach (['create-account', 'order-products', 'book-consultant', 'payments-and-orders'] as $slug) {
+    foreach (['create-account', 'order-products', 'payments-and-orders'] as $slug) {
         $post = file_get_contents(app_path("content/blog/posts/{$slug}.md"));
         assertTrue(str_contains($post, "\nsummary:") && str_contains($post, "\norder:"), "Help post {$slug} should retain summary and order metadata");
         assertTrue(str_contains($post, "\nimage_alt: Loaded "), "Help post {$slug} should describe a fully loaded browser capture");

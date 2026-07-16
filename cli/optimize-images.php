@@ -47,7 +47,7 @@ function convertDir(ImageOptimizerService $opt, string $dir, array $exts, array 
 }
 
 echo "=== HERO IMAGES (resize 480x640) ===\n";
-$heroDir = __DIR__ . '/../assets/images/hero/varahi';
+$heroDir = __DIR__ . '/../assets/images/hero';
 convertDir($opt, $heroDir, ['png', 'jpg', 'jpeg'], ['max_width' => 480, 'max_height' => 640, 'quality' => 80]);
 
 echo "\n=== PRODUCT IMAGES (resize 800x800) ===\n";
@@ -83,7 +83,7 @@ if (is_dir($mediaDir)) {
 
 echo "\n=== LARGE ROOT IMAGES ===\n";
 $rootImages = [
-    __DIR__ . '/../assets/images/varahi-amman.png',
+    // Removed: varahi-amman.png (legacy product)
     __DIR__ . '/../assets/images/logo.jpeg',
     __DIR__ . '/../assets/images/logo-square.jpeg',
 ];

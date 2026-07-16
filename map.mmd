@@ -7,14 +7,14 @@ flowchart LR
   classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b
   classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12
 
-  subgraph ARCH["Architecture Overview — 125 routes, 14 controllers, 41 services, 54 views, 0 data files, 24 tools"]
-    arch_routes["> Routes: 125 (Public + Auth + Payment + Admin + Support)"]:::arch
-    arch_ctrl["> Controllers: 14"]:::arch
-    arch_svc["> Services: 41"]:::arch
-    arch_views["> Views: 54"]:::arch
+  subgraph ARCH["Architecture Overview — 127 routes, 15 controllers, 42 services, 52 views, 0 data files, 24 tools"]
+    arch_routes["> Routes: 127 (Public + Auth + Payment + Admin + Support)"]:::arch
+    arch_ctrl["> Controllers: 15"]:::arch
+    arch_svc["> Services: 42"]:::arch
+    arch_views["> Views: 52"]:::arch
     arch_data["> Collections: 19 schema | 0 files"]:::arch
     arch_tools["> Tools: 24"]:::arch
-    arch_gaps["> Gaps: 2"]:::arch
+    arch_gaps["> Gaps: 0"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
@@ -33,6 +33,8 @@ flowchart LR
     route_get_terms["GET /terms — Terms of Service — 15 sections, legal"]:::route
     route_get_privacy["GET /privacy — Privacy Policy — 14 sections, data handling"]:::route
     route_get_consult["GET /consult — Therapies & treatments overview"]:::route
+    route_post_consultation_initiate["POST /consultation/initiate"]:::route
+    route_post_api_consultations_id_status["POST /api/consultations/{id}/status"]:::route
     route_get_hospitals["GET /hospitals — Hospital & campus facility listing"]:::route
     route_get_hospitals_slug["GET /hospitals/{slug} — Hospital & campus facility detail"]:::route
     route_get_shop["GET /shop — Product shop — grid with pill actions"]:::route
@@ -177,6 +179,7 @@ flowchart LR
     controller_blogcontroller["BlogController"]:::code
     controller_browseragentcontroller["BrowserAgentController"]:::code
     controller_commercecontroller["CommerceController"]:::code
+    controller_consultationcontroller["ConsultationController"]:::code
     controller_publiccontroller["PublicController"]:::code
     controller_remotedbcontroller["RemoteDbController"]:::code
     controller_reviewcontroller["ReviewController"]:::code
@@ -195,6 +198,7 @@ flowchart LR
     service_browsersession["BrowserSession"]:::code
     service_cartservice["CartService"]:::code
     service_categoryservice["CategoryService"]:::code
+    service_consultationservice["ConsultationService"]:::code
     service_contactservice["ContactService"]:::code
     service_couponservice["CouponService"]:::code
     service_databaseservice["DatabaseService"]:::code
@@ -280,8 +284,6 @@ flowchart LR
     view_public_shop["public/shop"]:::code
     view_public_sitemap["public/sitemap"]:::code
     view_public_support["public/support"]:::code
-    view_public_temple["public/temple"]:::code
-    view_public_temples["public/temples"]:::code
     view_public_terms["public/terms"]:::code
   end
 
@@ -343,8 +345,7 @@ flowchart LR
   end
 
   subgraph GAPS["Gaps & Missing Links"]
-    gap_d0702d1414["unwired_views: public/temple"]:::gap
-    gap_995329f3bf["unwired_views: public/temples"]:::gap
+    no_gaps["No detected gaps"]:::data
   end
 
   route_get --> controller_publiccontroller
@@ -377,6 +378,15 @@ flowchart LR
   route_get_consult --> controller_publiccontroller
   controller_publiccontroller --> service_reviewservice
   controller_publiccontroller -. renders .-> view_public_consult
+  route_post_consultation_initiate --> controller_consultationcontroller
+  controller_consultationcontroller --> service_consultationservice
+  controller_consultationcontroller --> service_resourceservice
+  controller_consultationcontroller --> service_mailqueueservice
+  controller_consultationcontroller --> service_secretservice
+  controller_consultationcontroller -. renders .-> view_public_consult
+  route_post_api_consultations_id_status --> controller_consultationcontroller
+  controller_consultationcontroller --> service_consultationservice
+  controller_consultationcontroller -. renders .-> view_public_404
   route_get_hospitals --> controller_publiccontroller
   controller_publiccontroller --> service_templeservice
   controller_publiccontroller -. renders .-> view_public_hospitals
@@ -822,6 +832,7 @@ flowchart LR
   controller_blogcontroller --> controller_basecontroller
   controller_browseragentcontroller --> controller_basecontroller
   controller_commercecontroller --> controller_basecontroller
+  controller_consultationcontroller --> controller_basecontroller
   controller_publiccontroller --> controller_basecontroller
   controller_remotedbcontroller --> controller_basecontroller
   controller_reviewcontroller --> controller_basecontroller
@@ -842,6 +853,9 @@ flowchart LR
   service_appointmentservice --> collection_appointments
   service_auditlogservice --> collection_audit_events
   service_categoryservice --> collection_categories
+  service_consultationservice --> collection_appointments
+  service_consultationservice --> collection_consultation_messages
+  service_consultationservice --> collection_consultation_signals
   service_contactservice --> collection_contact_submissions
   service_couponservice --> collection_coupons
   service_mailqueueservice --> collection_mail_queue
@@ -883,5 +897,3 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
-  gap_d0702d1414 -. missing .-> view_public_temple
-  gap_995329f3bf -. missing .-> view_public_temples

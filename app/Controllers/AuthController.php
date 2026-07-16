@@ -24,7 +24,7 @@ final class AuthController extends BaseController {
     $this->flash('Signed in.','success');
     session_write_close();
    if ($role === 'admin') { $this->redirect('/admin'); return; }
-   // astrologer role removed — all users go to dashboard
+   // consultant role removed — all users go to dashboard
     $this->redirect('/account/dashboard');
   }
  public function logout(): void {

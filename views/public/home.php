@@ -23,16 +23,16 @@
                 </div>
             </div>
         </div>
-        <div class="hero-deity" data-aura-hero>
-            <div class="deity-frame">
-                <img class="varahi-slide is-active" src="/assets/images/institute/maps-campus-building.jpg" alt="Aura Medical Institute campus building, Coimbatore" width="480" height="640" fetchpriority="high">
-                <img class="varahi-slide" src="/assets/images/institute/maps-hospital-front.jpg" alt="Aura Institutions and Hospital front view" width="480" height="640" loading="lazy">
-                <img class="varahi-slide" src="/assets/images/institute/maps-hospital-interior.jpg" alt="Aura Hospital interior facilities" width="480" height="640" loading="lazy">
+        <div class="hero-frame" data-aura-hero>
+            <div class="image-frame">
+                <img class="hero-slide is-active" src="/assets/images/institute/maps-campus-building.jpg" alt="Aura Medical Institute campus building, Coimbatore" width="480" height="640" fetchpriority="high">
+                <img class="hero-slide" src="/assets/images/institute/maps-hospital-front.jpg" alt="Aura Institutions and Hospital front view" width="480" height="640" loading="lazy">
+                <img class="hero-slide" src="/assets/images/institute/maps-hospital-interior.jpg" alt="Aura Hospital interior facilities" width="480" height="640" loading="lazy">
             </div>
-            <div class="varahi-dots" role="tablist" aria-label="Aura Medical slides">
-                <button class="varahi-dot is-active" type="button" role="tab" aria-label="Slide 1" aria-current="true" data-slide="0"></button>
-                <button class="varahi-dot" type="button" role="tab" aria-label="Slide 2" aria-current="false" data-slide="1"></button>
-                <button class="varahi-dot" type="button" role="tab" aria-label="Slide 3" aria-current="false" data-slide="2"></button>
+            <div class="hero-dots" role="tablist" aria-label="Aura Medical slides">
+                <button class="hero-dot is-active" type="button" role="tab" aria-label="Slide 1" aria-current="true" data-slide="0"></button>
+                <button class="hero-dot" type="button" role="tab" aria-label="Slide 2" aria-current="false" data-slide="1"></button>
+                <button class="hero-dot" type="button" role="tab" aria-label="Slide 3" aria-current="false" data-slide="2"></button>
             </div>
         </div>
     </div>
@@ -41,8 +41,8 @@
 (() => {
     const root = document.querySelector('[data-aura-hero]');
     if (!root) return;
-    const slides = [...root.querySelectorAll('.varahi-slide')];
-    const dots = [...root.querySelectorAll('.varahi-dot')];
+    const slides = [...root.querySelectorAll('.hero-slide')];
+    const dots = [...root.querySelectorAll('.hero-dot')];
     let index = 0, timer;
     const show = n => {
         slides[index].classList.remove('is-active');
@@ -92,23 +92,23 @@
         <h2 class="section-title">Why Choose Aura Medical</h2>
         <p class="lede">A practice-oriented institute and hospital where electropathy, acupuncture, and allied therapies are taught alongside real clinical exposure.</p>
     </div>
-    <div class="astro-carousel" aria-label="Aura Medical focus areas">
-        <div class="astro-carousel-track">
+    <div class="focus-carousel" aria-label="Aura Medical focus areas">
+        <div class="focus-carousel-track">
         <?php foreach([
             ['title'=>'Electropathy','body'=>'Electro-medical sciences rooted in alternative-medicine practice and hospital training.'],
             ['title'=>'Acupuncture','body'=>'Traditional needle therapy integrated with modern electropathy assessment methods.'],
             ['title'=>'Allied Health','body'=>'Supportive therapies, nutrition guidance, and rehabilitative practice for whole-person care.'],
             ['title'=>'Clinical Training','body'=>'Hands-on hospital rotation so students learn care where it is delivered.'],
         ] as $focus): ?>
-            <article class="astro-market-card reveal">
-                <div class="astro-market-info">
-                    <a href="/education" class="astro-market-name"><?= e($focus['title']) ?></a>
-                    <p class="astro-market-speciality"><?= e($focus['body']) ?></p>
+            <article class="focus-card reveal">
+                <div class="focus-info">
+                    <a href="/education" class="focus-name"><?= e($focus['title']) ?></a>
+                    <p class="focus-desc"><?= e($focus['body']) ?></p>
                 </div>
-                <div class="astro-market-actions">
-                    <div class="astro-action-row">
-                        <a href="/education" class="astro-action">Learn more</a>
-                        <a href="/contact" class="astro-action astro-action--primary">Enquire now</a>
+                <div class="focus-actions">
+                    <div class="focus-action-row">
+                        <a href="/education" class="focus-action">Learn more</a>
+                        <a href="/contact" class="astro-action focus-action--primary">Enquire now</a>
                     </div>
                 </div>
             </article>
