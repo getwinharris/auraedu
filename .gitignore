@@ -31,3 +31,7 @@ storage/.bin/kitten-tts/
 # .env.mysql and .env.test-user stay local-only.
 .env.mysql
 .env.test-user
+
+# Downloaded binaries (not committed)
+.bin/chrome-linux/
+storage/kittentts/
