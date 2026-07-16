@@ -250,7 +250,7 @@ echo $__palette_css;
 <noscript><link rel="stylesheet" href="/assets/css/band.css?v=<?= filemtime(__DIR__ . '/../../assets/css/band.css') ?>"></noscript>
 <?php $__secrets_org = (new \App\Services\SecretService())->all(); $__phone = $__secrets_org['phone'] ?? ''; $__telephone = $__phone !== '' ? '["' . e($__phone) . '"]' : '["+919790221065"]'; ?>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":["Organization","OnlineStore"],"name":"<?= e($seo['og_site_name'] ?? 'AuraEdu') ?>","description":"Authentic education products, sacred jewellery, expert Vedic astrology consultation, and temple guidance.","url":"https://<?= e($_SERVER['HTTP_HOST']) ?>","telephone":<?= $__telephone ?>,"email":"support@auraedu.co.ingmail.com"}
+{"@context":"https://schema.org","@type":["Organization","CollegeOrUniversity"],"name":"Aura Medical Institute of Electropathy and Hospital","description":"Aura Medical Institute of Electropathy and Hospital — electropathy, acupuncture, and allied-health healthcare-skilling in Coimbatore.","url":"https://<?= e($_SERVER['HTTP_HOST']) ?>","telephone":<?= $__telephone ?>,"email":"auramieh2017@gmail.com"}
 </script>
 <?php if (!empty($seo['json_ld'])): ?><?= $seo['json_ld'] ?><?php endif; ?>
 <?php
@@ -307,7 +307,21 @@ gtag('js', new Date());
     </button>
 <?php try { $__blogCats = (new \App\Services\BlogService())->categories(); } catch (\Throwable $e) { $__blogCats = []; } ?>
     <nav id="primary-nav">
-        <a href="/education"<?= str_starts_with($currentPath, '/education') ? ' aria-current="page"' : '' ?>>B.E.M.S.</a>
+        <a href="/education"<?= $currentPath === '/education' ? ' aria-current="page"' : '' ?>>B.E.M.S.</a>
+        <div class="nav-dropdown">
+            <a href="/courses" class="nav-dropdown__trigger"<?= str_starts_with($currentPath, '/courses') ? ' aria-current="page"' : '' ?>>Courses <span class="nav-dropdown__arrow">▾</span></a>
+            <div class="nav-dropdown__menu">
+                <a href="/courses/bems">B.E.M.S. — Electropathy</a>
+                <a href="/courses/mdeh">M.D.E.H.</a>
+                <a href="/courses/dacu">D.Acu — Acupuncture</a>
+                <a href="/courses/macu">M.Acu — Acupuncture</a>
+                <a href="/courses/dhm">D.H.M. &amp; C.T. — Hotel Mgmt</a>
+            </div>
+        </div>
+        <a href="/eligibility"<?= str_starts_with($currentPath, '/eligibility') ? ' aria-current="page"' : '' ?>>Eligibility</a>
+        <a href="/scope"<?= str_starts_with($currentPath, '/scope') ? ' aria-current="page"' : '' ?>>Scope</a>
+        <a href="/gallery"<?= str_starts_with($currentPath, '/gallery') ? ' aria-current="page"' : '' ?>>Gallery</a>
+        <a href="/faculty"<?= str_starts_with($currentPath, '/faculty') ? ' aria-current="page"' : '' ?>>Faculty</a>
         <a href="/shop"<?= str_starts_with($currentPath, '/shop') ? ' aria-current="page"' : '' ?>>Shop</a>
         <a href="/consult"<?= str_starts_with($currentPath, '/consult') ? ' aria-current="page"' : '' ?>>Therapies</a>
         <a href="/temples"<?= str_starts_with($currentPath, '/temples') ? ' aria-current="page"' : '' ?>>Hospital</a>
@@ -352,9 +366,9 @@ if ($__flash):
 <?php if (!in_array($currentPath, ['/login', '/register'])): ?>
 <nav class="bottom-nav" id="bottom-nav">
     <div class="nav-grid">
-        <a href="/education" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/education') === 0 ? 'active' : '') ?>">
-            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            <span>B.E.M.S.</span>
+        <a href="/courses" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/courses') === 0 ? 'active' : '') ?>">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Courses</span>
         </a>
         <a href="/shop" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/shop') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -419,12 +433,13 @@ if ($__flash):
             <div>
                 <h4 class="footer-heading">Institute</h4>
                 <ul class="footer-links">
-                    <li><a href="/education">B.E.M.S. Admissions</a></li>
-                    <li><a href="/shop">Therapy Products</a></li>
-                    <li><a href="/consult">Therapies</a></li>
-                    <li><a href="/temples">Hospital</a></li>
+                    <li><a href="/courses">All Courses</a></li>
+                    <li><a href="/courses/bems">B.E.M.S. Admissions</a></li>
+                    <li><a href="/eligibility">Eligibility</a></li>
+                    <li><a href="/scope">Career Scope</a></li>
+                    <li><a href="/gallery">Gallery</a></li>
+                    <li><a href="/faculty">Faculty &amp; Administration</a></li>
                     <li><a href="/about">About</a></li>
-                    <li><a href="/blog">Blog</a></li>
                     <li><a href="/contact">Contact</a></li>
                     <li><a href="/terms">Terms</a></li>
                     <li><a href="/privacy">Privacy</a></li>
@@ -448,7 +463,7 @@ if ($__flash):
                 <ul class="footer-links">
                     <li><a href="tel:+919790221065">+91 97902 21065</a></li>
                     <li><a href="tel:+919789444038">+91 97894 44038</a></li>
-                    <li><a href="mailto:support@auraedu.co.ingmail.com">support@auraedu.co.ingmail.com</a></li>
+                    <li><a href="mailto:auramieh2017@gmail.com">auramieh2017@gmail.com</a></li>
                 </ul>
             </div>
         </div>

@@ -7,14 +7,14 @@ flowchart LR
   classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b
   classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12
 
-  subgraph ARCH["Architecture Overview — 127 routes, 15 controllers, 43 services, 49 views, 0 data files, 24 tools"]
-    arch_routes["> Routes: 127 (Public + Auth + Payment + Admin + Support)"]:::arch
+  subgraph ARCH["Architecture Overview — 133 routes, 15 controllers, 43 services, 56 views, 0 data files, 24 tools"]
+    arch_routes["> Routes: 133 (Public + Auth + Payment + Admin + Support)"]:::arch
     arch_ctrl["> Controllers: 15"]:::arch
     arch_svc["> Services: 43"]:::arch
-    arch_views["> Views: 49"]:::arch
+    arch_views["> Views: 56"]:::arch
     arch_data["> Collections: 22 schema | 0 files"]:::arch
     arch_tools["> Tools: 24"]:::arch
-    arch_gaps["> Gaps: 2"]:::arch
+    arch_gaps["> Gaps: 1"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
@@ -24,6 +24,12 @@ flowchart LR
     route_get_about["GET /about — About AuraEdu — story, values, CTA"]:::route
     route_get_sri_panchami_education["GET /sri-panchami-education — AuraEdu landing page"]:::route
     route_get_education["GET /education — Short education landing redirect-equivalent page"]:::route
+    route_get_courses["GET /courses"]:::route
+    route_get_courses_slug["GET /courses/{slug}"]:::route
+    route_get_eligibility["GET /eligibility"]:::route
+    route_get_scope["GET /scope"]:::route
+    route_get_gallery["GET /gallery"]:::route
+    route_get_faculty["GET /faculty"]:::route
     route_get_terms["GET /terms — Terms of Service — 15 sections, legal"]:::route
     route_get_privacy["GET /privacy — Privacy Policy — 14 sections, data handling"]:::route
     route_get_consult["GET /consult — Astrologer marketplace — browse and book"]:::route
@@ -269,13 +275,20 @@ flowchart LR
     view_public_checkout["public/checkout"]:::code
     view_public_consult["public/consult"]:::code
     view_public_contact["public/contact"]:::code
+    view_public_course["public/course"]:::code
+    view_public_courses["public/courses"]:::code
+    view_public_education["public/education"]:::code
+    view_public_eligibility["public/eligibility"]:::code
+    view_public_faculty["public/faculty"]:::code
     view_public_forgot_password["public/forgot-password"]:::code
+    view_public_gallery["public/gallery"]:::code
     view_public_home["public/home"]:::code
     view_public_login["public/login"]:::code
     view_public_privacy["public/privacy"]:::code
     view_public_product["public/product"]:::code
     view_public_register["public/register"]:::code
     view_public_reset_password["public/reset-password"]:::code
+    view_public_scope["public/scope"]:::code
     view_public_shop["public/shop"]:::code
     view_public_sitemap["public/sitemap"]:::code
     view_public_spiritual["public/spiritual"]:::code
@@ -346,7 +359,6 @@ flowchart LR
   end
 
   subgraph GAPS["Gaps & Missing Links"]
-    gap_0bd02c5615["missing_view_files: public/education"]:::gap
     gap_a852d47145["unwired_views: public/spiritual"]:::gap
   end
 
@@ -362,6 +374,18 @@ flowchart LR
   controller_publiccontroller -. renders .-> view_public_education
   route_get_education --> controller_publiccontroller
   controller_publiccontroller -. renders .-> view_public_education
+  route_get_courses --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_courses
+  route_get_courses_slug --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_course
+  route_get_eligibility --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_eligibility
+  route_get_scope --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_scope
+  route_get_gallery --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_gallery
+  route_get_faculty --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_faculty
   route_get_terms --> controller_publiccontroller
   controller_publiccontroller -. renders .-> view_public_terms
   route_get_privacy --> controller_publiccontroller
@@ -920,5 +944,4 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
-  gap_0bd02c5615 -. missing .-> view_public_education
   gap_a852d47145 -. missing .-> view_public_spiritual

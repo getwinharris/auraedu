@@ -16,6 +16,12 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/about','name'=>'about','page'=>'public/about','controller'=>'PublicController@about','services'=>[]],
             ['method'=>'GET','path'=>'/sri-panchami-education','name'=>'education','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
             ['method'=>'GET','path'=>'/education','name'=>'education.short','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
+            ['method'=>'GET','path'=>'/courses','name'=>'courses','page'=>'public/courses','controller'=>'PublicController@courses','services'=>[]],
+            ['method'=>'GET','path'=>'/courses/{slug}','name'=>'courses.show','page'=>'public/course','controller'=>'PublicController@course','services'=>[]],
+            ['method'=>'GET','path'=>'/eligibility','name'=>'eligibility','page'=>'public/eligibility','controller'=>'PublicController@eligibility','services'=>[]],
+            ['method'=>'GET','path'=>'/scope','name'=>'scope','page'=>'public/scope','controller'=>'PublicController@scope','services'=>[]],
+            ['method'=>'GET','path'=>'/gallery','name'=>'gallery','page'=>'public/gallery','controller'=>'PublicController@gallery','services'=>[]],
+            ['method'=>'GET','path'=>'/faculty','name'=>'faculty','page'=>'public/faculty','controller'=>'PublicController@faculty','services'=>[]],
             ['method'=>'GET','path'=>'/terms','name'=>'terms','page'=>'public/terms','controller'=>'PublicController@terms','services'=>[]],
             ['method'=>'GET','path'=>'/privacy','name'=>'privacy','page'=>'public/privacy','controller'=>'PublicController@privacy','services'=>[]],
 

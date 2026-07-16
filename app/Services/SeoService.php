@@ -44,24 +44,25 @@ final class SeoService {
     }
 
     private function defaults(string $key): array {
-        $brand = 'AuraEdu';
-        $desc = 'Shop authentic education products and request scheduled consultations with verified consultants.';
+        $brand = 'Aura Medical Institute of Electropathy and Hospital';
+        $short = 'Aura Medical Institute';
+        $desc = 'Aura Medical Institute of Electropathy and Hospital — electropathy, acupuncture, and allied-health healthcare-skilling in Coimbatore. B.E.M.S., M.D.E.H., D.Acu, M.Acu and Hotel Management courses. Admissions open.';
         $maps = [
             'home' => [
-                'title' => $brand . ' – Online Astrology Consultation, education Products & Temple Guide',
-                'description' => 'Shop authentic education products, rudraksha, pooja items, and sacred jewellery, or request a scheduled consultation.',
+                'title' => $short . ' — Electropathy, Acupuncture & Allied-Health Courses',
+                'description' => $desc,
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'shop' => [
-                'title' => 'Shop education Products – Rudraksha, Pooja Items, Sacred Jewellery Online',
-                'description' => 'Browse authentic education products online at ' . $brand . '. Shop rudraksha, pooja items, sacred jewellery, and more for your education practice. Fast shipping across India.',
+                'title' => 'Therapy & Acupuncture Products – ' . $short,
+                'description' => 'Clinically oriented acupuncture and electropathy therapy products from ' . $short . ', Coimbatore.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
             'product' => [
-                'title' => 'Buy education Products Online',
-                'description' => 'Browse our collection of authentic education products.',
+                'title' => 'Therapy Products Online',
+                'description' => 'Browse our collection of acupuncture and electropathy therapy products.',
                 'og_type' => 'product',
                 'robots' => 'index, follow',
             ],
@@ -102,8 +103,44 @@ final class SeoService {
                 'robots' => 'index, follow',
             ],
             'education' => [
-                'title' => $brand . ' – Traditional Wisdom & Devotional Practice',
-                'description' => 'Explore ' . $brand . ' for authentic education guidance, traditional wisdom, devotional practices, and sacred products for your education journey.',
+                'title' => $short . ' — B.E.M.S. Electropathy Programme',
+                'description' => 'B.E.M.S. (Bachelor of Electro-Medical Sciences) at ' . $short . ', Coimbatore — electropathy medical education with hospital training. No NEET, no age bar.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'courses' => [
+                'title' => 'Courses Offered — ' . $short,
+                'description' => 'Electropathy, acupuncture, and allied-health programmes at ' . $short . ', Coimbatore — B.E.M.S., M.D.E.H., D.Acu, M.Acu, and Hotel Management. Admissions open.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'course' => [
+                'title' => 'Course — ' . $short,
+                'description' => 'Programme details, duration, and eligibility at ' . $short . ', Coimbatore.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'eligibility' => [
+                'title' => 'Eligibility & Admissions — ' . $short,
+                'description' => 'Admissions at ' . $short . ': no NEET, no age bar. Documents, eligibility, and how to apply for B.E.M.S. and allied-health courses.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'scope' => [
+                'title' => 'Career Scope — ' . $short,
+                'description' => 'Career pathways after electropathy, acupuncture, and allied-health training at ' . $short . ', Coimbatore.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'gallery' => [
+                'title' => 'Gallery — ' . $short,
+                'description' => 'Campus, hospital, therapy practice, and student life at ' . $short . ', Coimbatore.',
+                'og_type' => 'website',
+                'robots' => 'index, follow',
+            ],
+            'faculty' => [
+                'title' => 'Faculty & Administration — ' . $short,
+                'description' => 'Meet the faculty and administration behind ' . $short . ', Coimbatore.',
                 'og_type' => 'website',
                 'robots' => 'index, follow',
             ],
@@ -205,10 +242,10 @@ final class SeoService {
             '@context' => 'https://schema.org',
             '@type' => ['Organization', 'OnlineStore'],
             'name' => $this->siteName,
-            'description' => 'Authentic education products, sacred jewellery, expert Vedic astrology consultation, and temple guidance.',
+            'description' => 'Aura Medical Institute of Electropathy and Hospital — electropathy, acupuncture, and allied-health healthcare-skilling in Coimbatore.',
             'url' => $this->pageUrl(''),
             'telephone' => $this->telephone,
-            'email' => 'support@auraedu.co.ingmail.com',
+            'email' => 'auramieh2017@gmail.com',
         ];
     }
 
