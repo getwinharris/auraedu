@@ -34,6 +34,18 @@ git push -u origin HEAD
 Pushing an eligible feature/fix branch lets the repository workflow create or
 update the PR. CI and reviewer handoffs run in GitHub Actions.
 
+## Workflow Conditions
+
+All `.github/workflows/*.yml` files contain an `if:` guard matching the
+repository name. When the repo is renamed or forked, update every workflow:
+
+- `branch-pr.yml`: `github.repository == '<owner>/<repo>'`
+- `ci.yml`, `ai-pr-review.yml`, `issue-agent-trigger.yml`, `issue-comment-handoff.yml`: `endsWith(github.repository, '<repo>')`
+- `sync-upstream.yml`: `github.repository == '<owner>/<repo>'`
+
+All seven workflow files must match the current repository. CI runs are
+otherwise silently skipped.
+
 ## Hostinger
 
 ```bash
