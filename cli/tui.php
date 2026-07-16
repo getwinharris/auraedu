@@ -41,24 +41,15 @@ function gitBranch(): string {
 function gitDirty(): bool {
     return trim(shell_exec('git status --porcelain 2>/dev/null') ?? '') !== '';
 }
-function handoffSummary(string $root): array {
-    $dir = $root . '/.agents/handoffs';
-    $pass = 0; $gap = 0; $files = [];
-    if (is_dir($dir)) {
-        foreach (glob($dir . '/*.json') as $f) {
-            $data = json_decode((string)file_get_contents($f), true);
-            if (!is_array($data)) continue;
-            $objs = $data['objectives'] ?? $data['findings'] ?? [];
-            $hasGap = false;
-            foreach ((is_array($objs) ? $objs : []) as $o) {
-                $status = strtolower((string)($o['status'] ?? $o['verdict'] ?? ''));
-                if ($status === 'gap' || $status === 'fail') { $hasGap = true; $gap++; }
-                elseif ($status === 'pass') { $pass++; }
-            }
-            $files[] = [basename($f), $hasGap ? 'gap' : 'pass'];
-        }
-    }
-    return [$pass, $gap, $files];
+function activeHandoff(string $root): string {
+    $path = $root . '/.agents/handoffs/active/current.json';
+    if (!is_file($path)) return 'none';
+    $data = json_decode((string)file_get_contents($path), true);
+    if (!is_array($data)) return 'invalid';
+    $issue = (int)($data['issue'] ?? 0);
+    $role = (string)($data['workflow']['current_role'] ?? '?');
+    $next = (string)($data['workflow']['next_role'] ?? '?');
+    return $issue > 0 ? "#{$issue} {$role} -> {$next}" : 'invalid';
 }
 
 $menu = [
@@ -98,10 +89,9 @@ function render(array $flat, int $cursor, string $root): void {
     echo "\033[2J\033[H"; // clear + home
     $branch = gitBranch();
     $dirty = gitDirty() ? "\033[33mdirty\033[0m" : "\033[32mclean\033[0m";
-    [$pass, $gap] = handoffSummary($root);
+    $handoff = activeHandoff($root);
     echo "\033[1mbapXphp\033[0m  —  branch \033[36m{$branch}\033[0m  ({$dirty})";
-    echo "   handoffs: \033[32m{$pass} pass\033[0m";
-    echo $gap > 0 ? " \033[31m{$gap} gap\033[0m\n" : "\n";
+    echo "   handoff: \033[36m{$handoff}\033[0m\n";
     echo str_repeat('─', 60) . "\n";
     foreach ($flat as $i => $row) {
         if ($row[0] === 'header') {
