@@ -2938,14 +2938,6 @@ h1, h2, h3, h4, h5, h6,
     letter-spacing: 0;
 }
 
-.site-header {
-    min-height: 80px;
-    padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.98);
-    border-bottom-color: var(--color-border-light);
-    backdrop-filter: none;
-}
-
 .site-header nav a {
     position: relative;
     letter-spacing: 0;
@@ -2959,7 +2951,7 @@ h1, h2, h3, h4, h5, h6,
 .site-header nav a[aria-current="page"]::after {
     position: absolute;
     right: 0;
-    bottom: -7px;
+    bottom: -2px;
     left: 0;
     height: 2px;
     border-radius: var(--radius-pill);
@@ -3086,19 +3078,6 @@ h1, h2, h3, h4, h5, h6,
 .astrologer-card__photo { transition: none; }
 .product-card:hover .product-card__image img { transform: none; }
 
-.site-footer {
-    border-top: 1px solid var(--color-border-light);
-    background: var(--color-white);
-    color: var(--color-text-muted);
-}
-.footer-brand,
-.footer-heading { color: var(--color-ink); letter-spacing: 0; }
-.footer-links a { color: var(--color-text-muted); }
-.footer-links a:hover { color: var(--color-ink); }
-.footer-bottom { border-top-color: var(--color-border-light); color: var(--color-text-light); }
-.footer-bottom a { color: var(--color-gold); }
-.footer-bottom a:hover { color: var(--color-gold-dark); }
-
 .qty-input--sm { height: 30px; min-height: 30px; border: 1.5px solid var(--color-gold); background: var(--color-gold-light); border-radius: 999px; overflow: hidden; display: flex; align-items: center; }
 .qty-input--sm button { padding: 0 0.4rem; font-size: 0.8rem; line-height: 1; color: var(--color-maroon); background: transparent; border: 0; cursor: pointer; height: 100%; display: flex; align-items: center; transition: background var(--transition-base); }
 .qty-input--sm button:hover { background: var(--color-gold); }
@@ -3130,34 +3109,7 @@ h1, h2, h3, h4, h5, h6,
     .section { padding: 56px 24px; }
 }
 
-/* Client maroon and gold marketplace treatment */
-body { background: var(--color-bg); }
-
-.site-header {
-    position: relative;
-    top: auto;
-    background: rgba(250, 247, 240, 0.98);
-    border-bottom-color: rgba(209, 179, 104, 0.45);
-}
-.brand img { border-color: var(--color-gold); }
-.site-header nav a[aria-current="page"]::after { background: var(--color-gold); }
-.cart-count { background: var(--color-maroon); }
-
-.deity-frame { border-color: var(--color-gold); }
-.trust-bar,
-.section--alt { background: var(--color-bg-alt); }
-
-.btn-outline,
-.btn-ghost { border-color: var(--color-gold); background: var(--color-gold-light); color: var(--color-maroon); }
-.btn-outline:hover,
-.btn-ghost:hover { border-color: var(--color-gold-dark); background: var(--color-gold); color: var(--color-maroon); }
-
-.product-card__image,
-.category-img-wrap,
-.temple-feature-card__media { background: var(--color-bg-alt); }
-.product-card { border-color: rgba(209, 179, 104, 0.5); }
-.product-card__image { border-bottom: 1px solid rgba(209, 179, 104, 0.35); }
-.price { color: var(--color-maroon); }
+/* Alignments and legacy overrides cleaned — bapXaura design system active */
 
 /* Warm accent section */
 .section--warm {
@@ -3398,17 +3350,6 @@ body { background: var(--color-bg); }
 .astro-carousel { padding: 72px 8px 20px; }
 .astro-carousel .astro-market-card { width: min(292px, 82vw); }
 
-.site-footer {
-    border-top-color: var(--color-gold);
-    background: var(--color-maroon);
-    color: var(--color-gold-light);
-}
-.footer-brand,
-.footer-heading { color: var(--color-gold); }
-.footer-links a,
-.footer-bottom { color: var(--color-text-muted); }
-.footer-links a:hover { color: var(--color-ink); }
-.footer-bottom { border-top-color: rgba(209, 179, 104, 0.3); }
 .support-fab { background: var(--color-maroon); color: var(--color-gold); border: 1px solid var(--color-gold); }
 
 @media (max-width: 743px) {
