@@ -27,7 +27,7 @@ homepage.yml
 storage/.bin/chrome-linux/
 storage/.bin/kitten-tts/
 
-# Secrets — never commit
-.env
+# Secrets — .env is committed for this project's shared-host deploy (private repo).
+# .env.mysql and .env.test-user stay local-only.
 .env.mysql
 .env.test-user

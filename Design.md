@@ -3,67 +3,66 @@ version: alpha
 name: AuraEdu
 description: Calm, credible interface system for a consultation-first education service with supporting commerce and editorial content.
 colors:
-  primary: "#3a0003"
+  primary: "#08A900"
   on-primary: "#ffffff"
-  primary-container: "#651016"
-  on-primary-container: "#f3e8c9"
-  secondary: "#7a4a35"
+  primary-container: "#00A816"
+  on-primary-container: "#E6F7E6"
+  secondary: "#087E82"
   on-secondary: "#ffffff"
-  secondary-container: "#a67a64"
-  on-secondary-container: "#faf7f0"
-  tertiary: "#d1b368"
-  on-tertiary: "#3a0003"
-  tertiary-container: "#f3e8c9"
-  on-tertiary-container: "#5c4315"
-  neutral: "#faf7f0"
-  neutral-variant: "#f7f0e4"
-  surface: "#faf7f0"
-  surface-container: "#f6ede4"
-  outline: "#d8ccb7"
-  outline-variant: "#eadfcd"
-  ink: "#222222"
-  ink-muted: "#6a6259"
-  ink-soft: "#91877c"
-  success: "#2d8a4e"
-  warning: "#e8a317"
-  error: "#d64045"
-  info: "#3b82f6"
+  secondary-container: "#0A9A9F"
+  on-secondary-container: "#E4F4F4"
+  tertiary: "#EF6900"
+  on-tertiary: "#ffffff"
+  tertiary-container: "#FDEEE2"
+  on-tertiary-container: "#5c2a00"
+  neutral: "#F1F1F1"
+  neutral-variant: "#E6E6E6"
+  surface: "#FFFFFF"
+  surface-container: "#F1F1F1"
+  outline: "#D7D7D7"
+  outline-variant: "#E6E6E6"
+  ink: "#454545"
+  ink-muted: "#6A6A6A"
+  ink-soft: "#8E8E8E"
+  success: "#08A900"
+  warning: "#EF6900"
+  error: "#D64045"
+  info: "#087E82"
 typography:
   display:
-    fontFamily: Inter
-    fontSize: 1.75rem
-    fontWeight: 700
-    lineHeight: 1.2
+    fontFamily: "Bebas Neue"
+    fontSize: 2.5rem
+    fontWeight: 400
+    lineHeight: 1.1
   h2:
-    fontFamily: Inter
-    fontSize: 1.375rem
+    fontFamily: "Oswald"
+    fontSize: 1.5rem
     fontWeight: 600
-    lineHeight: 1.3
+    lineHeight: 1.2
   body-md:
-    fontFamily: Inter
+    fontFamily: "Montserrat"
     fontSize: 1rem
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.7
   body-sm:
-    fontFamily: Inter
+    fontFamily: "Montserrat"
     fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   label:
-    fontFamily: Inter
+    fontFamily: "Montserrat"
     fontSize: 0.8rem
     fontWeight: 600
     lineHeight: 1.4
-  accent-italic:
-    fontFamily: Playfair Display
-    fontSize: 1.05rem
-    fontWeight: 600
+  tamil:
+    fontFamily: "Noto Sans Tamil"
+    fontWeight: 800
 rounded:
   xs: 4px
   sm: 8px
-  md: 8px
-  lg: 8px
-  xl: 8px
+  md: 14px
+  lg: 20px
+  xl: 32px
   pill: 999px
 spacing:
   2xs: 2px
@@ -84,6 +83,11 @@ components:
   button-primary-hover:
     backgroundColor: "{colors.primary-container}"
   button-secondary:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.on-secondary}"
+    rounded: "{rounded.sm}"
+    height: 48px
+  button-cta:
     backgroundColor: "{colors.tertiary}"
     textColor: "{colors.on-tertiary}"
     rounded: "{rounded.sm}"
@@ -93,46 +97,46 @@ components:
     rounded: "{rounded.sm}"
     padding: 16px
   card-astrologer:
-    backgroundColor: "{colors.on-primary}"
+    backgroundColor: "{colors.surface}"
     rounded: "{rounded.sm}"
   input:
-    backgroundColor: "{colors.on-primary}"
+    backgroundColor: "{colors.surface}"
     rounded: "{rounded.sm}"
     height: 48px
 ---
 
 ## Overview
 
-AuraEdu is a consultation-first service. The primary customer journey is discover consultant -> review profile -> request an appointment -> manage the session. education products and editorial content support that service; they do not replace it in the first viewport. This file is the canonical visual contract for everything customer-facing in `views/` and `assets/css/band.css`.
-
-Commercial references such as Deiveegaa are used to audit product clarity, imagery, pricing, policies, testimonials, FAQs, and checkout visibility. Do not copy their visual identity or unverified product claims; use the comparison to expose missing commerce information and interaction wiring.
+AuraEdu (Aura Medical Institute of Electropathy and Hospital) is a healthcare-and-education institution. The primary customer journey is discover a course / treatment -> review details -> request an appointment / admission -> manage the session. Editorial content and commerce support that journey; they do not replace it in the first viewport. This file is the canonical visual contract for everything customer-facing in `views/` and `assets/css/band.css`.
 
 Keep the existing PHP templates, routes, forms, and JSON-backed behavior. Design changes must not scaffold a second frontend.
 
 ## Colors
 
-- **Primary -- deep maroon (`#3a0003`):** headers, primary buttons, price, active nav state. `on-primary` is white; `primary-container` (`#651016`) is the maroon-active/pressed state.
-- **Secondary -- warm brown (`#7a4a35`):** supporting accent, links-on-dark, secondary emphasis.
-- **Tertiary -- muted gold (`#d1b368`):** secondary buttons, active underline, eyebrow labels, dividers. `on-tertiary` is maroon text for contrast.
-- **Surface (`#faf7f0`) / surface-container (`#f6ede4`):** canvas and warm alternate-section background. Never pure white as a page background; white (`on-primary`) is reserved for cards and inputs so they read as raised above the canvas.
+- **Primary -- Aura Green (`#08A900`, range `#00A816`–`#149F13`):** dominant brand colour. Logo, major backgrounds, course panels, headings, icons, footer, and primary call-to-action elements. `on-primary` is white; `primary-container` (`#00A816`) is the pressed/active state. White text on green is the accessible default.
+- **Secondary -- Energy Orange (`#EF6900`, range `#E96308`–`#F27612`):** reserved strictly for calls to action, admission messaging, important announcements, and phone-number bars. Orange creates urgency against green. Use white text only when the orange is sufficiently dark; for small text use charcoal (`#454545`) over orange.
+- **Supporting -- Institutional Teal (`#087E82`):** affiliation strips, secondary information bars, institutional details.
+- **Charcoal (`#454545`):** course duration, hostel and placement information, body text hierarchy.
+- **Soft Grey (`#F1F1F1`):** background shapes, section separation, subtle visual depth.
+- **White (`#FFFFFF`):** text over green/orange/teal backgrounds, clean medical backgrounds, visual breathing space. Predominantly white backgrounds preserve a clean healthcare appearance.
 - **Outline / outline-variant:** hairline borders only -- no heavy strokes.
 - **Ink / ink-muted / ink-soft:** body text hierarchy from primary copy down to placeholders.
-- Success, warning, error, info are semantic exceptions -- they may break the earthy palette when, and only when, they communicate order/payment/form state.
+- Success uses Aura Green; warning uses Energy Orange; error is red; info uses teal.
 
 ## Typography
 
-- Body: Inter (300-700) with system sans-serif fallbacks.
-- Display headings: Inter, weight 600-700, `22px`-`28px`.
-- `accent-italic` (Playfair Display, 600 italic): decorative highlight only -- eyebrow labels and value-card titles. Never body text.
-- Body copy: `14px`-`16px`, weight 400, line-height `1.45`-`1.6`.
-- Labels/metadata: `12px`-`14px`, weight 500-600.
-- Letter-spacing is `0` everywhere except short operational labels (table headers, filter labels, badges), where uppercase + slight tracking is acceptable. Buttons and headings are never uppercase.
+- **Main English headings: Bebas Neue** (tall, condensed, bold display). Use for hero/H1-scale headings (B.E.M.S, NO NEET, NO AGE BAR, CALL +91…).
+- **Secondary English headings: Oswald Bold** for smaller condensed promotional and section headings.
+- **Body text: Montserrat** Regular/Medium, `14px`–`16px`, weight 400, line-height `1.7`.
+- **Tamil headings: Noto Sans Tamil ExtraBold**; Tamil body: Noto Sans Tamil Regular/Medium.
+- Two type families (English + Tamil equivalent) maximum. Reserve orange strictly for CTAs and critical admission info.
+- Labels/metadata: `12px`–`14px`, weight 500-600.
 
 ## Layout
 
 - Spacing scale: `2, 4, 8, 16, 24, 32, 48, 64px`.
 - Container: centered, max `1300px` (`1440px` for wide layouts).
-- `.section`: `64px` vertical padding by default. `.section--alt` uses `surface-container`; `.section--warm` uses the warmer `#f6ede4` for value sections.
+- `.section`: `64px` vertical padding by default. `.section--alt` uses `surface-container` (`#F1F1F1`) for alternate sections.
 - Responsive breakpoints: mobile below `744px` (one column, compact header, bottom nav), tablet `744-1128px` (reduced grid columns, same card geometry), desktop above `1128px` (centered container, `64px` section spacing).
 - Text, buttons, images, and fixed controls must not overlap or reflow awkwardly as content length changes.
 - Do not scale typography with viewport width. Use explicit breakpoint sizes so headings remain predictable and do not dominate short mobile screens.
@@ -142,7 +146,7 @@ Keep the existing PHP templates, routes, forms, and JSON-backed behavior. Design
 
 ## Elevation & Depth
 
-Depth is used sparingly and tonally-first, the way Material 3 treats elevation: a surface reads as "raised" primarily because it's a different, lighter tone than the canvas (white card on warm surface), with a soft shadow as the secondary cue -- not a spotlight effect.
+Depth is used sparingly and tonally-first, the way Material 3 treats elevation: a surface reads as "raised" primarily because it's a different, lighter tone than the canvas (white card on light grey surface), with a soft shadow as the secondary cue -- not a spotlight effect.
 
 Four shadow steps exist (`--shadow-sm/md/lg/xl` in `band.css`), each with exactly one job:
 
@@ -175,11 +179,11 @@ Shape should stay consistent within a component family -- don't mix `sm` and `lg
 
 ## Components
 
-- **Header:** warm-neutral (`rgba(250,247,240,0.98)`), ~`80px` tall, non-sticky, hairline bottom border (`rgba(209,179,104,0.45)`), compact logo, centered primary nav with a gold active underline, right-aligned account/cart actions.
+- **Header:** light (`rgba(255,255,255,0.98)`), ~`80px` tall, non-sticky, hairline bottom border (`rgba(8,169,0,0.45)`), compact logo, centered primary nav with a green active underline, right-aligned account/cart actions.
 - **Navigation:** the linked brand mark and name are the sole home control. Do not repeat a separate Home item in desktop or mobile navigation.
-- **Mobile commerce tray:** after the cart becomes non-empty, show one fixed maroon tray above the bottom navigation with item count and a direct View cart action. Use an 8px radius and stable 56px minimum height; update it without page reload.
+- **Mobile commerce tray:** after the cart becomes non-empty, show one fixed green tray above the bottom navigation with item count and a direct View cart action. Use an 8px radius and stable 56px minimum height; update it without page reload.
 - **Editorial media:** every blog post uses one intentional 16:9 image for both its listing thumbnail and article hero. UI guides use a legible screenshot of the exact page, cropped around the relevant interface rather than a decorative stock image, and link the represented page below the article.
-- **Buttons (`button-primary` / `button-secondary`):** `48px` minimum height, `8px` radius, no uppercase, no letter-spacing. Primary is solid maroon with a gold hover overlay; hover moves from `shadow-md` to `shadow-lg` and lifts 2px, no more. Secondary is gold-on-maroon-text. Hover states never shift layout.
+- **Buttons (`button-primary` / `button-secondary` / `button-cta`):** `48px` minimum height, `8px` radius, no uppercase, no letter-spacing. Primary is solid Aura Green; Secondary is teal; CTA is orange for admission/urgent actions. Hover moves from `shadow-md` to `shadow-lg` and lifts 2px, no more. Hover states never shift layout.
 - **Forms:** white fields (`on-primary`), `8px` radius, `48px` height, clear labels, a single-value focus ring (`--shadow-focus`) -- no glow.
 - **Search/filter:** one rounded (`pill`) search control, or a quiet grouped filter row. No nested cards for filters.
 - **Product cards (`card-product`):** white, `8px` radius, 1px quiet border, stable 1:1 media, concise title and price, then the `- 0 +` quantity control. Do not add a second cart button.
