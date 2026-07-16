@@ -5,7 +5,7 @@
             <h1>B.E.M.S. — Electropathy Medical Education &amp; Care</h1>
             <p class="lede">Aura Medical Institute of Electropathy and Hospital offers the Bachelor of Electro-Medical Sciences (B.E.M.S.) programme, hospital training, and integrated alternative-medicine care — no NEET, no age bar.</p>
             <div class="hero-actions">
-                <a href="/education" class="btn btn-primary">Explore B.E.M.S. Admissions</a>
+                <a href="/education" class="btn btn-accent btn-lg">Explore B.E.M.S. Admissions</a>
                 <a href="/contact" class="btn btn-outline">Book a Hospital Visit</a>
             </div>
             <div class="hero-stats">
