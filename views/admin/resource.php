@@ -35,12 +35,12 @@
                 </label>
             <?php endforeach; ?>
         </div>
-        <?php if(in_array($collection, ['products','temples','astrologers'], true)): ?>
+        <?php if(in_array($collection, ['products','temples'], true)): ?>
             <div class="admin-upload-panel">
                 <label>Upload Media Files
                     <input type="file" name="media_files[]" id="field-media-files" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
                 </label>
-                <p>Uploaded files are saved into the media library by upload time. Product uploads are added to the gallery; temple and astrologer uploads fill the main image when empty.</p>
+                <p>Uploaded files are saved into the media library by upload time. Product uploads are added to the gallery; temple/facility uploads fill the main image when empty.</p>
                 <div class="admin-image-preview" id="product-image-preview"></div>
             </div>
             <?php if(!empty($mediaFiles)): ?>
@@ -58,7 +58,7 @@
                                     <button type="button" class="btn btn-sm btn-ghost use-media" data-field="image_url" data-path="<?= e($media['url'] ?? $media['path']) ?>">Primary</button>
                                     <button type="button" class="btn btn-sm btn-ghost use-media" data-field="image_urls" data-append="1" data-path="<?= e($media['url'] ?? $media['path']) ?>">Gallery</button>
                                 <?php else: ?>
-                                    <button type="button" class="btn btn-sm btn-ghost use-media" data-field="<?= $collection === 'astrologers' ? 'photo_url' : 'image_url' ?>" data-path="<?= e($media['url'] ?? $media['path']) ?>">Use</button>
+                                    <button type="button" class="btn btn-sm btn-ghost use-media" data-field="image_url" data-path="<?= e($media['url'] ?? $media['path']) ?>">Use</button>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>

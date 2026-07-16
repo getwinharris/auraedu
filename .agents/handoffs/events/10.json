@@ -1,0 +1,37 @@
+{
+  "event_type": "issues.opened",
+  "issue": 10,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "fix: update admin labels from 'Temples' to 'Hospital Facilities'",
+    "body": "Admin panel still shows 'Temples' in dashboard card and media context dropdown. Update labels to 'Hospital Facilities'. Admin URL path /admin/temples kept for backward compat with MySQL table name.",
+    "labels": ["admin", "ui"],
+    "repository": {
+      "owner": "getwinharris",
+      "name": "auraedu"
+    }
+  },
+  "objectives": [
+    {
+      "id": "OBJ-ADMIN-LABEL-1",
+      "status": "pass",
+      "evidence": [
+        "views/admin/dashboard.php: 'Manage astrologers, remote session requests, and temples'→'Manage sessions, hospital facilities, and appointments'",
+        "views/admin/dashboard.php: removed Astrologers link, Temples→Hospital Facilities link",
+        "views/admin/media.php: 'Temples'→'Hospital Facilities', removed 'Astrologers' option",
+        "views/admin/resource.php: collection check removed astrologers, data-field ternary simplified"
+      ],
+      "browser_evidence": [],
+      "unresolved": []
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

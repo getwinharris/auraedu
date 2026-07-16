@@ -14,7 +14,7 @@ final class MediaService {
     public function all(?string $context = null): array {
         if ($context) return $this->readWithAliases($context);
         $all = [];
-        foreach (['shared','products','temples','astrologers'] as $ctx) {
+        foreach (['shared','products','temples'] as $ctx) {
             $all = array_merge($all, $this->readWithAliases($ctx));
         }
         usort($all, fn($a,$b) => strcmp((string)($b['created_at']??''), (string)($a['created_at']??'')));
@@ -78,7 +78,7 @@ final class MediaService {
     }
 
     public function delete(string $id, ?string $context = null): void {
-        $contexts = $context ? [$context] : ['shared','products','temples','astrologers'];
+        $contexts = $context ? [$context] : ['shared','products','temples'];
         foreach ($contexts as $ctx) {
             $filePath = '';
             $records = array_values(array_filter($this->readYaml($ctx), function($r) use ($id, &$filePath) {
@@ -247,7 +247,7 @@ final class MediaService {
     private function scanExistingAssets(): array {
         $base = app_path('assets/images');
         $items = [];
-        foreach (['products', 'temples', 'astrologers'] as $context) {
+        foreach (['products', 'temples'] as $context) {
             $dir = $base . '/' . $context;
             if (!is_dir($dir)) continue;
             foreach (glob($dir . '/*.{jpg,jpeg,png,webp,gif,svg}', GLOB_BRACE) ?: [] as $file) {

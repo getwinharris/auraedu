@@ -44,7 +44,7 @@ try {
         '/contact' => 200,
         '/consult' => 200,
         '/consult/shrikanth-purushothaman' => 404,
-        '/temples' => 200,
+        '/hospitals' => 200,
         '/sri-panchami-education' => 301,
         '/forgot-password' => 200,
         '/reset-password' => 200,
@@ -107,7 +107,7 @@ try {
         '/api/categories',
         '/api/product/karuppasami-dollar',
         '/api/consult',
-        '/api/temples',
+        '/api/hospitals',
     ] as $path) {
         $response = httpRequest($base . $path);
         json_decode($response['body'], true);

@@ -97,9 +97,14 @@ if ($uri === '/sri-panchami-education') {
     header('Location: /education', response_code: 301);
     exit;
 }
+if (str_starts_with($uri, '/temples')) {
+    $newPath = '/hospitals' . substr($uri, 8);
+    header('Location: ' . $newPath, response_code: 301);
+    exit;
+}
 
 // PHP routes (admin + public pages)
-$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/consult','/temples','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/courses','/eligibility','/scope','/gallery','/faculty','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
+$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/consult','/hospitals','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/courses','/eligibility','/scope','/gallery','/faculty','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
 $isPhpRoute = false;
 foreach ($phpRoutes as $route) {
     if (strpos($uri, $route . '/') === 0 || $uri === $route) {

@@ -134,13 +134,13 @@ final class PublicController extends BaseController {
         $this->render('public/consult', ['items' => [], 'reviews' => $reviews]);
     }
 
-    public function temples(): void { 
+    public function hospitals(): void { 
         $this->detectApiRequest();
         $this->seoKey = 'temples';
-        $this->render('public/temples', ['items' => (new TempleService())->all()]); 
+        $this->render('public/hospitals', ['items' => (new TempleService())->all()]); 
     }
     
-    public function temple(string $slug): void { 
+    public function hospital(string $slug): void { 
         $this->detectApiRequest();
         $temple = (new TempleService())->findBySlug($slug);
         $this->seoKey = 'temples';
@@ -149,7 +149,7 @@ final class PublicController extends BaseController {
             'description' => ($temple['name'] ?? 'This facility') . ' at Aura Medical Institute of Electropathy and Hospital, Coimbatore. ' . ($temple['description'] ?? ''),
             'og_image' => $temple['image_url'] ?? '',
         ];
-        $this->render('public/temple', ['slug' => $slug, 'temple' => $temple]); 
+        $this->render('public/hospital', ['slug' => $slug, 'temple' => $temple]); 
     }
     
     public function shop(): void {
@@ -177,7 +177,7 @@ final class PublicController extends BaseController {
             if ($catName) {
                 $this->seoOverrides = [
                     'title' => 'Buy ' . $catName . ' Online – education Products at AuraEdu',
-                    'description' => 'Shop authentic ' . $catName . ' online at AuraEdu. Browse our collection of sacred items for your education practice. Fast shipping across India.',
+                    'description' => 'Shop authentic ' . $catName . ' online at AuraEdu. Browse our collection of therapy and wellness products. Fast shipping across India.',
                 ];
             }
         }

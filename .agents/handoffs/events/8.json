@@ -1,0 +1,45 @@
+{
+  "event_type": "issues.opened",
+  "issue": 8,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "cleanup: remove remaining astrologer/spiritual references from production code",
+    "body": "Codebase audit found 15+ remaining references to astrologer, sacred items, and spiritual content across production code. Remove all of them: AuthService.requireAstrologer(), AuthController astrologer_slug session, ApiController $astrologers variable, MediaService astrologers context, admin dashboard astrologer links, SupportBotService astrologer responses, AgentController astrologerCount, robots.txt astrologer disallow, PublicController 'sacred items' SEO string.",
+    "labels": ["cleanup"],
+    "repository": {
+      "owner": "getwinharris",
+      "name": "auraedu"
+    }
+  },
+  "objectives": [
+    {
+      "id": "OBJ-CLEAN-ASTRO-1",
+      "status": "pass",
+      "evidence": [
+        "robots.txt: removed /astrologer/ disallow",
+        "AuthService: requireAstrologer()→requirePractitioner(), role check astrologer→practitioner",
+        "AuthController: removed astrologer_slug from Google OAuth + login sessions, removed astrologer role block",
+        "ApiController consult(): $astrologers→$products, response key astrologers→products",
+        "MediaService: removed 'astrologers' from all 3 context arrays",
+        "Admin dashboard: removed Astrologers card, updated text to 'Manage sessions, hospital facilities'",
+        "Admin media: removed 'Astrologers' option from context dropdown",
+        "Admin resource: removed astrologers from collection check + data-field ternary",
+        "SupportBotService: removed astrologer keyword trigger + response text",
+        "AgentController: removed astrologerCount from AI context",
+        "PublicController: 'sacred items'→'therapy and wellness products' in SEO",
+        "Consult view: 'Vedic Astrology'→'Therapy & Wellness', review summary key 'astrologer'→'product'"
+      ],
+      "browser_evidence": [],
+      "unresolved": []
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

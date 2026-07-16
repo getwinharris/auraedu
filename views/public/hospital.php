@@ -3,7 +3,7 @@
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" style="margin:0 auto var(--space-md);"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <h1 style="margin:0 0 var(--space-sm);">Facility Not Found</h1>
         <p style="color:var(--color-text-muted); margin-bottom:var(--space-lg);">The facility you're looking for doesn't exist.</p>
-        <a href="/temples" class="btn btn-primary">View All Facilities</a>
+        <a href="/hospitals" class="btn btn-primary">View All Facilities</a>
     </div>
 <?php else: ?>
     <section class="section" style="padding-top:var(--space-xl);">
@@ -54,7 +54,7 @@
             <?php endif; ?>
             <div style="text-align:center;">
                 <a href="/contact" class="btn btn-primary">Enquire About This Facility</a>
-                <a href="/temples" class="btn btn-ghost" style="margin-left:var(--space-sm);">View All Facilities</a>
+                <a href="/hospitals" class="btn btn-ghost" style="margin-left:var(--space-sm);">View All Facilities</a>
             </div>
         </div>
     </section>

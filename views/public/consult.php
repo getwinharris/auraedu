@@ -45,10 +45,10 @@
             <div class="astro-market-grid">
                 <?php foreach($items as $item): ?>
                     <?php
-                        $summary = isset($reviews) ? $reviews->summary('astrologer', $item['slug'] ?? '') : ['average' => 0, 'count' => 0];
+                        $summary = isset($reviews) ? $reviews->summary('product', $item['slug'] ?? '') : ['average' => 0, 'count' => 0];
                         $languageText = implode(', ', array_slice(array_values(array_filter($item['languages'] ?? [])), 0, 2));
                         $experience = trim((string)($item['experience_years'] ?? ''));
-                        $speciality = $item['speciality'] ?? 'Vedic Astrology';
+                        $speciality = $item['speciality'] ?? 'Therapy & Wellness';
                     ?>
                     <article class="astro-market-card reveal" data-astro-card data-language="<?= e(strtolower(implode(' ', $item['languages'] ?? []))) ?>" data-search="<?= e(strtolower(($item['name'] ?? '') . ' ' . $languageText . ' ' . $speciality)) ?>">
                         <a class="astro-market-photo" href="/consult/<?= e($item['slug'] ?? '') ?>" aria-label="View <?= e($item['name'] ?? 'Astrologer') ?>">

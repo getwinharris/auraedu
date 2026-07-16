@@ -29,9 +29,9 @@ final class AuthService {
         }
     }
 
-    public function requireAstrologer(): void {
+    public function requirePractitioner(): void {
         $user = $this->user();
         if (!$user) { header('Location: /login'); exit; }
-        if (($user['role'] ?? '') !== 'astrologer') { $_SESSION['flash']=['message'=>'Astrologer access required.','type'=>'warning']; header('Location: /'); exit; }
+        if (($user['role'] ?? '') !== 'practitioner') { $_SESSION['flash']=['message'=>'Practitioner access required.','type'=>'warning']; header('Location: /'); exit; }
     }
 }

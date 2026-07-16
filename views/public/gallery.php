@@ -9,12 +9,12 @@
         <div class="category-grid">
             <?php
             $gallery = [
-                ['src' => '/assets/images/institute/students-campus.jpg', 'alt' => 'Indian medical students on campus', 'cap' => 'Campus & Hospital'],
+                ['src' => '/assets/images/institute/maps-campus-building.jpg', 'alt' => 'Aura Medical Institute campus building, Coimbatore', 'cap' => 'Campus Building'],
+                ['src' => '/assets/images/institute/maps-hospital-front.jpg', 'alt' => 'Aura Institutions and Hospital front view', 'cap' => 'Hospital Front'],
+                ['src' => '/assets/images/institute/maps-hospital-interior.jpg', 'alt' => 'Aura Hospital interior facilities', 'cap' => 'Hospital Interior'],
                 ['src' => '/assets/images/institute/medical-students.jpg', 'alt' => 'Indian medical students in clinical training', 'cap' => 'Student Training'],
                 ['src' => '/assets/images/institute/lab-students.jpg', 'alt' => 'Students in a science laboratory', 'cap' => 'Laboratory Practice'],
                 ['src' => '/assets/images/institute/free-medical-camp.jpg', 'alt' => 'Medical students at a free medical camp', 'cap' => 'Community Care'],
-                ['src' => '/assets/images/institute/esic-students.jpg', 'alt' => 'Medical students with faculty at a hospital', 'cap' => 'Hospital Training'],
-                ['src' => '/assets/images/institute/student-group.jpg', 'alt' => 'Group of medical students', 'cap' => 'Campus Life'],
             ];
             foreach ($gallery as $g):
             ?>

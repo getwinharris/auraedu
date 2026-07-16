@@ -21,7 +21,7 @@
             <div class="temple-feature-list">
                 <?php foreach ($items as $item): ?>
                     <article class="showcase-card temple-feature-card reveal">
-                        <a class="temple-feature-card__media" href="/temples/<?= e($item['slug']) ?>" aria-label="View <?= e($item['name']) ?>">
+                        <a class="temple-feature-card__media" href="/hospitals/<?= e($item['slug']) ?>" aria-label="View <?= e($item['name']) ?>">
                             <?php if (!empty($item['image_url'])): ?>
                                 <img src="<?= e($item['image_url']) ?>" alt="<?= e($item['name']) ?>" decoding="async">
                             <?php else: ?>
@@ -44,7 +44,7 @@
                                 </p>
                             <?php endif; ?>
                             <div class="temple-feature-card__actions">
-                                <a href="/temples/<?= e($item['slug']) ?>" class="btn btn-sm btn-primary">View Details</a>
+                                <a href="/hospitals/<?= e($item['slug']) ?>" class="btn btn-sm btn-primary">View Details</a>
                                 <?php if (!empty($item['map_link'])): ?>
                                     <a href="<?= e($item['map_link']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>

@@ -33,8 +33,8 @@ flowchart LR
     route_get_terms["GET /terms — Terms of Service — 15 sections, legal"]:::route
     route_get_privacy["GET /privacy — Privacy Policy — 14 sections, data handling"]:::route
     route_get_consult["GET /consult — Therapies & treatments overview"]:::route
-    route_get_temples["GET /temples — Temple listing page"]:::route
-    route_get_temples_slug["GET /temples/{slug} — Temple detail page"]:::route
+    route_get_hospitals["GET /hospitals — Hospital & campus facility listing"]:::route
+    route_get_hospitals_slug["GET /hospitals/{slug} — Hospital & campus facility detail"]:::route
     route_get_shop["GET /shop — Product shop — grid with pill actions"]:::route
     route_get_categories["GET /categories — Products filtered by category"]:::route
     route_get_product_slug["GET /product/{slug} — Product detail — gallery, add-to-cart, buy-now"]:::route
@@ -43,7 +43,7 @@ flowchart LR
     route_get_api_categories["GET /api/categories"]:::route
     route_get_api_product_slug["GET /api/product/{slug}"]:::route
     route_get_api_consult["GET /api/consult"]:::route
-    route_get_api_temples["GET /api/temples"]:::route
+    route_get_api_hospitals["GET /api/hospitals"]:::route
     route_get_sitemap_xml["GET /sitemap.xml"]:::route
     route_get_contact["GET /contact — Contact form GET"]:::route
     route_post_contact["POST /contact — Contact form POST submission"]:::route
@@ -120,7 +120,7 @@ flowchart LR
     route_get_admin_shipping["GET /admin/shipping — Admin — shipping settings"]:::route
     route_get_admin_appointments["GET /admin/appointments — Admin — session list"]:::route
     route_get_admin_tax_report["GET /admin/tax-report"]:::route
-    route_get_admin_temples["GET /admin/temples — Admin — manage temples"]:::route
+    route_get_admin_temples["GET /admin/temples — Admin — manage hospital facilities"]:::route
     route_get_admin_settings["GET /admin/settings — Admin — site settings"]:::route
     route_post_admin_settings_save["POST /admin/settings/save — Admin — save settings"]:::route
     route_post_admin_settings_admin_credentials["POST /admin/settings/admin-credentials — Admin — save admin login"]:::route
@@ -149,8 +149,8 @@ flowchart LR
     route_post_admin_categories_delete["POST /admin/categories/delete — Admin — delete category"]:::route
     route_post_admin_coupons_save["POST /admin/coupons/save — Admin — create/update coupon"]:::route
     route_post_admin_coupons_delete["POST /admin/coupons/delete — Admin — delete coupon"]:::route
-    route_post_admin_temples_save["POST /admin/temples/save — Admin — create/update temple"]:::route
-    route_post_admin_temples_delete["POST /admin/temples/delete — Admin — delete temple"]:::route
+    route_post_admin_temples_save["POST /admin/temples/save — Admin — create/update hospital facility"]:::route
+    route_post_admin_temples_delete["POST /admin/temples/delete — Admin — delete hospital facility"]:::route
     route_post_admin_integrations_save["POST /admin/integrations/save — Admin — save integration secrets"]:::route
     route_get_admin_blog["GET /admin/blog"]:::route
     route_post_admin_blog_save["POST /admin/blog/save"]:::route
@@ -269,6 +269,8 @@ flowchart LR
     view_public_forgot_password["public/forgot-password"]:::code
     view_public_gallery["public/gallery"]:::code
     view_public_home["public/home"]:::code
+    view_public_hospital["public/hospital"]:::code
+    view_public_hospitals["public/hospitals"]:::code
     view_public_login["public/login"]:::code
     view_public_privacy["public/privacy"]:::code
     view_public_product["public/product"]:::code
@@ -278,8 +280,6 @@ flowchart LR
     view_public_shop["public/shop"]:::code
     view_public_sitemap["public/sitemap"]:::code
     view_public_support["public/support"]:::code
-    view_public_temple["public/temple"]:::code
-    view_public_temples["public/temples"]:::code
     view_public_terms["public/terms"]:::code
   end
 
@@ -374,12 +374,12 @@ flowchart LR
   route_get_consult --> controller_publiccontroller
   controller_publiccontroller --> service_reviewservice
   controller_publiccontroller -. renders .-> view_public_consult
-  route_get_temples --> controller_publiccontroller
+  route_get_hospitals --> controller_publiccontroller
   controller_publiccontroller --> service_templeservice
-  controller_publiccontroller -. renders .-> view_public_temples
-  route_get_temples_slug --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_hospitals
+  route_get_hospitals_slug --> controller_publiccontroller
   controller_publiccontroller --> service_templeservice
-  controller_publiccontroller -. renders .-> view_public_temple
+  controller_publiccontroller -. renders .-> view_public_hospital
   route_get_shop --> controller_publiccontroller
   controller_publiccontroller --> service_productservice
   controller_publiccontroller --> service_categoryservice
@@ -405,7 +405,7 @@ flowchart LR
   route_get_api_consult --> controller_apicontroller
   controller_apicontroller --> service_productservice
   controller_apicontroller -. renders .-> view_public_404
-  route_get_api_temples --> controller_apicontroller
+  route_get_api_hospitals --> controller_apicontroller
   controller_apicontroller --> service_templeservice
   controller_apicontroller -. renders .-> view_public_404
   route_get_cart --> controller_publiccontroller

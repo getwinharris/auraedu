@@ -39,7 +39,7 @@
             </article>
             <article class="support-card">
                 <h2>Hospital &amp; care</h2>
-                <p>Explore the <a href="/temples">hospital guide</a> for hospital details, timings, and directions.</p>
+                <p>Explore the <a href="/hospitals">hospital guide</a> for hospital details, timings, and directions.</p>
             </article>
             <article class="support-card">
                 <h2>Talk to a person</h2>

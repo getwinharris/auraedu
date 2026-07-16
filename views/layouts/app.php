@@ -267,7 +267,7 @@ gtag('js', new Date());
         <a href="/gallery"<?= str_starts_with($currentPath, '/gallery') ? ' aria-current="page"' : '' ?>>Gallery</a>
         <a href="/shop"<?= str_starts_with($currentPath, '/shop') ? ' aria-current="page"' : '' ?>>Shop</a>
         <a href="/consult"<?= str_starts_with($currentPath, '/consult') ? ' aria-current="page"' : '' ?>>Therapies</a>
-        <a href="/temples"<?= str_starts_with($currentPath, '/temples') ? ' aria-current="page"' : '' ?>>Hospital</a>
+        <a href="/hospitals"<?= str_starts_with($currentPath, '/hospitals') ? ' aria-current="page"' : '' ?>>Hospital</a>
         <div class="nav-dropdown">
             <a href="/blog" class="nav-dropdown__trigger"<?= str_starts_with($currentPath, '/blog') ? ' aria-current="page"' : '' ?>>Blog <span class="nav-dropdown__arrow">▾</span></a>
             <div class="nav-dropdown__menu">
@@ -327,7 +327,7 @@ if ($__flash):
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 000 20 14.5 14.5 0 000-20"/><path d="M2 12h20"/></svg>
             <span>Therapies</span>
         </a>
-        <a href="/temples" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/temples') === 0 ? 'active' : '') ?>">
+        <a href="/hospitals" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/hospitals') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M9 21v-4a2 2 0 012-2h2a2 2 0 012 2v4"/></svg>
             <span>Hospital</span>
         </a>
@@ -398,7 +398,7 @@ if ($__flash):
                 <h4 class="footer-heading">Care &amp; Training</h4>
             <ul class="footer-links">
                 <li><a href="/consult">Therapies</a></li>
-                <li><a href="/temples">Hospital</a></li>
+                <li><a href="/hospitals">Hospital</a></li>
                 <li><a href="/education">Admissions</a></li>
                 <li><a href="/blog">Blog</a></li>
                 <?php foreach ($__blogCats as $__cat): ?>

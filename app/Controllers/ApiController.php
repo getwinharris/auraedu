@@ -10,7 +10,7 @@ final class ApiController extends BaseController {
             '/api/categories',
             '/api/product/{slug}',
             '/api/consult',
-            '/api/temples',
+            '/api/hospitals',
         ]]);
     }
 
@@ -42,12 +42,12 @@ final class ApiController extends BaseController {
 
     public function consult(): void {
         $service = new ProductService();
-        $astrologers = $service->all();
-        $this->jsonResponse(['success' => true, 'astrologers' => $astrologers]);
+        $products = $service->all();
+        $this->jsonResponse(['success' => true, 'products' => $products]);
     }
 
-    public function temples(): void {
+    public function hospitals(): void {
         $temples = (new TempleService())->all();
-        $this->jsonResponse(['success' => true, 'temples' => $temples]);
+        $this->jsonResponse(['success' => true, 'hospitals' => $temples]);
     }
 }

@@ -37,11 +37,10 @@ class AgentController extends BaseController {
             $userCount = count($db->read('users'));
             $orderCount = count($db->read('orders'));
             $productCount = count($db->read('products'));
-            $astrologerCount = count($db->read('astrologers'));
             $appointmentCount = count($db->read('appointments'));
             $ticketCount = count($db->read('support_tickets'));
             $revenue = array_sum(array_column($db->read('orders'), 'total'));
-            $context = "{$siteName} site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Astrologers: {$astrologerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue: ₹" . number_format($revenue, 2);
+            $context = "{$siteName} site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue: ₹" . number_format($revenue, 2);
             if (!empty($mc['apiKey'])) {
                 $answer = $this->callAi($mc, $agentName, $siteName, $message, $context);
             } else {

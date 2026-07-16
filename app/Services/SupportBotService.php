@@ -117,8 +117,8 @@ final class SupportBotService {
         if (str_contains($lower, 'order')) {
             return empty($context['orders']) ? 'I could not find orders in your account yet.' : 'I found your recent order data in the account panel. Open My Orders for full delivery address, status, shipped time, and review options.';
         }
-        if (str_contains($lower, 'talk') || str_contains($lower, 'session') || str_contains($lower, 'astrologer')) {
-            return empty($context['sessions']) ? 'I could not find astrologer sessions in your account yet.' : 'I found recent astrologer session records. Open My Sessions to see who you contacted, session type, credits spent, and review options.';
+        if (str_contains($lower, 'talk') || str_contains($lower, 'session')) {
+            return empty($context['sessions']) ? 'I could not find sessions in your account yet.' : 'I found recent session records. Open My Sessions to see details.';
         }
         return 'I can help with product orders, delivery addresses, consultant bookings, reviews, and account history. Please ask one specific question.';
     }
@@ -132,7 +132,7 @@ final class SupportBotService {
         }
         if (preg_match('/\b(product|available|shop|buy|item|pendant|jewelry|jewellery)\b/i', $message)) {
             $names = array_filter(array_map(fn($p) => trim((string)($p['name'] ?? '')), $products));
-            $list = $names ? implode(', ', $names) : 'sacred emblems and education jewelry';
+            $list = $names ? implode(', ', $names) : 'therapy and wellness products';
             return 'Available products include ' . $list . '. Open ' . ($pages['shop'] ?? '/shop') . ' to browse all products, or add an item to cart from its product page.';
         }
         if (preg_match('/\b(service|consult|booking|book|astrology|call|message|temple)\b/i', $message)) {
@@ -157,7 +157,7 @@ final class SupportBotService {
     }
 
     private function extractActions(string $reply): array {
-        preg_match_all('/\/(?:shop|cart|checkout|consult|temples|contact|blog(?:\/[a-z0-9-]+|\/category\/[a-z0-9-]+)?|product\/[a-z0-9-]+|account\/dashboard(?:\/orders|\/sessions|\/install)?)(?=[\s.,)\/  ]|$)/i', $reply, $matches);
+        preg_match_all('/\/(?:shop|cart|checkout|consult|hospitals|contact|blog(?:\/[a-z0-9-]+|\/category\/[a-z0-9-]+)?|product\/[a-z0-9-]+|account\/dashboard(?:\/orders|\/sessions|\/install)?)(?=[\s.,)\/  ]|$)/i', $reply, $matches);
         $seen = [];
         $actions = [];
         foreach ($matches[0] as $path) {
@@ -170,7 +170,7 @@ final class SupportBotService {
                 $path === '/checkout' => 'Go to Checkout',
                 $path === '/consult' => 'View Consultants',
                 $path === '/contact' => 'Contact Us',
-                $path === '/temples' => 'View Temples',
+                $path === '/hospitals' => 'View Hospitals',
                 $path === '/blog' => 'Read Blog',
                 default => 'Open ' . trim(preg_replace('/^\/+/', '', str_replace(['-', '/'], ' ', $path)))
             };

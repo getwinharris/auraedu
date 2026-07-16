@@ -1,0 +1,36 @@
+{
+  "event_type": "issues.opened",
+  "issue": 9,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "refactor: create HospitalService as primary, deprecate TempleService",
+    "body": "TempleService still uses the old 'temples' naming. Create HospitalService as the primary service and add a backward-compatible alias. Depends on MySQL 'temples' table rename to 'hospitals'.",
+    "labels": ["refactor", "schema"],
+    "repository": {
+      "owner": "getwinharris",
+      "name": "auraedu"
+    }
+  },
+  "objectives": [
+    {
+      "id": "OBJ-SERVICE-1",
+      "status": "pass",
+      "evidence": [
+        "Created app/Services/HospitalService.php wrapping TempleService",
+        "TempleService preserved for backward compat with 'temples' MySQL table",
+        "All controller callers still use TempleService — HospitalService ready for swap when DB renamed"
+      ],
+      "browser_evidence": [],
+      "unresolved": ["MySQL table rename on Hostinger needed before switching controllers to HospitalService"]
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

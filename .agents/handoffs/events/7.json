@@ -1,0 +1,42 @@
+{
+  "event_type": "issues.opened",
+  "issue": 7,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "fix: rename /temples route to /hospitals across entire codebase",
+    "body": "The /temples public route still uses the old temple naming. Rename to /hospitals to match the Aura Medical Institute repositioning. Includes controller methods, view files, nav links, API endpoint, route descriptions, and a 301 redirect from /temples to /hospitals for backward compatibility.",
+    "labels": ["enhancement", "routes"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-ROUTE-1",
+      "status": "pass",
+      "evidence": [
+        "index.php: whitelist /temples→/hospitals, added 301 redirect",
+        "PublicController: temples()→hospitals(), temple()→hospital()",
+        "Copied views: temples.php→hospitals.php, temple.php→hospital.php with internal links updated",
+        "ApiController: temples()→hospitals(), /api/temples→/api/hospitals",
+        "SupportBotService: regex whitelist + friendly name updated",
+        "ProjectMapService: all 6 route entries + descriptions updated",
+        "app.php: all nav links /temples→/hospitals (4 occurrences)",
+        "smoke-local.php: expected routes updated",
+        "support.php: link updated"
+      ],
+      "browser_evidence": [],
+      "unresolved": []
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}
