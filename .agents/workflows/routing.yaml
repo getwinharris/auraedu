@@ -1,0 +1,73 @@
+# bapXaura Event Routing Policy
+# Governs role → event → next_action mapping for the bapx-agents[bot] GitHub App.
+# The router reads this file to determine which role handles which event and who to hand off to next.
+
+roles:
+  cto:
+    handle:
+      - issues.opened
+      - issues.edited
+      - owner_requirement_added
+    next:
+      planned: worker
+      blocked: owner
+
+  worker:
+    handle:
+      - objective.ready
+      - review.fix_requested
+      - merge_conflict.detected
+    next:
+      implemented: reviewer
+      blocked: cto
+
+  reviewer:
+    handle:
+      - pull_request.opened
+      - pull_request.synchronize
+      - fixer.completed
+    next:
+      changes_required: fixer
+      approved: documenter
+      blocked: cto
+
+  fixer:
+    handle:
+      - review.changes_required
+    next:
+      fixed: reviewer
+      blocked: cto
+
+  documenter:
+    handle:
+      - review.approved
+    next:
+      completed: final_verifier
+      changes_required: worker
+
+  final_verifier:
+    handle:
+      - documentation.completed
+    next:
+      approved: merge_bot
+      changes_required: worker
+
+  deployment:
+    handle:
+      - push.main
+      - merge.completed
+    next:
+      deployed: verify
+      failed: rollback
+
+notifications:
+  owner: getwinharris
+  notify_on:
+    - plan_ready
+    - business_decision_required
+    - security_blocked
+    - destructive_change
+    - repeated_failure
+    - deployment_failed
+    - rollback_completed
+    - release_completed

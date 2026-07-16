@@ -8,22 +8,99 @@ alwaysApply: true
 
 ## Orchestration Model
 
-Strict sequential handoff chain. Never dispatch sub-agents in parallel.
+Event-driven role-bot chain. A single GitHub App (`bapx-agents[bot]`) performs all actions. Event routing reads machine-readable JSON in comments, not GitHub user resolution.
+
+### Bot Roles
+
+| Role | Identity | Handles |
+|------|----------|---------|
+| CTO | `bapx-agents[bot]` (tagged `bapx-cto`) | Issue plan, scope, routing, merge approval |
+| Worker | `bapx-agents[bot]` (tagged `bapx-worker`) | Implement one objective, push branch |
+| Reviewer | `bapx-agents[bot]` (tagged `bapx-reviewer`) | Verify evidence, diff, tests, map, schema |
+| Fixer | `bapx-agents[bot]` (tagged `bapx-worker`) | Fix findings (same worker identity, separate run) |
+| Documenter | `bapx-agents[bot]` (tagged `bapx-docs`) | Update affected durable docs |
+| Browser Tester | `bapx-agents[bot]` (tagged `bapx-browser-tester`) | Live UI verification |
+
+### Event-Driven Sequence
 
 ```
-Issue → handoff JSON (GitHub Action) → CTO (bapXaura handoff next)
-  → Worker (single objective) → evidence
-  → Reviewer (verify evidence) → findings
-  → CTO (close loop, route next objective or close issue)
+Issue created/updated
+  → CTO plans objectives (issues.edited)
+  → CTO hands off to Worker (issue_comment with JSON block)
+Worker implements one objective
+  → pushes branch → opens/updates PR
+PR synchronize
+  → Reviewer verifies issue coverage, diff, tests, map, schema
+  → If changes_required:
+      → Reviewer run A (findings)
+      → Fixer run B (modifies code, pushes)
+      → Reviewer run C (fresh context, independent verify)
+  → If approved:
+      → Documenter updates affected docs
+Documentation done
+  → Final Verifier checks every objective and gate
+  → Merge bot merges automatically
+Push to main
+  → Deployment bot updates public_html using git
+  → verifies deployed SHA and live behaviour
 ```
 
-**Event-driven protocol:**
-- `issues: opened` → creates event payload in `.agents/handoffs/events/<issue>.json`
-- `issue_comment: /handoff <role>` → routes active handoff to next role
-- Active handoff: `.agents/handoffs/active/current.json`
-- Agents advance by commenting `/handoff worker`, `/handoff reviewer`, etc.
+### Event Comment Format
 
-**Telemetry:** `.agents/ops/telemetry.json` tracks cycle time, score, error rate. Score = `(closed_issues/total_issues) × (1 - errors/objectives) × max(0.5, 1 - duration/240) × 100`. Goal ≥90.
+Every handoff comment includes a machine-readable JSON block:
+
+```html
+<!-- bapx-handoff
+{
+  "schema_version": "1.0",
+  "event_id": "EVT-1042",
+  "workflow_id": "WF-ISSUE-12",
+  "issue": 12,
+  "pull_request": 21,
+  "from_role": "reviewer",
+  "to_role": "fixer",
+  "objective_id": "OBJ-12-3",
+  "head_sha": "abc123",
+  "status": "changes_required",
+  "blocking_findings": ["REV-12-4"],
+  "owner": {
+    "github": "getwinharris",
+    "notify": false,
+    "reason": null
+  }
+}
+-->
+## Handoff: Reviewer → Fixer
+**Responsible:** `@bapx-worker`
+**Objective:** `OBJ-12-3`
+**Required action:** (human-readable text)
+```
+
+The router (GitHub Actions workflow) reads the JSON block, not the prose.
+
+### When to Notify `@getwinharris`
+
+Notify the owner only for meaningful events:
+- New issue plan ready
+- Major objective or product interpretation changed
+- Agent cannot determine business/content truth
+- Security or credential concern
+- Destructive schema or data migration
+- Repeated review/fix loop failure
+- Deployment failure / rollback performed
+- Release published
+- Final merged summary
+- Workflow permanently blocked
+
+Do not notify for routine handoffs, successful test reruns, normal doc updates, minor review corrections, routine merges, or ordinary deployment progress.
+
+### Routing Policy
+
+`.agents/workflows/routing.yaml` governs event routing. See that file for the complete role → event → next_action mapping.
+
+### Telemetry
+
+`.agents/ops/telemetry.json` tracks cycle time, score, error rate. Score = `(closed_issues/total_issues) × (1 - errors/objectives) × max(0.5, 1 - duration/240) × 100`. Goal ≥90.
 
 ## Repository Contract
 
