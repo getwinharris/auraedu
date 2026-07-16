@@ -221,13 +221,13 @@ if [ -f "$env_file" ]; then
 fi
 done
 
-MYSQL_HOST="${BAPX_MYSQL_HOST:-srv1877.hstgr.io}"
+MYSQL_HOST="${BAPX_MYSQL_HOST:-localhost}"
 MYSQL_PORT="${BAPX_MYSQL_PORT:-3306}"
-MYSQL_DB="${BAPX_MYSQL_DB:-u907253411_db_name_sps}"
-MYSQL_USER="${BAPX_MYSQL_USER:-u907253411_db_user_sps}"
+MYSQL_DB="${BAPX_MYSQL_DB:-u925137283_aura_db_name}"
+MYSQL_USER="${BAPX_MYSQL_USER:-u925137283_aura_user}"
 MYSQL_PASS="${BAPX_MYSQL_PASS:-}"
 SCHEMA_FILE="$ROOT/storage/schema/collections.php"
-APP_URL="${APP_URL:-https://sripanchamispiritual.com}"
+APP_URL="${APP_URL:-https://auraedu.co.in}"
 REMOTE_DB_URL="${BAPX_REMOTE_DB_URL:-${APP_URL%/}/remoteDB}"
 
 # ── Colors ─────────────────────────────────────────────────────
@@ -1091,7 +1091,7 @@ cmd_agent() {
     echo "  bapXaura agent create a blog post about Diwali offers"
     return 0
   fi
-  local endpoint="${BAPX_AGENT_URL:-https://sripanchamispiritual.com/api/agent}"
+  local endpoint="${BAPX_AGENT_URL:-${APP_URL%/}/api/agent}"
   echo "Agent: thinking..."
   local response
   response=$(curl -s -X POST "$endpoint" \
