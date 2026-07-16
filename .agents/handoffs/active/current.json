@@ -15,14 +15,25 @@
     {
       "id": "OBJ-CLEANUP-1",
       "status": "pass",
-      "evidence": ["Deleted ConsultationController, AstrologerService, astrologer views, admin forms", "Removed all astrologer routes from ProjectMapService and index.php", "756 lines of astrologer CSS removed", "68 astrologer image files deleted"],
+      "evidence": [
+        "Deleted ConsultationController, AstrologerService, astrologer views, admin forms",
+        "Removed all astrologer routes from ProjectMapService and index.php",
+        "756 lines of astrologer CSS removed",
+        "68 astrologer image files deleted"
+      ],
       "unresolved": []
     },
     {
       "id": "OBJ-CLEANUP-2",
       "status": "pass",
-      "evidence": ["Temple→Hospital labels in admin nav", "Temple schema preserved for backward compat", "Route descriptions updated"],
-      "unresolved": ["Temple→Hospital views/content rewrite deferred to content migration"]
+      "evidence": [
+        "Temple→Hospital labels in admin nav",
+        "Temple schema preserved for backward compat",
+        "Route descriptions updated"
+      ],
+      "unresolved": [
+        "Temple→Hospital views/content rewrite deferred to content migration"
+      ]
     }
   ],
   "files_changed": [
@@ -40,5 +51,9 @@
   ],
   "risks": [
     "MySQL 'temples' table still uses old name — rename blocked until remote DB access"
-  ]
+  ],
+  "workflow": {
+    "current_role": "merge_bot",
+    "next_role": "deployment"
+  }
 }
