@@ -7,14 +7,14 @@ flowchart LR
   classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b
   classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12
 
-  subgraph ARCH["Architecture Overview — 127 routes, 15 controllers, 42 services, 52 views, 0 data files, 24 tools"]
-    arch_routes["> Routes: 127 (Public + Auth + Payment + Admin + Support)"]:::arch
-    arch_ctrl["> Controllers: 15"]:::arch
-    arch_svc["> Services: 42"]:::arch
-    arch_views["> Views: 52"]:::arch
+  subgraph ARCH["Architecture Overview — 139 routes, 17 controllers, 43 services, 59 views, 0 data files, 23 tools"]
+    arch_routes["> Routes: 139 (Public + Auth + Payment + Admin + Support)"]:::arch
+    arch_ctrl["> Controllers: 17"]:::arch
+    arch_svc["> Services: 43"]:::arch
+    arch_views["> Views: 59"]:::arch
     arch_data["> Collections: 19 schema | 0 files"]:::arch
-    arch_tools["> Tools: 24"]:::arch
-    arch_gaps["> Gaps: 0"]:::arch
+    arch_tools["> Tools: 23"]:::arch
+    arch_gaps["> Gaps: 2"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
@@ -65,6 +65,12 @@ flowchart LR
     route_get_blog_category_slug["GET /blog/category/{slug} — Blog listing filtered by category"]:::route
     route_post_api_agent["POST /api/agent"]:::route
     route_post_api_tts_tokenize["POST /api/tts/tokenize — TTS — tokenize text for KittenTTS ONNX model"]:::route
+    route_post_chat_completions["POST /chat/completions"]:::route
+    route_get_chat_tools["GET /chat/tools"]:::route
+    route_post_agent_webhook["POST /agent/webhook"]:::route
+    route_get_agent_status["GET /agent/status"]:::route
+    route_get_agent_handoffs["GET /agent/handoffs"]:::route
+    route_post_agent_prompt["POST /agent/prompt"]:::route
     route_post_api_browser_search["POST /api/browser/search"]:::route
     route_post_api_browser_open["POST /api/browser/open"]:::route
     route_post_api_browser_click["POST /api/browser/click"]:::route
@@ -112,6 +118,8 @@ flowchart LR
   end
 
   subgraph ROUTES_ADMIN["ADMIN Routes"]
+    route_get_admin_workspace["GET /admin/workspace"]:::route
+    route_post_admin_workspace_create["POST /admin/workspace/create"]:::route
     route_get_admin["GET /admin — Admin dashboard — counts overview"]:::route
     route_get_admin_products["GET /admin/products — Admin — manage products"]:::route
     route_get_admin_categories["GET /admin/categories — Admin — manage categories"]:::route
@@ -129,6 +137,8 @@ flowchart LR
     route_get_admin_integrations["GET /admin/integrations — Admin — API keys, integrations"]:::route
     route_get_admin_agent["GET /admin/agent"]:::route
     route_post_admin_agent_ask["POST /admin/agent/ask"]:::route
+    route_get_admin_terminal["GET /admin/terminal"]:::route
+    route_post_admin_terminal_run["POST /admin/terminal/run"]:::route
     route_get_admin_backups["GET /admin/backups — Admin — backup list"]:::route
     route_get_admin_audit_log["GET /admin/audit-log — Admin — audit log"]:::route
     route_get_admin_contact_submissions["GET /admin/contact-submissions — Admin — contact form entries"]:::route
@@ -142,6 +152,8 @@ flowchart LR
     route_post_admin_appearance_save["POST /admin/appearance/save — Admin — save logo/favicon"]:::route
     route_get_admin_media["GET /admin/media — Admin — media library"]:::route
     route_post_admin_media_upload["POST /admin/media/upload — Admin — upload media"]:::route
+    route_get_admin_environment["GET /admin/environment — Admin — environment editor"]:::route
+    route_post_admin_environment_save["POST /admin/environment/save — Admin — save environment"]:::route
     route_post_admin_environment_fix_permissions["POST /admin/environment/fix-permissions — Admin — fix storage permissions"]:::route
     route_get_admin_developer_project_map["GET /admin/developer/project-map — Admin — project map viewer"]:::route
     route_get_admin_developer_workflow["GET /admin/developer/workflow — Admin — agent workflow viewer"]:::route
@@ -173,11 +185,13 @@ flowchart LR
     controller_accountcontroller["AccountController"]:::code
     controller_admincontroller["AdminController"]:::code
     controller_agentcontroller["AgentController"]:::code
+    controller_aichatcontroller["AiChatController"]:::code
     controller_apicontroller["ApiController"]:::code
     controller_authcontroller["AuthController"]:::code
     controller_basecontroller["BaseController"]:::code
     controller_blogcontroller["BlogController"]:::code
     controller_browseragentcontroller["BrowserAgentController"]:::code
+    controller_cloudagentcontroller["CloudAgentController"]:::code
     controller_commercecontroller["CommerceController"]:::code
     controller_consultationcontroller["ConsultationController"]:::code
     controller_publiccontroller["PublicController"]:::code
@@ -190,6 +204,7 @@ flowchart LR
   subgraph SERVICES["Services"]
     service_addressservice["AddressService"]:::code
     service_agentcontextservice["AgentContextService"]:::code
+    service_agentruntimeservice["AgentRuntimeService"]:::code
     service_appointmentservice["AppointmentService"]:::code
     service_auditlogservice["AuditLogService"]:::code
     service_authservice["AuthService"]:::code
@@ -253,7 +268,14 @@ flowchart LR
     view_admin_resource["admin/resource"]:::code
     view_admin_settings["admin/settings"]:::code
     view_admin_tax_report["admin/tax-report"]:::code
+    view_admin_terminal["admin/terminal"]:::code
     view_admin_workflow["admin/workflow"]:::code
+    view_admin_workspace["admin/workspace"]:::code
+    view_admin_workspace_nav["admin/workspace/_nav"]:::code
+    view_admin_workspace_build["admin/workspace/build"]:::code
+    view_admin_workspace_intake["admin/workspace/intake"]:::code
+    view_admin_workspace_monitor["admin/workspace/monitor"]:::code
+    view_admin_workspace_plan["admin/workspace/plan"]:::code
     view_layouts_admin["layouts/admin"]:::code
     view_layouts_app["layouts/app"]:::code
     view_public_404["public/404"]:::code
@@ -338,14 +360,14 @@ flowchart LR
     tool_refresh_blog_cache["refresh-blog-cache"]:::tool
     tool_smoke_local["smoke-local"]:::tool
     tool_test_race["test_race"]:::tool
-    tool_tui["tui"]:::tool
     tool_validate_docs_map["validate-docs-map"]:::tool
     tool_validate_project_map["validate-project-map"]:::tool
     tool_bapxaura["bapXaura"]:::tool
   end
 
   subgraph GAPS["Gaps & Missing Links"]
-    no_gaps["No detected gaps"]:::data
+    gap_0c9217a9ce["POST /admin/workspace/create — missing AuditLogService"]:::gap
+    gap_58c2afbd3c["POST /admin/terminal/run — missing AuditLogService"]:::gap
   end
 
   route_get --> controller_publiccontroller
@@ -501,6 +523,12 @@ flowchart LR
   route_get_account_bookings --> controller_accountcontroller
   controller_accountcontroller --> service_authservice
   controller_accountcontroller -. renders .-> view_account_bookings
+  route_get_admin_workspace --> controller_admincontroller
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_workspace
+  route_post_admin_workspace_create --> controller_admincontroller
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_workspace
   route_get_admin --> controller_admincontroller
   controller_admincontroller --> service_orderservice
   controller_admincontroller --> service_appointmentservice
@@ -583,6 +611,13 @@ flowchart LR
   controller_admincontroller --> service_databaseservice
   controller_admincontroller --> service_authservice
   controller_admincontroller -. renders .-> view_admin_agent
+  route_get_admin_terminal --> controller_admincontroller
+  controller_admincontroller --> service_secretservice
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_terminal
+  route_post_admin_terminal_run --> controller_admincontroller
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_terminal
   route_get_admin_backups --> controller_admincontroller
   controller_admincontroller --> service_databaseservice
   controller_admincontroller --> service_authservice
@@ -641,11 +676,20 @@ flowchart LR
   controller_admincontroller --> service_auditlogservice
   controller_admincontroller --> service_authservice
   controller_admincontroller -. renders .-> view_admin_media
+  route_get_admin_environment --> controller_admincontroller
+  controller_admincontroller --> service_storagepermissionservice
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_environment
+  route_post_admin_environment_save --> controller_admincontroller
+  controller_admincontroller --> service_envservice
+  controller_admincontroller --> service_auditlogservice
+  controller_admincontroller --> service_authservice
+  controller_admincontroller -. renders .-> view_admin_environment
   route_post_admin_environment_fix_permissions --> controller_admincontroller
   controller_admincontroller --> service_storagepermissionservice
   controller_admincontroller --> service_auditlogservice
   controller_admincontroller --> service_authservice
-  controller_admincontroller -. renders .-> view_admin_settings
+  controller_admincontroller -. renders .-> view_admin_environment
   route_get_admin_developer_project_map --> controller_admincontroller
   controller_admincontroller --> service_projectmapservice
   controller_admincontroller --> service_authservice
@@ -792,6 +836,21 @@ flowchart LR
   controller_agentcontroller -. renders .-> view_public_404
   route_post_api_tts_tokenize --> controller_ttscontroller
   controller_ttscontroller -. renders .-> view_public_404
+  route_post_chat_completions --> controller_aichatcontroller
+  controller_aichatcontroller --> service_secretservice
+  controller_aichatcontroller -. renders .-> view_public_404
+  route_get_chat_tools --> controller_aichatcontroller
+  controller_aichatcontroller -. renders .-> view_public_404
+  route_post_agent_webhook --> controller_cloudagentcontroller
+  controller_cloudagentcontroller --> service_agentruntimeservice
+  controller_cloudagentcontroller -. renders .-> view_public_404
+  route_get_agent_status --> controller_cloudagentcontroller
+  controller_cloudagentcontroller -. renders .-> view_public_404
+  route_get_agent_handoffs --> controller_cloudagentcontroller
+  controller_cloudagentcontroller -. renders .-> view_public_404
+  route_post_agent_prompt --> controller_cloudagentcontroller
+  controller_cloudagentcontroller --> service_agentruntimeservice
+  controller_cloudagentcontroller -. renders .-> view_public_404
   route_post_api_browser_search --> controller_browseragentcontroller
   controller_browseragentcontroller -. renders .-> view_public_404
   route_post_api_browser_open --> controller_browseragentcontroller
@@ -827,10 +886,12 @@ flowchart LR
   controller_accountcontroller --> controller_basecontroller
   controller_admincontroller --> controller_basecontroller
   controller_agentcontroller --> controller_basecontroller
+  controller_aichatcontroller --> controller_basecontroller
   controller_apicontroller --> controller_basecontroller
   controller_authcontroller --> controller_basecontroller
   controller_blogcontroller --> controller_basecontroller
   controller_browseragentcontroller --> controller_basecontroller
+  controller_cloudagentcontroller --> controller_basecontroller
   controller_commercecontroller --> controller_basecontroller
   controller_consultationcontroller --> controller_basecontroller
   controller_publiccontroller --> controller_basecontroller
@@ -897,3 +958,5 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
+  gap_0c9217a9ce -. missing .-> controller_admincontroller
+  gap_58c2afbd3c -. missing .-> controller_admincontroller
