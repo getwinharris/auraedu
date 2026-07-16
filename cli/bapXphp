@@ -1,0 +1,2572 @@
+#!/usr/bin/env bash
+# PHP polyglot guard — Issue #201. Allows `php cli/bapXphp <cmd>` to work.
+: <<'BAP_PHP_GUARD'
+<?php
+if (PHP_SAPI === 'cli') {
+    $args = $argv;
+    $script = array_shift($args);
+    $cmd = 'bash ' . escapeshellarg($script);
+    foreach ($args as $a) $cmd .= ' ' . escapeshellarg($a);
+    passthru($cmd, $rc);
+    exit($rc);
+}
+__halt_compiler(); ?>
+BAP_PHP_GUARD
+set -euo pipefail
+
+# ═══════════════════════════════════════════════════════════════
+# bapXphp — Project management CLI for the PHP/JSON monorepo
+# ═══════════════════════════════════════════════════════════════
+# Usage: bapXphp <command> [args...]
+#
+# ── Orientation ─────────────────────────────────────────────────
+#   bapXphp help                    — this message
+#   bapXphp understand              — full project overview (schema, commits, issues, PRs, skills, AGENTS.md)
+#   bapXphp context                 — quick session orientation (branch, status, last test result)
+#
+# ── Development ─────────────────────────────────────────────────
+#   bapXphp test                    — run test suite (php tests/run.php)
+#   bapXphp lint [path]             — PHP syntax check (php -l)
+#   bapXphp ci                      — non-mutating validation: lint → test → maps → smoke
+#   bapXphp check                   — alias for bapXphp ci
+#   bapXphp update                  — regenerate and validate both project maps
+#   bapXphp serve                   — start dev server on 127.0.0.1:6020
+#   bapXphp smoke                   — run local smoke tests
+#   bapXphp dev:user [--dry-run]   — create/update the fixed remote-DB customer used for browser testing
+#
+# ── Project Map ─────────────────────────────────────────────────
+#   bapXphp map                     — regenerate + view map.mmd (deterministic code graph with edges + gaps)
+#   bapXphp map:gen                 — regenerate systematic-map.mmd + map.mmd from source (AST/regex parsed)
+#   bapXphp map:val                 — validate both maps are up-to-date
+#
+# ── Schema (collections.php) ───────────────────────────────────
+#   bapXphp schema list             — list all collections with field counts
+#   bapXphp schema show <col>       — show full collection schema (fields, types, constraints)
+#   bapXphp add <field>:<type> [opts] under <collection>
+#                                   — add a field to collection schema
+#                                     opts: required:true values:a,b,c items:string
+#   bapXphp remove <field> under <collection>
+#                                   — remove a field from collection schema
+#
+# ── Tool Management ─────────────────────────────────────────────
+#   bapXphp tool list               — list all PHP tools in cli/
+#   bapXphp tool add <file>         — create a new PHP tool with nano editor
+#
+# ── Skills & Routes ─────────────────────────────────────────────
+#   bapXphp skills                  — list available agent skills with descriptions
+#   bapXphp route:list              — list all registered routes with controllers
+#
+# ── Git ─────────────────────────────────────────────────────────
+#   bapXphp status                  — git status + recent commits
+#   bapXphp logs [--limit N]        — read recent live audit events from remote MySQL
+#   bapXphp logs --local            — tail ignored local development logs
+#   bapXphp artifacts:clean [--dry-run]
+#                                   — untrack and ignore runtime/test artifacts
+#
+# ── GitHub ──────────────────────────────────────────────────────
+#   bapXphp issue                   — create a GitHub issue (interactive via gh CLI)
+#   bapXphp pr [gh args]            — validate, then create a GitHub PR
+#   bapXphp merge [gh args]         — validate, then merge a GitHub PR
+#   bapXphp handoff validate <file> [--issue]
+#                                   — validate structure; --issue also proves GitHub objective coverage
+#   bapXphp handoff comment <file> <pr-number>
+#                                   — create or update the PR's CTO HANDOFF comment
+#   bapXphp handoff next <issue>    — show event-based handoff with role + workflow
+#   bapXphp handoff template <issue> — generate empty handoff template from issue
+#   bapXphp handoff execute <issue> [--next role]
+#                                   — emit handoff context JSON (includes score + event + workflow)
+#   bapXphp handoff score <issue>   — validate work and assign 0-100 score to handoff event
+#
+# ── Mail & Images ───────────────────────────────────────────────
+#   bapXphp mail:process            — process pending mail queue
+#   bapXphp images:optimize         — convert/resize images to WebP
+#   bapXphp product:images <source> [--dry-run|--assets-only|--database-only]
+#                                   — import ordered product galleries from a ZIP/folder
+#   bapXphp blog:image <slug> <image> [--source-url /path] [--alt text] [--dry-run]
+#                                   — crop a screenshot/image and attach it to a blog post
+#
+# ── Database (MySQL direct) ──────────────────────────────────────
+#   bapXphp db tables               — list all MySQL tables
+#   bapXphp db describe <table>     — describe MySQL table columns
+#   bapXphp db list                 — list all schema collections (from collections.php)
+#   bapXphp db show <collection>    — show schema collection fields & types
+#   bapXphp db query <collection> [--where "field=value"] [--limit N] [--id id] [--owner email]
+#                                   — query records from MySQL
+#   bapXphp db find <collection> <id>
+#                                   — shorthand: find record by ID
+#   bapXphp db status               — verify DB paths and integration readiness
+#   bapXphp db raw <sql>            — execute raw SQL on MySQL
+#   bapXphp db init                 — create MySQL tables from collections.php schema
+#   bapXphp db sync                 — pull MySQL data → seed YAML files (currently: db init only)
+#
+# ── AI / Agent ───────────────────────────────────────────────────
+#   bapXphp agent <message>          — chat with the site AI agent
+#   bapXphp ai:config               — show AI model config from MySQL secrets
+#   bapXphp handoff execute <issue> [--next role]
+#                                   — load handoff context for next role
+#
+# ── Workflows (.agents/workflows/) ───────────────────────────────
+#   .agents/workflows/worker.md     — Worker (implementation)
+#   .agents/workflows/reviewer.md   — Reviewer (optional verification)
+#
+# ── Attachments (.agents/temp/) ──────────────────────────────────
+#   .agents/temp/                   — inbox for user-provided screenshots/docs
+#
+# ── Telemetry (.agents/ops/) ─────────────────────────────────────
+#   .agents/ops/telemetry.json      — cycle tracking + scoring
+#
+# ── Blog & Docs ──────────────────────────────────────────────────
+#       bapXphp docsmap                 — regenerate docs/map.mmd (content: skills, docs, blog, admin, agents)
+#       bapXphp codemap                 — regenerate map.mmd (root, code dependency graph with edges + gaps)
+#   bapXphp bloggen                 — regenerate blog cache from GitHub markdown sources
+#       bapXphp okfgen                  — generate .okf/ knowledge bundle (OKF v0.1, concept nodes + edges)
+#
+# ── Browser Agent (PHP-native, no Node.js needed) ──────────────
+#   bapXphp browser-agent open <url>      — fetch page, return YAML snapshot
+#   bapXphp browser-agent search <query>  — Google search, parse organic results
+#   bapXphp browser-agent goto <url>      — navigate to URL
+#   bapXphp browser-agent snapshot        — print current page as YAML snapshot
+#   bapXphp browser-agent click <sel>     — follow link by CSS selector
+#   bapXphp browser-agent fill <sel> <t>  — store form field value
+#   bapXphp browser-agent submit          — submit form with stored values
+#   bapXphp browser-agent smoke <url>     — run smoke tests (status, links, images)
+#   bapXphp browser-agent links           — extract all links from current page
+#   bapXphp browser-agent forms           — list all forms with fields
+#   bapXphp browser-agent captcha         — detect captcha on current page
+#   bapXphp browser-agent console <url>   — show page HTTP metadata
+#   bapXphp browser-agent html            — print raw HTML of current page
+#   bapXphp browser-agent help            — detailed help with all options
+#   (Use --pw prefix for Playwright mode when Node.js is available.)
+#
+# ── Task Management (todowrite) ──────────────────────────────────
+#   bapXphp todo                   — list tasks
+#   bapXphp todo add <description> — add a task
+#   bapXphp todo update <id> <status> — update task status (pending/in_progress/completed/cancelled)
+#   bapXphp todo done <id>         — mark task completed
+#
+# ── Objectives ───────────────────────────────────────────────────
+#   bapXphp objective read         — show current objectives from OBJECTIVE.md
+#   bapXphp objective update <text> — update objective entry (pipe or pass text)
+#
+# ── Task Dispatch ────────────────────────────────────────────────
+#   bapXphp task run <description> — dispatch a sub-agent task
+#   bapXphp task list              — list running/pending tasks
+#
+# ── Question ─────────────────────────────────────────────────────
+#   bapXphp question <text>        — ask the user a question
+#
+# ── Session Memory ───────────────────────────────────────────────
+#   bapXphp memory init            — initialize session.json in .tmp/
+#
+# ── Context (extract + search) ────────────────────────────────────
+#   bapXphp context-extract        — extract last 48h conversation + commits to .tmp/context-extract.xml
+#   bapXphp context-extract --hours 72
+#                                  — custom window (e.g., 72 hours)
+#   bapXphp context-extract --output /path/file.xml
+#                                  — custom output path (default: .tmp/context-extract.xml)
+#   bapXphp context <query>        — search extracted context for matching messages
+#   bapXphp context "bapXphp opencode compact"
+#                                  — find marker commands in conversation history
+#   bapXphp memory add <role> <content> — append entry
+#   bapXphp memory list            — show all entries
+#   bapXphp memory search <text>   — search by content
+#   bapXphp memory last [n]        — show last n entries
+#   bapXphp memory export          — dump full JSON
+#   bapXphp memory info            — session stats
+#   bapXphp memory clear           — erase session memory
+#
+# ── Skill ────────────────────────────────────────────────────────
+#   bapXphp skill <name>           — load a skill SKILL.md
+#   bapXphp skills                 — list available skills
+#
+# ── Read / Write Content ────────────────────────────────────────
+#   bapXphp read blog [slug]        — read blog post (list all if no slug)
+#   bapXphp write blog [slug]       — create/edit blog post with auto-slug/date/URL
+#   bapXphp read docs [slug]        — read customer guide (list all if no slug)
+#   bapXphp write docs [slug]       — create/edit customer guide
+#   bapXphp read product [slug]     — read product (list all if no slug)
+#   bapXphp write product [slug]    — create/edit product interactively
+#
+# ── Generic File Operations (no direct shell/edit/write) ─────────
+#   bapXphp read file <path>        — read arbitrary file with line numbers
+#   bapXphp write file <path>       — write/create arbitrary file (reads stdin)
+#   bapXphp edit <path> <search> <replace>
+#                                   — search/replace in file (dry-run with --preview)
+#   bapXphp grep <pattern> [path]   — search file contents (ripgrep style)
+#   bapXphp find <glob>             — find files by glob pattern
+#   bapXphp run <command...>        — execute any shell command through the CLI
+#
+# ── Backward compatibility aliases ──────────────────────────────
+#   bapXphp mysql:query   → bapXphp db raw
+#   bapXphp mysql:import  → bapXphp db sync
+# ═══════════════════════════════════════════════════════════════
+
+BAPX_SRC="${BASH_SOURCE[0]}"
+if [ -L "$BAPX_SRC" ]; then
+  BAPX_SRC="$(readlink "$BAPX_SRC")"
+fi
+ROOT="$(cd "$(dirname "$BAPX_SRC")/.." && pwd)"
+
+# Load project and ignored operator connection settings for CLI subcommands.
+for env_file in "$ROOT/.env" "$ROOT/.env.mysql" "$ROOT/.env.test-user"; do
+if [ -f "$env_file" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    # Skip comments and empty lines
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "${line// }" ]] && continue
+    # Strip carriage returns
+    line=$(echo "$line" | tr -d '\r')
+    if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+      eval "export $line"
+    fi
+  done < "$env_file"
+fi
+done
+
+MYSQL_HOST="${BAPX_MYSQL_HOST:-srv1877.hstgr.io}"
+MYSQL_PORT="${BAPX_MYSQL_PORT:-3306}"
+MYSQL_DB="${BAPX_MYSQL_DB:-u907253411_db_name_sps}"
+MYSQL_USER="${BAPX_MYSQL_USER:-u907253411_db_user_sps}"
+MYSQL_PASS="${BAPX_MYSQL_PASS:-}"
+SCHEMA_FILE="$ROOT/storage/schema/collections.php"
+APP_URL="${APP_URL:-https://sripanchamispiritual.com}"
+REMOTE_DB_URL="${BAPX_REMOTE_DB_URL:-${APP_URL%/}/remoteDB}"
+
+# ── Colors ─────────────────────────────────────────────────────
+R='\033[0;31m'; G='\033[0;32m'; Y='\033[1;33m'; C='\033[0;36m'; B='\033[1m'; N='\033[0m'
+
+# ── Helpers ────────────────────────────────────────────────────
+hr()  { printf "%$(tput cols)s\n" | tr ' ' '═'; }
+hr2() { printf "%$(tput cols)s\n" | tr ' ' '─'; }
+info() { printf "${C}%s${N}\n" "$*"; }
+ok()   { printf "${G}%s${N}\n" "$*"; }
+warn() { printf "${Y}%s${N}\n" "$*" >&2; }
+err()  { printf "${R}%s${N}\n" "$*" >&2; }
+
+die()  { err "$*"; exit 1; }
+
+require_php() { command -v php >/dev/null 2>&1 || die "PHP is not installed"; }
+require_gh()  { command -v gh >/dev/null 2>&1 || die "GitHub CLI (gh) is not installed"; }
+
+schema_path() { echo "$SCHEMA_FILE"; }
+
+# ── Commands ───────────────────────────────────────────────────
+
+cmd_dev_user() {
+  local dry_run=false
+  local generate=false
+  [ "${1:-}" = "--dry-run" ] && dry_run=true
+  [ "${1:-}" = "--generate" ] && generate=true
+  local id="${BAPX_TEST_USER_ID:-dev_test_customer}"
+  local email="${BAPX_TEST_USER_EMAIL:-test.user@bapx.dev}"
+  local name="${BAPX_TEST_USER_NAME:-Development Test User}"
+  local password="${BAPX_TEST_USER_PASSWORD:-}"
+  if [ "$generate" = true ] && [ -z "$password" ]; then
+    command -v openssl >/dev/null 2>&1 || die "OpenSSL is required to generate the development password."
+    password=$(openssl rand -base64 24 | tr -d '\r\n')
+    umask 077
+    printf 'BAPX_TEST_USER_PASSWORD=%s\n' "$password" > "$ROOT/.env.test-user"
+  fi
+  [ -n "$password" ] || die "Set BAPX_TEST_USER_PASSWORD in ignored operator config, or run bapXphp dev:user --generate."
+
+  local record
+  record=$(php -r '
+    echo json_encode([
+      "id"=>$argv[1], "email"=>$argv[2], "username"=>"dev_test_customer",
+      "name"=>$argv[3], "role"=>"customer",
+      "password_hash"=>password_hash($argv[4], PASSWORD_DEFAULT),
+      "accepted_terms_at"=>date(DATE_ATOM), "development_fixture"=>true,
+    ], JSON_UNESCAPED_SLASHES);
+  ' "$id" "$email" "$name" "$password")
+
+  if [ "$dry_run" = true ]; then
+    echo "Would upsert fixed development customer: $id ($email)"
+    return
+  fi
+  cmd_db_upsert users "$record" >/dev/null
+  ok "Development customer ready: $id ($email)"
+}
+
+cmd_help() {
+  awk '
+    /^# [═╬]/ { c++; if (c == 2) { capturing = 1; next } if (c == 3) { exit } }
+    capturing { sub(/^# ?/, ""); print }
+  ' "${BASH_SOURCE[0]}"
+  echo ""
+  echo "Run 'bapXphp <command>' for command-specific help."
+}
+
+# ── understand ─────────────────────────────────────────────────
+cmd_understand() {
+  require_php
+
+  local branch="" last_commit="" git_status="" dirty=""
+  branch=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?")
+  last_commit=$(git -C "$ROOT" log --oneline -1 2>/dev/null || echo "?")
+  dirty=$(git -C "$ROOT" status --short 2>/dev/null | wc -l | tr -d ' ')
+  [ "$dirty" -gt 0 ] && git_status="${dirty} modified/staged" || git_status="clean"
+
+  echo ""
+  printf "${B}${C}%s${N}${B}%s${N}\n" "╔══════════════════════════════════════════╗" ""
+  printf "${B}${C}%s${N}${B}%s${N}\n" "║" "          bapXphp understand" ""
+  printf "${B}${C}%s${N}${B}%s${N}\n" "╚══════════════════════════════════════════╝" ""
+  echo ""
+
+  # ── Repository ──
+  printf "${B}── Repository ──────────────────────────────${N}\n"
+  echo "  Branch:      ${branch}"
+  echo "  Last commit: ${last_commit}"
+  echo "  Status:      ${git_status}"
+  echo ""
+
+  # ── Recent commits ──
+  printf "${B}── Recent Commits ──────────────────────────${N}\n"
+  git -C "$ROOT" log --oneline -5 2>/dev/null | sed 's/^/  /'
+  echo ""
+
+  # ── Open Issues (gh) ──
+  if command -v gh >/dev/null 2>&1; then
+    local issues
+    issues=$(gh issue list --state open --limit 10 --json number,title,createdAt 2>/dev/null) || issues=""
+    if [ -n "$issues" ] && [ "$issues" != "[]" ]; then
+      printf "${B}── Open Issues ────────────────────────────${N}\n"
+      echo "$issues" | php -r '
+        $items = json_decode(stream_get_contents(STDIN), true);
+        foreach ($items as $i) printf("  #%d  %s (opened %s)\n", $i["number"], $i["title"], substr($i["createdAt"],0,10));
+      '
+      echo ""
+    fi
+  fi
+
+  # ── Recent Merged PRs (gh) ──
+  if command -v gh >/dev/null 2>&1; then
+    local prs
+    prs=$(gh pr list --state merged --limit 5 --json number,title,mergedAt 2>/dev/null) || prs=""
+    if [ -n "$prs" ] && [ "$prs" != "[]" ]; then
+      printf "${B}── Recent PRs Merged ───────────────────────${N}\n"
+      echo "$prs" | php -r '
+        $items = json_decode(stream_get_contents(STDIN), true);
+        foreach ($items as $i) printf("  #%d  %s (merged %s)\n", $i["number"], $i["title"], substr($i["mergedAt"],0,10));
+      '
+      echo ""
+    fi
+  fi
+
+  # ── Schema Collections ──
+  if [ -f "$SCHEMA_FILE" ]; then
+    printf "${B}── Schema Collections ──────────────────────${N}\n"
+    php -r "
+      \$s = require '$SCHEMA_FILE';
+      foreach (\$s['collections'] ?? [] as \$name => \$col) {
+        echo \"  ${B}\${name}${N}\n\";
+        echo \"    table:   \" . preg_replace('/[^a-z_]/', '', \$name) . \"\n\";
+    echo \"    pkey:    \" . (\$col['primary_key'] ?? 'id') . \"\n\";
+    echo \"    managed: \" . ((\$col['admin_managed'] ?? false) ? 'admin' : 'runtime') . \"\n\";
+        if (\$col['admin_fields'] ?? []) echo \"    a_fields: \" . implode(', ', \$col['admin_fields']) . \"\n\";
+        if (\$col['media_fields'] ?? []) echo \"    m_fields: \" . implode(', ', \$col['media_fields']) . \"\n\";
+        if (\$col['agent_context'] ?? []) echo \"    context:  \" . implode(', ', \$col['agent_context']) . \"\n\";
+        echo \"\";
+        foreach (\$col['fields'] ?? [] as \$fname => \$fdef) {
+          \$req = !empty(\$fdef['required']) ? ' (required)' : '';
+          \$vals = isset(\$fdef['values']) ? ' [' . implode(', ', \$fdef['values']) . ']' : '';
+          \$items = isset(\$fdef['items']) ? ' of ' . \$fdef['items'] : '';
+          echo \"    ├─ \$fname: \" . \$fdef['type'] . \$items . \$vals . \$req . \"\n\";
+        }
+      }
+    "
+    echo ""
+  fi
+
+  # ── Skills ──
+  local skills_root="$ROOT/.agents/skills"
+  printf "${B}── Skills ──────────────────────────────────${N}\n"
+  if [ -d "$skills_root" ]; then
+    for skill_dir in "$skills_root"/*/; do
+      [ -d "$skill_dir" ] || continue
+      local sname; sname=$(basename "$skill_dir" 2>/dev/null) || true
+      local sdesc
+      sdesc=$(head -3 "$skill_dir/SKILL.md" 2>/dev/null | tail -1 | sed 's/^#* *//') || true
+      sdesc="${sdesc:-Use when editing $sname tasks}"
+      printf "  • %s  %s\n" "$sname" "$sdesc"
+    done
+  else
+    echo "  (no skills directory found)"
+  fi
+  echo ""
+
+  # ── AGENTS.md root excerpt ──
+  if [ -f "$ROOT/AGENTS.md" ]; then
+    printf "${B}── AGENTS.md Root (excerpt) ───────────────${N}\n"
+    grep -v '^---$' "$ROOT/AGENTS.md" | grep -v '^globs:' | grep -v '^alwaysApply:' | grep -v '^description:' | head -12 | sed 's/^/  /'
+    echo ""
+  fi
+
+  # ── Quick Reference ──
+  printf "${B}── Quick Reference ─────────────────────────${N}\n"
+  printf "  ${C}bapXphp test${N}        php tests/run.php\n"
+  printf "  ${C}bapXphp serve${N}       php -S 127.0.0.1:6020 index.php\n"
+  printf "  ${C}bapXphp ci${N}          lint → test → map validation → docs-map validation → smoke\n"
+  printf "  ${C}bapXphp check${N}       alias for ci\n"
+  printf "  ${C}bapXphp update${N}      regenerate and validate both repository maps\n"
+  printf "  ${C}bapXphp db query <col>${N}  --where 'field=val' --limit 10\n"
+  printf "  ${C}bapXphp db init${N}     create MySQL tables from schema\n"
+  printf "  ${C}bapXphp db sync${N}     push JSON → MySQL\n"
+  printf "  ${C}bapXphp understand${N}  Full project overview\n"
+  printf "  ${C}bapXphp help${N}        All commands\n"
+  echo ""
+}
+
+# ── context ────────────────────────────────────────────────────
+cmd_context() {
+  require_php
+  echo ""
+  local branch
+  branch=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')
+  printf "${B}${C}── bapXphp context ══ ${branch} ──${N}\n"
+  git -C "$ROOT" log --oneline -3 2>/dev/null | sed 's/^/  /' || true
+  local dirty
+  dirty=$(git -C "$ROOT" status --short 2>/dev/null | wc -l | tr -d ' ') || true
+  echo "  Status: ${dirty:-0} pending"
+  echo "  bapXphp understand for full overview | bapXphp check for full validation"
+  echo ""
+}
+
+# ── Schema Commands ────────────────────────────────────────────
+cmd_schema() {
+  local action="${1:-list}"
+  shift 2>/dev/null || true
+  case "$action" in
+    list) cmd_schema_list "$@" ;;
+    show) cmd_schema_show "$1" ;;
+    *)    cmd_schema_list ;;
+  esac
+}
+
+cmd_schema_list() {
+  [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
+  php -r "
+    \$s = require '$SCHEMA_FILE';
+    echo \"Collections (\" . count(\$s['collections'] ?? []) . \"):\n\";
+    foreach (\$s['collections'] ?? [] as \$name => \$col) {
+      \$c = count(\$col['fields'] ?? []);
+      echo \"  \$name  (\$c fields)\n\";
+    }
+  "
+}
+
+cmd_schema_show() {
+  local collection="$1"
+  [ -z "$collection" ] && die "Usage: bapXphp schema show <collection>"
+  [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
+  php -r "
+    \$s = require '$SCHEMA_FILE';
+    \$col = \$s['collections']['$collection'] ?? null;
+    if (!\$col) { fprintf(STDERR, \"Collection '$collection' not found\n\"); exit(1); }
+    echo \"Collection: $collection\n\";
+    echo \"Table:      \" . preg_replace('/[^a-z_]/', '', \$col['name'] ?? '$collection') . \"\n\";
+    echo \"PKey:       \" . (\$col['primary_key'] ?? 'id') . \"\n\";
+    echo \"Managed:    \" . (\$col['admin_managed'] ? 'admin' : 'runtime') . \"\n\";
+    if (\$col['admin_fields'] ?? []) echo \"Admin flds: \" . implode(', ', \$col['admin_fields']) . \"\n\";
+    if (\$col['media_fields'] ?? []) echo \"Media flds: \" . implode(', ', \$col['media_fields']) . \"\n\";
+    if (\$col['agent_context'] ?? []) echo \"Context:    \" . implode(', ', \$col['agent_context']) . \"\n\";
+    echo \"\nFields:\n\";
+    foreach (\$col['fields'] ?? [] as \$fname => \$fdef) {
+      \$req = !empty(\$fdef['required']) ? ' required' : '';
+      \$vals = isset(\$fdef['values']) ? ' [' . implode(', ', \$fdef['values']) . ']' : '';
+      \$items = isset(\$fdef['items']) ? ' of ' . \$fdef['items'] : '';
+      echo \"  \$fname: \" . \$fdef['type'] . \$items . \$vals . \$req . \"\n\";
+    }
+  "
+}
+
+cmd_add() {
+  local field_spec="" collection=""
+  local args=()
+
+  # Parse: bapXphp add <field>:<type> [opts] under <collection>
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      under) shift; collection="$1" ;;
+      *) args+=("$1") ;;
+    esac
+    shift
+  done
+
+  [ -z "$collection" ] && die "Usage: bapXphp add <field>:<type> [modifiers] under <collection>"
+  [ ${#args[@]} -eq 0 ] && die "Missing field spec. Usage: bapXphp add <field>:<type> under <collection>"
+
+  field_spec="${args[0]}"
+  local field_name="${field_spec%%:*}"
+  local field_type="${field_spec#*:}"
+
+  [ -z "$field_name" ] && die "Field name is required"
+  [ -z "$field_type" ] && die "Field type is required (e.g. string, number, boolean, email, text, slug, url, datetime)"
+
+  local required="false"
+  local enum_values=""
+  local items_type=""
+
+  for ((i=1; i<${#args[@]}; i++)); do
+    case "${args[$i]}" in
+      required:*) required="${args[$i]#required:}" ;;
+      values:*)   enum_values="${args[$i]#values:}" ;;
+      items:*)    items_type="${args[$i]#items:}" ;;
+    esac
+  done
+
+  [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
+
+  php -r "
+    \$path = '$SCHEMA_FILE';
+    \$s = require \$path;
+    if (!isset(\$s['collections']['$collection'])) {
+      fprintf(STDERR, \"Collection '$collection' not found\n\"); exit(1);
+    }
+    if (isset(\$s['collections']['$collection']['fields']['$field_name'])) {
+      fprintf(STDERR, \"Field '$field_name' already exists in '$collection'\n\"); exit(1);
+    }
+    \$def = ['type' => '$field_type'];
+    if ('$required' === 'true') \$def['required'] = true;
+    if ('$enum_values' !== '') \$def['values'] = explode(',', '$enum_values');
+    if ('$items_type' !== '') \$def['items'] = '$items_type';
+    \$s['collections']['$collection']['fields']['$field_name'] = \$def;
+    file_put_contents(\$path, '<?php return ' . var_export(\$s, true) . ';' . PHP_EOL);
+    echo \"Added $field_name: $field_type to $collection\n\";
+  "
+}
+
+cmd_remove() {
+  local field_name="" collection=""
+  local args=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      under) shift; collection="$1" ;;
+      *) args+=("$1") ;;
+    esac
+    shift
+  done
+
+  [ -z "$collection" ] && die "Usage: bapXphp remove <field> under <collection>"
+  [ ${#args[@]} -eq 0 ] && die "Missing field name. Usage: bapXphp remove <field> under <collection>"
+
+  field_name="${args[0]}"
+  [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
+
+  php -r "
+    \$path = '$SCHEMA_FILE';
+    \$s = require \$path;
+    if (!isset(\$s['collections']['$collection'])) {
+      fprintf(STDERR, \"Collection '$collection' not found\n\"); exit(1);
+    }
+    if (!isset(\$s['collections']['$collection']['fields']['$field_name'])) {
+      fprintf(STDERR, \"Field '$field_name' not found in '$collection'\n\"); exit(1);
+    }
+    unset(\$s['collections']['$collection']['fields']['$field_name']);
+
+    // Clean up related arrays
+    foreach (['admin_fields', 'media_fields', 'agent_context'] as \$key) {
+      if (isset(\$s['collections']['$collection'][\$key])) {
+        \$s['collections']['$collection'][\$key] = array_values(array_filter(
+          \$s['collections']['$collection'][\$key],
+          fn(\$v) => \$v !== '$field_name'
+        ));
+        if (empty(\$s['collections']['$collection'][\$key])) unset(\$s['collections']['$collection'][\$key]);
+      }
+    }
+    file_put_contents(\$path, '<?php return ' . var_export(\$s, true) . ';' . PHP_EOL);
+    echo \"Removed $field_name from $collection\n\";
+  "
+}
+
+# ── Tool Commands ──────────────────────────────────────────────
+cmd_tool() {
+  local action="${1:-list}"
+  shift 2>/dev/null || true
+  case "$action" in
+    list) cmd_tool_list ;;
+    add)  cmd_tool_add "$1" ;;
+    *)    cmd_tool_list ;;
+  esac
+}
+
+cmd_tool_list() {
+  echo "Tools in $ROOT/cli/:"
+  echo ""
+  for f in "$ROOT/cli/"*.php; do
+    [ -f "$f" ] || continue
+    local name
+    name=$(basename "$f") || true
+    local desc
+    desc=$(head -3 "$f" | sed -n 's/.*\* *//p' | head -1) || true
+    printf "  %s  %s\n" "$name" "$desc"
+  done
+  [ -x "$ROOT/bapXphp" ] && printf "  %s  %s\n" "bapXphp" "Project management CLI"
+}
+
+cmd_tool_add() {
+  local filename="$1"
+  [ -z "$filename" ] && die "Usage: bapXphp tool add <filename.php>"
+
+  # Ensure .php extension
+  [[ "$filename" == *.php ]] || filename="${filename}.php"
+  local filepath="$ROOT/cli/$filename"
+
+  [ -f "$filepath" ] && die "File already exists: $filepath"
+
+  # Create template
+  cat > "$filepath" << 'TEMPLATE'
+<?php
+/**
+ * Short description of this tool.
+ *
+ * Usage: php cli/__FILE__
+ */
+
+require __DIR__ . '/../app/bootstrap.php';
+
+// Your tool logic here
+echo "Tool ready.\n";
+TEMPLATE
+
+  # Replace placeholder
+  sed -i '' "s/__FILE__/$filename/" "$filepath"
+
+  # Open in nano for editing
+  nano "$filepath"
+
+  # Validate
+  if php -l "$filepath" 2>&1; then
+    chmod +x "$filepath"
+    ok "Created and validated: cli/$filename"
+  else
+    err "PHP syntax errors in $filename. Fix with: nano cli/$filename"
+    exit 1
+  fi
+}
+
+# ── Dev Commands ───────────────────────────────────────────────
+cmd_test() {
+  require_php
+  php "$ROOT/tests/run.php" 2>&1
+}
+
+cmd_lint() {
+  require_php
+  local target="${1:-}"
+  if [ -n "$target" ]; then
+    if [ -f "$target" ]; then
+      php -l "$target"
+    else
+      find "$target" -name '*.php' -exec php -l {} \; 2>&1 | grep -v 'No syntax errors' || true
+    fi
+  else
+    find "$ROOT/app" "$ROOT/api" "$ROOT/tests" "$ROOT/cli" "$ROOT/views" "$ROOT/index.php" -name '*.php' 2>/dev/null \
+      -exec php -l {} \; 2>&1 | grep -v 'No syntax errors' || true
+    ok "PHP syntax check complete"
+  fi
+}
+
+cmd_ci() {
+  require_php
+  local failed=0
+
+  echo "── lint ──"
+  cmd_lint || { failed=1; warn "LINT FAILED"; }
+
+  echo "── test ──"
+  cmd_test || { failed=1; warn "TESTS FAILED"; }
+
+  echo "── map:val ──"
+  php "$ROOT/cli/validate-project-map.php" 2>&1 || { failed=1; warn "MAP VALIDATION FAILED"; }
+
+  echo "── docsmap:val ──"
+  php "$ROOT/cli/validate-docs-map.php" "$ROOT" 2>&1 || { failed=1; warn "DOCS MAP VALIDATION FAILED"; }
+
+  echo "── codemap:val (root map.mmd) ──"
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/.map.mmd.tmp"
+  if [ -f "$ROOT/map.mmd" ]; then
+    if ! diff -q "$ROOT/map.mmd" "$ROOT/.map.mmd.tmp" >/dev/null 2>&1; then
+      warn "CODE MAP STALE. Run bapXphp codemap and commit map.mmd."
+      failed=1
+    else
+      ok "Code map is current"
+    fi
+  else
+    warn "map.mmd missing. Run bapXphp codemap."
+    failed=1
+  fi
+  rm -f "$ROOT/.map.mmd.tmp"
+
+  echo "── smoke ──"
+  php "$ROOT/cli/smoke-local.php" 2>&1 || { failed=1; warn "SMOKE FAILED"; }
+
+  if [ "$failed" -eq 0 ]; then
+    ok "ALL CHECKS PASSED"
+  else
+    err "SOME CHECKS FAILED"
+    exit 1
+  fi
+}
+
+cmd_check() { cmd_ci; }
+
+cmd_update() {
+  require_php
+  php "$ROOT/cli/generate-project-map.php"
+  php "$ROOT/cli/generate-docs-map.php" "$ROOT" "$ROOT/docs/map.mmd"
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/map.mmd"
+  php "$ROOT/cli/generate-okf-bundle.php" "$ROOT"
+  php "$ROOT/cli/validate-project-map.php"
+  php "$ROOT/cli/validate-docs-map.php" "$ROOT"
+  ok "MAPS AND KNOWLEDGE BUNDLE UPDATED"
+}
+
+cmd_serve() {
+  require_php
+  echo "Starting dev server at http://127.0.0.1:6020"
+  php -S 127.0.0.1:6020 -t "$ROOT" "$ROOT/index.php"
+}
+
+cmd_smoke() {
+  require_php
+  php "$ROOT/cli/smoke-local.php" 2>&1
+}
+
+# ── Map Commands ───────────────────────────────────────────────
+cmd_map() {
+  require_php
+  echo "── Generating map.mmd (deterministic code graph) ──" >&2
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/map.mmd" >&2
+  echo "── map.mmd (code: routes → controllers → services → collections, edges + gaps) ──" >&2
+  cat "$ROOT/map.mmd"
+}
+
+cmd_map_gen() {
+  require_php
+  php "$ROOT/cli/generate-project-map.php" 2>&1
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/map.mmd" 2>&1
+  echo "generated: docs/systematic-map.mmd, map.mmd"
+}
+
+cmd_map_val() {
+  require_php
+  php "$ROOT/cli/validate-project-map.php" 2>&1
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/.map.mmd.tmp" 2>&1
+  if [ -f "$ROOT/map.mmd" ]; then
+    if ! diff -q "$ROOT/map.mmd" "$ROOT/.map.mmd.tmp" >/dev/null 2>&1; then
+      warn "map.mmd STALE. Run bapXphp map:gen / codemap."
+      rm -f "$ROOT/.map.mmd.tmp"
+      return 1
+    fi
+    ok "map.mmd is current"
+  else
+    warn "map.mmd MISSING. Run bapXphp codemap."
+    rm -f "$ROOT/.map.mmd.tmp"
+    return 1
+  fi
+  rm -f "$ROOT/.map.mmd.tmp"
+}
+
+# ── Skills ──────────────────────────────────────────────────────
+cmd_skills() {
+  local skills_root="$ROOT/.agents/skills"
+  if [ ! -d "$skills_root" ]; then
+    warn "Skills directory not found: $skills_root"
+    return
+  fi
+  echo "Available skills:"
+  echo ""
+  for skill_dir in "$skills_root"/*/; do
+    [ -d "$skill_dir" ] || continue
+    local name
+    name=$(basename "$skill_dir" 2>/dev/null) || true
+    local desc=""
+    if [ -f "$skill_dir/SKILL.md" ]; then
+      desc=$(head -3 "$skill_dir/SKILL.md" 2>/dev/null | tail -1 | sed 's/^#* *//') || true
+    fi
+    desc="${desc:-No description}"
+    printf "  %s  %s\n" "$name" "$desc"
+  done
+}
+
+# ── Route:list ─────────────────────────────────────────────────
+cmd_route_list() {
+  require_php
+  php -r "
+    // routes.php needs bootstrap (autoloader) because ProjectMapService is used
+    require '$ROOT/app/bootstrap.php';
+    \$routes = require '$ROOT/app/routes.php';
+    printf(\"%-8s %-38s %-30s %s\n\", 'Method', 'Path', 'Controller', 'Services');
+    echo str_repeat('-', 100) . \"\n\";
+    foreach (\$routes as \$r) {
+      \$method = \$r['method'] ?? 'GET';
+      \$path = \$r['path'] ?? '';
+      \$ctrl = \$r['controller'] ?? '';
+      \$svcs = implode(', ', \$r['services'] ?? []);
+      printf(\"%-8s %-38s %-30s %s\n\", \$method, \$path, \$ctrl, \$svcs);
+    }
+  "
+}
+
+# ── Status ──────────────────────────────────────────────────────
+cmd_status() {
+  echo "── git status ──"
+  git -C "$ROOT" status --short 2>/dev/null || echo "(not a git repo)"
+  echo ""
+  echo "── recent commits ──"
+  git -C "$ROOT" log --oneline -5 2>/dev/null || echo "(not a git repo)"
+}
+
+# ── Logs ────────────────────────────────────────────────────────
+cmd_logs() {
+  local mode="remote" limit=20
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --local) mode="local" ;;
+      --limit) shift; limit="${1:-20}" ;;
+      *) die "Usage: bapXphp logs [--limit N|--local]" ;;
+    esac
+    shift
+  done
+
+  if [ "$mode" = "remote" ]; then
+    [[ "$limit" =~ ^[0-9]+$ ]] || die "--limit must be a positive integer"
+    [ "$limit" -gt 0 ] || die "--limit must be a positive integer"
+    info "Live production audit events (remote MySQL):"
+    cmd_db_raw "SELECT * FROM audit_events ORDER BY _created_at DESC LIMIT $limit"
+    return
+  fi
+
+  local logfiles
+  logfiles=$(find "$ROOT/storage/logs" -maxdepth 1 -type f -name '*.log' 2>/dev/null | head -5)
+  [ -f "$ROOT/server.log" ] && logfiles="${logfiles}${logfiles:+$'\n'}$ROOT/server.log"
+  if [ -z "$logfiles" ]; then
+    echo "No local development logs found."
+  else
+    for f in $logfiles; do
+      echo "── $(basename "$f") (last 20 lines) ──"
+      tail -20 "$f" 2>/dev/null || echo "(empty)"
+      echo ""
+    done
+  fi
+}
+
+cmd_artifacts_clean() {
+  local dry_run=false
+  [ "${1:-}" = "--dry-run" ] && dry_run=true
+  [ $# -gt 1 ] && die "Usage: bapXphp artifacts:clean [--dry-run]"
+
+  local tracked
+  tracked=$(git -C "$ROOT" ls-files 'server.log' 'output/playwright/**' 'storage/logs/**')
+  if [ -z "$tracked" ]; then
+    echo "No tracked runtime or Playwright artifacts."
+    return
+  fi
+  echo "$tracked"
+  if [ "$dry_run" = "true" ]; then
+    echo "Dry run: listed artifacts would be removed from Git tracking only."
+    return
+  fi
+  git -C "$ROOT" rm -r --cached --ignore-unmatch -- server.log output/playwright storage/logs
+  ok "Runtime and Playwright artifacts removed from Git tracking; working files preserved."
+}
+
+# ── GitHub Commands ────────────────────────────────────────────
+cmd_issue() {
+  require_gh
+  gh issue create
+}
+
+cmd_pr() {
+  require_gh
+  cmd_ci
+  gh pr create "$@"
+}
+
+cmd_merge() {
+  require_gh
+  cmd_ci
+  gh pr merge "$@"
+}
+
+cmd_handoff() {
+  local action="${1:-}" file="${2:-}" argument="${3:-}"
+  case "$action" in
+    validate)
+      [ $# -ge 2 ] && [ $# -le 3 ] && [ -n "$file" ] || die "Usage: bapXphp handoff validate <file> [--issue]"
+      require_php
+      php "$ROOT/cli/handoff.php" validate "$file"
+      if [ -n "$argument" ]; then
+        [ "$argument" = "--issue" ] || die "Usage: bapXphp handoff validate <file> [--issue]"
+        require_gh
+        local issue_number evidence_file
+        issue_number=$(php -r '$data=json_decode(file_get_contents($argv[1]), true); echo $data["issue"] ?? "";' "$file")
+        [[ "$issue_number" =~ ^[1-9][0-9]*$ ]] || die "Handoff issue number is invalid"
+        evidence_file=$(mktemp)
+        trap 'rm -f "$evidence_file"' RETURN
+        gh issue view "$issue_number" --json body,comments > "$evidence_file"
+        php "$ROOT/cli/handoff.php" coverage "$file" "$evidence_file"
+        rm -f "$evidence_file"
+        trap - RETURN
+      fi
+      ;;
+    comment)
+      local pr_number="$argument"
+      [ $# -eq 3 ] && [ -n "$file" ] && [[ "$pr_number" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff comment <file> <pr-number>"
+      require_php
+      require_gh
+      local body comment_id marker='<!-- HANDOFF-MARKER -->'
+      body=$(php "$ROOT/cli/handoff.php" render-comment "$file")
+      comment_id=$(gh api --paginate "repos/${GITHUB_REPOSITORY:-getwinharris/bapXphpAiBackend}/issues/$pr_number/comments" \
+        --jq ".[] | select(.body | contains(\"$marker\")) | .id" | head -1)
+      if [ -n "$comment_id" ]; then
+        gh api --method PATCH "repos/${GITHUB_REPOSITORY:-getwinharris/bapXphpAiBackend}/issues/comments/$comment_id" -f body="$body" >/dev/null
+        ok "HANDOFF comment updated"
+      else
+        gh api --method POST "repos/${GITHUB_REPOSITORY:-getwinharris/bapXphpAiBackend}/issues/$pr_number/comments" -f body="$body" >/dev/null
+        ok "HANDOFF comment created"
+      fi
+      ;;
+    next)
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff next <issue>"
+      require_php
+      require_gh
+      local event_file="$ROOT/.agents/handoffs/events/${file}.json"
+      [ ! -f "$event_file" ] && event_file=$(ls "$ROOT/.agents/handoffs/events/${file}"-*.json 2>/dev/null | head -1)
+      if [ -f "$event_file" ]; then
+        echo "── Handoff event for issue #${file} ──"
+        echo "Event type: $(jq -r '.event_type' "$event_file")"
+        echo "Current role: $(jq -r '.workflow.current_role' "$event_file")"
+        echo "Next role: $(jq -r '.workflow.next_role' "$event_file")"
+        echo "Score: $(jq '.telemetry.score // "unscored"' "$event_file")/100"
+        echo "Chain: $(jq -r '.workflow.sequence | join(" → ")' "$event_file")"
+        echo ""
+        echo "── Workflow for current role ──"
+        local role
+        role=$(jq -r '.workflow.current_role' "$event_file")
+        local wf="$ROOT/.agents/workflows/${role}.md"
+        if [ -f "$wf" ]; then
+          cat "$wf"
+        else
+          echo "No workflow definition for role: $role"
+        fi
+      else
+        warn "No handoff event for issue #${file} at .agents/handoffs/events/${file}*.json"
+      fi
+      ;;
+    template)
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff template <issue>"
+      require_php
+      require_gh
+      local evidence_file_3
+      evidence_file_3=$(mktemp)
+      trap 'rm -f "$evidence_file_3"' RETURN
+      gh issue view "$file" --json body,comments > "$evidence_file_3"
+      php "$ROOT/cli/handoff.php" template "$file" "$evidence_file_3"
+      rm -f "$evidence_file_3"
+      trap - RETURN
+      ;;
+    execute)
+      [ $# -ge 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff execute <issue> [--next role]"
+      local nextFlag=""
+      [ "$argument" = "--next" ] && nextFlag="${4:-}"
+      local event_file="$ROOT/.agents/handoffs/events/${file}.json"
+      [ ! -f "$event_file" ] && event_file=$(ls "$ROOT/.agents/handoffs/events/${file}"-*.json 2>/dev/null | head -1)
+      [ -f "$event_file" ] || die "No handoff event for issue #${file}"
+      local role="$nextFlag"
+      [ -z "$role" ] && role=$(jq -r '.workflow.current_role' "$event_file")
+      local wf="$ROOT/.agents/workflows/${role}.md"
+      local workflow_content=""
+      [ -f "$wf" ] && workflow_content=$(cat "$wf")
+      local model_config
+      model_config=$(php -r '
+        require "'"$ROOT"'/app/bootstrap.php";
+        $cfg = (new App\Services\SecretService())->getModelConfig();
+        echo json_encode($cfg);
+      ' 2>/dev/null || echo '{}')
+      echo "{"
+      echo "  \"issue\": $file,"
+      echo "  \"role\": \"$role\","
+      echo "  \"score\": $(jq '.telemetry.score // 0' "$event_file"),"
+      echo "  \"model_config\": $(echo "$model_config" | jq -c .),"
+      echo "  \"event\": $(jq -c '.' "$event_file"),"
+      echo "  \"workflow\": $(echo "$workflow_content" | jq -Rs .),"
+      echo "  \"attachments\": [$(ls "$ROOT/.agents/temp" 2>/dev/null | jq -R -s -c 'split("\n") | map(select(length > 0))')]"
+      echo "}"
+      ;;
+    score)
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff score <issue>"
+      local event_file="$ROOT/.agents/handoffs/events/${file}.json"
+      if [ ! -f "$event_file" ]; then
+        local found
+        found=$(ls "$ROOT/.agents/handoffs/events/${file}"-*.json 2>/dev/null | head -1)
+        [ -n "$found" ] && event_file="$found"
+      fi
+      [ -f "$event_file" ] || die "No handoff event for issue #${file}. Run bapXphp issue or GH Actions first."
+
+      echo "── Scoring handoff for issue #${file} ──"
+
+      local score=0
+      local breakdown=""
+
+      # 1) CI validation (30 points)
+      echo -n "CI check (30pts) ... "
+      if bapXphp ci >/dev/null 2>&1; then
+        score=$((score + 30))
+        breakdown="${breakdown}ci:30 "
+        echo "PASS"
+      else
+        breakdown="${breakdown}ci:0 "
+        echo "FAIL"
+      fi
+
+      # 2) All objectives have evidence (25 points)
+      local total_objs evidence_count
+      total_objs=$(jq '.objectives | length' "$event_file")
+      evidence_count=$(jq '[.objectives[].evidence[]] | length' "$event_file")
+      echo -n "Evidence check (${evidence_count}/${total_objs} objs) ... "
+      if [ "$total_objs" -gt 0 ] && [ "$evidence_count" -ge "$total_objs" ]; then
+        score=$((score + 25))
+        breakdown="${breakdown}evidence:25 "
+        echo "PASS"
+      else
+        local evidence_score=0
+        [ "$total_objs" -gt 0 ] && evidence_score=$(( evidence_count * 25 / total_objs ))
+        score=$((score + evidence_score))
+        breakdown="${breakdown}evidence:${evidence_score} "
+        echo "PARTIAL (${evidence_score})"
+      fi
+
+      # 3) No unresolved items (15 points)
+      local unresolved_count
+      unresolved_count=$(jq '[.objectives[].unresolved[]] | length' "$event_file")
+      echo -n "Unresolved items (${unresolved_count}) ... "
+      if [ "$unresolved_count" -eq 0 ]; then
+        score=$((score + 15))
+        breakdown="${breakdown}unresolved:15 "
+        echo "PASS"
+      else
+        breakdown="${breakdown}unresolved:0 "
+        echo "FAIL"
+      fi
+
+      # 4) No gap statuses (15 points)
+      local gap_count
+      gap_count=$(jq '[.objectives[] | select(.status == "gap")] | length' "$event_file")
+      echo -n "Gap check (${gap_count} gaps) ... "
+      if [ "$gap_count" -eq 0 ]; then
+        score=$((score + 15))
+        breakdown="${breakdown}gaps:15 "
+        echo "PASS"
+      else
+        breakdown="${breakdown}gaps:0 "
+        echo "FAIL"
+      fi
+
+      # 5) Tests pass (15 points)
+      local tests_passed
+      tests_passed=$(jq -r '.telemetry.tests_passed // ""' "$event_file")
+      echo -n "Tests check ... "
+      if [ -n "$tests_passed" ]; then
+        local num passed
+        num=$(echo "$tests_passed" | cut -d/ -f2)
+        passed=$(echo "$tests_passed" | cut -d/ -f1)
+        if [ "$num" -gt 0 ] && [ "$passed" -eq "$num" ]; then
+          score=$((score + 15))
+          breakdown="${breakdown}tests:15 "
+          echo "PASS (${tests_passed})"
+        else
+          breakdown="${breakdown}tests:0 "
+          echo "FAIL (${tests_passed})"
+        fi
+      else
+        breakdown="${breakdown}tests:0 "
+        echo "NO DATA (0)"
+      fi
+
+      echo "── Score: ${score}/100 (${breakdown}) ──"
+
+      # Inject score into handoff event JSON
+      jq --argjson score "$score" '.telemetry.score = $score' "$event_file" > "${event_file}.tmp" && mv "${event_file}.tmp" "$event_file"
+
+      # Also update telemetry.json cycle
+      local cycle_file="$ROOT/.agents/ops/telemetry.json"
+      if [ -f "$cycle_file" ]; then
+        local latest_id
+        latest_id=$(jq -r '.cycles[-1].id' "$cycle_file")
+        jq --arg id "$latest_id" --argjson score "$score" \
+          '(.cycles[] | select(.id == $id) | .score) = $score
+           | .metrics.avg_score = ([.cycles[].score] | add / length | floor)' \
+          "$cycle_file" > "${cycle_file}.tmp" && mv "${cycle_file}.tmp" "$cycle_file"
+      fi
+
+      echo "Score written to handoff event"
+      ;;
+    *) die "Usage: bapXphp handoff <validate|comment|next|template|execute|score> <file> [--next role]" ;;
+  esac
+}
+
+# ── Mail & Images ──────────────────────────────────────────────
+cmd_mail_process() {
+  require_php
+  php "$ROOT/cli/process-mail-queue.php" 2>&1
+}
+
+cmd_images_optimize() {
+  require_php
+  php "$ROOT/cli/optimize-images.php" 2>&1
+}
+
+cmd_agent() {
+  local message="$*"
+  if [ -z "$message" ]; then
+    echo "Usage: bapXphp agent <message>"
+    echo ""
+    echo "Chat with the site AI agent."
+    echo ""
+    echo "Examples:"
+    echo "  bapXphp agent how many users do we have"
+    echo "  bapXphp agent what's the revenue this month"
+    echo "  bapXphp agent create a blog post about Diwali offers"
+    return 0
+  fi
+  local endpoint="${BAPX_AGENT_URL:-https://sripanchamispiritual.com/api/agent}"
+  echo "Agent: thinking..."
+  local response
+  response=$(curl -s -X POST "$endpoint" \
+    -H 'Content-Type: application/json' \
+    -d "$(printf '{"message":"%s","source":"cli"}' "$(echo "$message" | sed 's/"/\\"/g')")" \
+    --connect-timeout 10 --max-time 60 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "Error: Could not reach agent at $endpoint"
+    echo "Set BAPX_AGENT_URL env var for a different endpoint, or check your connection."
+    return 1
+  fi
+  local answer
+  answer=$(echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('answer','') or d.get('error','Unknown error'))" 2>/dev/null)
+  if [ -z "$answer" ]; then
+    echo "Error parsing response: $answer"
+    return 1
+  fi
+  echo ""
+  echo "$answer"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Database Commands (db) — MySQL direct connection
+# Subcommands: tables, describe, list, show, query, find, raw, upsert, delete, remote-status, init, sync
+# ═══════════════════════════════════════════════════════════════
+# The `db` command suite lets the agent query and inspect project data
+# from MySQL. All queries hit the live database.
+#
+# See the collections.php schema for the authoritative field definitions.
+# JSON collection name == MySQL table name (underscored).
+#
+# MySQL schema per table:
+#   id          VARCHAR(36) PK   — record ID (matches JSON primary_key)
+#   _data       JSON NOT NULL    — full record data (same as JSON file contents)
+#   _owner      VARCHAR(255)     — owner email (for owner_field collections)
+#   _status     VARCHAR(50)      — record status (for indexed lookups)
+#   _created_at DATETIME         — creation timestamp
+#   _updated_at DATETIME         — last update timestamp
+# ═══════════════════════════════════════════════════════════════
+
+# ── db <command> ───────────────────────────────────────────────
+# Entry point: bapXphp db <subcommand> [args]
+# Subcommands: tables, describe, list, show, query, find, raw, init, sync
+cmd_db() {
+  local action="${1:-help}"
+  shift 2>/dev/null || true
+  case "$action" in
+    tables|list)      cmd_db_tables "$@" ;;
+    describe|desc)    cmd_db_describe "$1" ;;
+    show)             cmd_db_show "$1" ;;
+    query)            cmd_db_query "$@" ;;
+    find)             cmd_db_find "$1" "$2" ;;
+    raw|sql)          cmd_db_raw "$*" ;;
+    upsert)           cmd_db_upsert "$1" "$2" ;;
+    delete)           cmd_db_delete "$1" "$2" ;;
+    status|remote-status) cmd_db_remote_status ;;
+    pma)              cmd_db_pma "$*" ;;
+    hosted|ssh-sql)   cmd_db_hosted_sql "$*" ;;
+    init)             cmd_db_init ;;
+    sync|import)      cmd_db_sync ;;
+    help|*)           cmd_db_help ;;
+  esac
+}
+
+cmd_db_help() {
+  echo "Database commands — query MySQL directly, or via /remoteDB web proxy when local MySQL is unavailable."
+  echo ""
+  echo "  bapXphp db tables              — list MySQL tables"
+  echo "  bapXphp db describe <table>    — describe MySQL table columns"
+  echo "  bapXphp db list                — list all collections from schema"
+  echo "  bapXphp db show <collection>   — show schema collection fields"
+  echo "  bapXphp db query <collection> [--where 'f=v'] [--limit N] [--id id]"
+  echo "  bapXphp db find <collection> <id>  — find record by ID"
+  echo "  bapXphp db raw <sql>           — execute raw SQL via remote endpoint"
+  echo "  bapXphp db upsert <collection> <json> — upsert record via remote endpoint"
+  echo "  bapXphp db delete <collection> <id>   — delete record via remote endpoint"
+  echo "  bapXphp db status              — verify DB paths and integration readiness"
+  echo "  bapXphp db pma <sql>           — execute SQL via phpMyAdmin web proxy"
+  echo "  bapXphp db hosted <sql>        — execute SQL on hosted MySQL through SSH"
+  echo "  bapXphp db init                — create MySQL tables from collections.php"
+  echo "  bapXphp db sync                — push JSON data files → MySQL tables"
+  echo ""
+  echo "Config env vars: BAPX_MYSQL_HOST, BAPX_MYSQL_DB, BAPX_MYSQL_USER, BAPX_MYSQL_PASS"
+  echo "Remote endpoint: $REMOTE_DB_URL"
+}
+
+cmd_db_remote_status() {
+  require_php
+  echo "Runtime data store: remote MySQL"
+  echo "Remote endpoint: $REMOTE_DB_URL"
+  php -r '
+    require $argv[1] . "/app/bootstrap.php";
+    $cfg = require $argv[1] . "/config/database.php";
+    try {
+      $dsn = "mysql:host={$cfg["host"]};port={$cfg["port"]};dbname={$cfg["dbname"]};charset=utf8mb4";
+      new PDO($dsn, $cfg["user"], $cfg["pass"], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 4]);
+      echo "Direct MySQL: connected\n";
+    } catch (Throwable) {
+      echo "Direct MySQL: unavailable from this machine; using /remotedb fallback\n";
+    }
+    $secrets = (new App\Services\SecretService())->all();
+    foreach (["razorpay" => ["razorpay_key_id", "razorpay_key_secret"], "google_oauth" => ["google_client_id", "google_client_secret"], "smtp" => ["smtp_host", "smtp_username", "smtp_password"]] as $name => $keys) {
+      $ready = count(array_filter($keys, fn($key) => trim((string)($secrets[$key] ?? "")) !== "")) === count($keys);
+      echo "Integration {$name}: " . ($ready ? "configured" : "incomplete") . "\n";
+    }
+  ' "$ROOT"
+  curl -fsS --max-time 12 -X POST "$REMOTE_DB_URL" -H "Content-Type: application/json" -d '{"query":"SELECT 1"}' >/dev/null \
+    && echo "Remote endpoint: reachable" \
+    || { echo "Remote endpoint: unavailable"; return 1; }
+}
+
+cmd_db_upsert() {
+  local collection="$1" record="$2"
+  [ -n "$collection" ] && [ -n "$record" ] || die "Usage: bapXphp db upsert <collection> '<json record>'"
+  php -r 'json_decode($argv[1], true, 512, JSON_THROW_ON_ERROR);' "$record" >/dev/null 2>&1 || die "Record must be valid JSON."
+  local payload
+  payload=$(php -r 'echo json_encode(["action"=>"upsert","collection"=>$argv[1],"record"=>json_decode($argv[2],true,512,JSON_THROW_ON_ERROR)]);' "$collection" "$record") || die "Unable to encode record."
+  curl -sS --max-time 15 -X POST "$REMOTE_DB_URL" \
+    -H "Content-Type: application/json" \
+    -d "$payload" \
+    | php -r '
+      $result = json_decode(file_get_contents("php://stdin"), true) ?: [];
+      if (empty($result["success"])) { fwrite(STDERR, "Remote mutation failed: " . ($result["error"] ?? "Unknown error") . "\n"); exit(1); }
+      echo json_encode($result, JSON_UNESCAPED_UNICODE) . "\n";
+    '
+}
+
+cmd_db_delete() {
+  local collection="$1" id="$2"
+  [ -n "$collection" ] && [ -n "$id" ] || die "Usage: bapXphp db delete <collection> <id>"
+  local payload
+  payload=$(php -r 'echo json_encode(["action"=>"delete","collection"=>$argv[1],"id"=>$argv[2]]);' "$collection" "$id")
+  curl -sS --max-time 15 -X POST "$REMOTE_DB_URL" \
+    -H "Content-Type: application/json" \
+    -d "$payload" \
+    | php -r '
+      $result = json_decode(file_get_contents("php://stdin"), true) ?: [];
+      if (empty($result["success"])) { fwrite(STDERR, "Remote mutation failed: " . ($result["error"] ?? "Unknown error") . "\n"); exit(1); }
+      echo json_encode($result, JSON_UNESCAPED_UNICODE) . "\n";
+    '
+}
+
+# ── db tables — List MySQL tables ───────────────────────────────
+# Connects to MySQL and runs SHOW TABLES.
+cmd_db_tables() {
+  cmd_db_raw "SHOW TABLES" 2>/dev/null || {
+    warn "MySQL not reachable, trying phpMyAdmin proxy..."
+    cmd_db_pma "SHOW TABLES" 2>/dev/null || {
+      warn "phpMyAdmin also unavailable. Showing schema collections:"
+      cmd_schema_list
+      return 1
+    }
+  }
+}
+
+# ── db describe <table> — Describe MySQL table columns ─────────
+# Shows column names, types, nullability for a given table.
+cmd_db_describe() {
+  local table="$1"
+  [ -z "$table" ] && die "Usage: bapXphp db describe <table>"
+  cmd_db_raw "DESCRIBE \`$table\`" 2>/dev/null || {
+    warn "MySQL not reachable — showing schema instead:"
+    cmd_schema_show "$table"
+  }
+}
+
+# ── db list — List collections from schema ──────────────────────
+# Reads collections.php and lists all known collections (independent of MySQL).
+cmd_db_list() {
+  echo "Schema collections (from $SCHEMA_FILE):"
+  cmd_schema_list
+}
+
+# ── db show <collection> — Show schema collection fields ────────
+# Reads collections.php and shows full field definitions for a collection.
+cmd_db_show() {
+  cmd_schema_show "$1"
+}
+
+# ── db query <collection> [--where "field=value"] [--limit N] [--id id] [--owner email]
+# ────────────────────────────────────────────────────────────────
+# Queries a collection. Tries MySQL first, falls back to reading JSON file.
+#   --where "field=value"   — filter records where _data->>"$.field" matches value
+#   --id <id>               — shorthand: find by id column
+#   --owner <email>         — shorthand: find by _owner column
+#   --limit N               — max records to return (default: 50)
+#   --json                  — output raw JSON (one record per line)
+cmd_db_query() {
+  require_php
+  local collection="" where="" id_val="" owner_val="" limit=50 json_output=false
+  local args=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --where)    shift; where="$1" ;;
+      --id)       shift; id_val="$1" ;;
+      --owner)    shift; owner_val="$1" ;;
+      --limit)    shift; limit="$1" ;;
+      --json)     json_output=true ;;
+      *)          args+=("$1") ;;
+    esac
+    shift
+  done
+
+  collection="${args[0]:-}"
+  [ -z "$collection" ] && die "Usage: bapXphp db query <collection> [--where 'f=v'] [--id id] [--owner email] [--limit N]"
+
+  # ── Query via remote DB endpoint ──
+  local sql="SELECT * FROM $collection"
+  [ -n "$id_val" ] && sql="$sql WHERE id = '$id_val'"
+  [ -n "$owner_val" ] && sql="$sql AND _owner = '$owner_val'"
+  [ -n "$limit" ] && sql="$sql LIMIT $limit"
+  local resp
+  resp=$(curl -s --max-time 15 -X POST "$REMOTE_DB_URL" \
+    -H "Content-Type: application/json" \
+    -d "$(php -r 'echo json_encode(["query" => $argv[1]]);' "$sql")" 2>&1) || { die "Remote DB unreachable."; }
+  local data
+  data=$(echo "$resp" | php -r '$r=json_decode(file_get_contents("php://stdin"),true);foreach(($r["data"]??[]) as $row){$d=json_decode($row["_data"]??"{}",true)?:[];$d["id"]=$row["id"]??"";echo json_encode($d,JSON_UNESCAPED_UNICODE)."\n";}')
+  [ -z "$data" ] && { echo "No records found in $collection."; return; }
+  local count
+  count=$(echo "$data" | wc -l | tr -d ' ')
+  echo "Found $count records in $collection:"
+  echo ""
+  if [ "$json_output" = "true" ]; then
+    echo "$data"
+  else
+    echo "$data" | while IFS= read -r line; do
+      php -r '
+        $d = json_decode(file_get_contents("php://stdin"), true) ?: [];
+        echo "  ID:   " . ($d["id"] ?? "") . PHP_EOL;
+        foreach ($d as $k => $v) {
+          if ($k === "id") continue;
+          $val = is_array($v) ? json_encode($v) : $v;
+          echo "  $k: $val\n";
+        }
+        echo "  ---\n";
+      ' <<< "$line"
+    done
+  fi
+}
+
+# ── db find <collection> <id> ───────────────────────────────────
+# Shorthand for bapXphp db query <collection> --id <id>
+cmd_db_find() {
+  local collection="$1" id="$2"
+  [ -z "$collection" ] && die "Usage: bapXphp db find <collection> <id>"
+  [ -z "$id" ] && die "Usage: bapXphp db find <collection> <id>"
+  cmd_db_query "$collection" --id "$id"
+}
+
+# ── db raw <sql> — Execute raw SQL via remote endpoint ─────────────
+# POSTs the SQL to the remote DB endpoint and outputs JSON lines.
+cmd_db_raw() {
+  local sql="$*"
+  [ -z "$sql" ] && die "Usage: bapXphp db raw \"SELECT ...\""
+
+  curl -s --max-time 15 -X POST "$REMOTE_DB_URL" \
+    -H "Content-Type: application/json" \
+    -d "$(php -r 'echo json_encode(["query" => $argv[1]]);' "$sql")" 2>&1 \
+    | php -r '
+      $r = json_decode(file_get_contents("php://stdin"), true);
+      if (!empty($r["error"])) { fprintf(STDERR, "Error: %s\n", $r["error"]); exit(1); }
+      $data = $r["data"] ?? [];
+      if (empty($data)) { echo "No results.\n"; exit(0); }
+      foreach ($data as $row) {
+        $decoded = json_decode($row["_data"] ?? "{}", true) ?: [];
+        $decoded["id"] = $row["id"] ?? "";
+        echo json_encode($decoded, JSON_UNESCAPED_UNICODE) . "\n";
+      }
+    '
+}
+
+# ── db pma <sql> — Execute SQL via phpMyAdmin web proxy ──────────
+# Always uses the phpMyAdmin web interface, bypassing direct MySQL limits.
+cmd_db_pma() {
+  local sql="$*"
+  [ -z "$sql" ] && die "Usage: bapXphp db pma \"SELECT ...\" (or --table-stats, --export)"
+  php "$ROOT/cli/pma-client.php" "$sql"
+}
+
+# ── db hosted <sql> — Execute SQL on hosting through SSH ───────
+cmd_db_hosted_sql() {
+  local sql="$*"
+  [ -n "$sql" ] || die "Usage: bapXphp db hosted \"SELECT ...\""
+  for name in BAPX_SSH_HOST BAPX_SSH_USER BAPX_SSH_PASS BAPX_MYSQL_DB BAPX_MYSQL_USER BAPX_MYSQL_PASS; do
+    [ -n "${!name:-}" ] || die "$name is required in .env.mysql"
+  done
+  command -v sshpass >/dev/null 2>&1 || die "sshpass is required for non-interactive hosted DB operations."
+  local remote_mysql_host="${BAPX_MYSQL_HOST:-localhost}"
+  local remote_command
+  printf -v remote_command 'MYSQL_PWD=%q mysql --batch --raw -h %q -P %q -u %q %q' \
+    "$BAPX_MYSQL_PASS" "$remote_mysql_host" "${BAPX_MYSQL_PORT:-3306}" "$BAPX_MYSQL_USER" "$BAPX_MYSQL_DB"
+  sshpass -p "$BAPX_SSH_PASS" ssh -o StrictHostKeyChecking=accept-new -p "${BAPX_SSH_PORT:-22}" \
+    "$BAPX_SSH_USER@$BAPX_SSH_HOST" "$remote_command" <<< "$sql"
+}
+
+# ── db init — Create MySQL tables from collections.php schema ────
+# Reads the schema file, creates MySQL tables with _data JSON column
+# and indexed columns for commonly queried fields.
+cmd_db_init() {
+  require_php
+  echo "Creating MySQL tables from collections.php schema..."
+  php -r "
+    \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
+    \$pdo = new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
+    if (!\$pdo) { fprintf(STDERR, \"Cannot connect to MySQL. Check config/database.php.\n\"); exit(1); }
+
+    \$schema = require '$SCHEMA_FILE';
+    foreach (\$schema['collections'] as \$name => \$col) {
+      \$table = preg_replace('/[^a-z_]/', '', \$name);
+      \$pdo->exec(\"CREATE TABLE IF NOT EXISTS {\$table} (
+        id VARCHAR(36) PRIMARY KEY,
+        _data JSON NOT NULL,
+        _owner VARCHAR(255) DEFAULT NULL,
+        _status VARCHAR(50) DEFAULT NULL,
+        _created_at DATETIME DEFAULT NULL,
+        _updated_at DATETIME DEFAULT NULL,
+        INDEX idx_owner (_owner),
+        INDEX idx_status (_status),
+        INDEX idx_created (_created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\");
+      echo \"  CREATED TABLE \$table\n\";
+      if (\$name === 'consultation_signals') {
+        try { \$pdo->exec(\"ALTER TABLE consultation_signals ADD COLUMN appointment_id VARCHAR(36) GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(_data, '$.appointment_id'))) STORED\"); } catch (\PDOException \$e) {}
+        try { \$pdo->exec(\"CREATE INDEX idx_signals_appointment_id ON consultation_signals (appointment_id)\"); } catch (\PDOException \$e) {}
+        echo \"  INDEXED consultation_signals.appointment_id\n\";
+      }
+    }
+    echo \"Done. \" . count(\$schema['collections']) . \" tables created.\n\";
+  "
+}
+
+# ── db sync — Push JSON data files → MySQL tables ──────────────
+# Reads every JSON data file defined in collections.php and inserts
+# records into the corresponding MySQL table (INSERT IGNORE).
+cmd_db_sync() {
+  require_php
+
+  # Test connection
+  php -r "
+    \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
+    try { new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]); echo \"OK\n\"; exit(0); } catch (Exception \$e) {}
+    echo \"FAIL\n\"; exit(1);
+  " 2>/dev/null || die "Cannot connect to MySQL. Check config/database.php."
+
+  echo "Pushing JSON collections into MySQL..."
+  php -r "
+    \$schema = require '$SCHEMA_FILE';
+
+    \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
+    \$pdo = new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
+
+    \$total = 0;
+    foreach (\$schema['collections'] as \$name => \$col) {
+      \$table = preg_replace('/[^a-z_]/', '', \$name);
+
+      // Ensure table exists
+      \$pdo->exec(\"CREATE TABLE IF NOT EXISTS {\$table} (
+        id VARCHAR(36) PRIMARY KEY,
+        _data JSON NOT NULL,
+        _owner VARCHAR(255) DEFAULT NULL,
+        _status VARCHAR(50) DEFAULT NULL,
+        _created_at DATETIME DEFAULT NULL,
+        _updated_at DATETIME DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4\");
+
+      echo \"  CREATED \$table (no JSON files — data is in MySQL)\n\";
+      if (\$name === 'consultation_signals') {
+        try { \$pdo->exec(\"ALTER TABLE consultation_signals ADD COLUMN appointment_id VARCHAR(36) GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(_data, '$.appointment_id'))) STORED\"); } catch (\PDOException \$e) {}
+        try { \$pdo->exec(\"CREATE INDEX idx_signals_appointment_id ON consultation_signals (appointment_id)\"); } catch (\PDOException \$e) {}
+      }
+      \$total++;
+    }
+    echo \"Done. \$total tables created.\n\";
+  "
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Blog & Docs Commands
+# ═══════════════════════════════════════════════════════════════
+
+# ── docsmap — Regenerate docs/map.mmd ─────────────────────────
+cmd_docsmap() {
+  require_php
+  echo "Generating docs/map.mmd (content map)..."
+  php "$ROOT/cli/generate-docs-map.php" "$ROOT" "$ROOT/docs/map.mmd"
+  echo "Done. → docs/map.mmd"
+}
+
+# ── codemap — Regenerate root map.mmd ─────────────────────────
+cmd_codemap() {
+  require_php
+  echo "Generating map.mmd (code dependency graph)..."
+  php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/map.mmd"
+  echo "Done. → map.mmd"
+}
+
+# ── okfgen — Generate OKF knowledge bundle + knowledge graph ──
+cmd_okfgen() {
+  require_php
+  echo "Generating OKF knowledge bundle..."
+  php "$ROOT/cli/generate-okf-bundle.php" "$ROOT"
+  echo "Done. → .okf/"
+}
+
+# ── bloggen — Regenerate blog cache from GitHub ──────────────
+cmd_bloggen() {
+  require_php
+  echo "Regenerating blog cache from GitHub markdown sources..."
+  php "$ROOT/cli/refresh-blog-cache.php" "$ROOT"
+  echo "Done. Blog cache refreshed."
+}
+
+cmd_product_images() {
+  require_php
+  local source="${1:-}"
+  [ -z "$source" ] && die "Usage: bapXphp product:images <archive.zip|folder> [--dry-run|--assets-only|--database-only]"
+  shift
+  php "$ROOT/cli/import-product-images.php" "$ROOT" "$source" "$@"
+}
+
+cmd_blog_image() {
+  require_php
+  php "$ROOT/cli/blog-image.php" "$ROOT" "$@"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Browser Agent Commands — PHP-native browser automation
+# ═══════════════════════════════════════════════════════════════
+
+cmd_browser_agent() {
+  require_php
+  php "$ROOT/cli/browser-agent.php" "$@"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Read / Write Commands — CRUD for blog posts and products
+# ═══════════════════════════════════════════════════════════════
+
+# ── read blog <slug> — Read a blog post ────────────────────────
+# ── read product <slug> — Read a product ───────────────────────
+# ── read blog — List all blog posts ────────────────────────────
+# ── read product — List all products ───────────────────────────
+cmd_read() {
+  require_php
+  local type="${1:-}" slug="${2:-}"
+  case "$type" in
+    blog)
+      php "$ROOT/cli/blog-read.php" "$ROOT" "$slug" ;;
+    docs|doc)
+      php "$ROOT/cli/doc-read.php" "$ROOT" "$slug" ;;
+    product|products)
+      php "$ROOT/cli/product-read.php" "$ROOT" "$slug" ;;
+    file)
+      [ -z "$slug" ] && die "Usage: bapXphp read file <path>"
+      [ -f "$slug" ] || die "File not found: $slug"
+      echo "── $slug ──"
+      awk '{ printf "%d: %s\n", NR, $0 }' "$slug"
+      ;;
+    *)
+      echo "Usage: bapXphp read blog <slug>"
+      echo "       bapXphp read docs <slug>"
+      echo "       bapXphp read product <slug>"
+      echo "       bapXphp read file <path>"
+      exit 1 ;;
+  esac
+}
+
+# ── write blog [slug] — Create or edit a blog post ─────────────
+# ── write product [slug] — Create or edit a product ────────────
+cmd_write() {
+  require_php
+  local type="${1:-}" slug="${2:-}"
+  case "$type" in
+    blog)
+      php "$ROOT/cli/blog-write.php" "$ROOT" edit "$slug" ;;
+    docs|doc)
+      php "$ROOT/cli/doc-write.php" "$ROOT" "$slug" ;;
+    product|products)
+      php "$ROOT/cli/product-write.php" "$ROOT" "$slug" ;;
+    file)
+      [ -z "$slug" ] && die "Usage: bapXphp write file <path>  (provide content via stdin)"
+      local tmpdir dir
+      tmpdir=$(dirname "$slug")
+      [ -d "$tmpdir" ] || mkdir -p "$tmpdir"
+      cat > "$slug"
+      local lines
+      lines=$(wc -l < "$slug" | tr -d ' ')
+      ok "Wrote $lines lines to $slug"
+      ;;
+    *)
+      echo "Usage: bapXphp write blog [slug]     (create new or edit existing)"
+      echo "       bapXphp write docs [slug]     (create new or edit existing)"
+      echo "       bapXphp write product [slug]  (create new or edit existing)"
+      echo "       bapXphp write file <path>     (write file, pipe content via stdin)"
+      exit 1 ;;
+  esac
+}
+
+# ── Generic File Operations ────────────────────────────────────
+
+# ── edit <path> <search> <replace> — Search/replace in a file ──
+cmd_edit() {
+  local preview=false
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --preview) preview=true; shift ;;
+      *) break ;;
+    esac
+  done
+
+  local path="${1:-}" search="${2:-}" replace="${3:-}"
+  [ -z "$path" ] && die "Usage: bapXphp edit <path> <search> <replace>"
+  [ -f "$path" ] || die "File not found: $path"
+  [ -z "$search" ] && die "Usage: bapXphp edit <path> <search> <replace>"
+
+  if [ "$preview" = true ]; then
+    php -r "
+      \$path = \$argv[1]; \$search = \$argv[2]; \$replace = \$argv[3];
+      \$content = file_get_contents(\$path);
+      if (\$content === false) { fwrite(STDERR, \"Failed to read: \$path\n\"); exit(1); }
+      \$count = 0;
+      \$new = str_replace(\$search, \$replace, \$content, \$count);
+      if (\$count === 0) { echo \"No matches found\n\"; exit(0); }
+      echo \"Preview: \$count occurrence(s) would be replaced in \$path\n\";
+      // Show diff-like context
+      \$lines = explode(\"\n\", \$content);
+      foreach (\$lines as \$i => \$line) {
+        if (strpos(\$line, \$search) !== false) {
+          echo \"  -\$line\n\";
+          echo \"  +\" . str_replace(\$search, \$replace, \$line) . \"\n\";
+        }
+      }
+    " "$path" "$search" "$replace"
+    return
+  fi
+
+  php -r "
+    \$path = \$argv[1]; \$search = \$argv[2]; \$replace = \$argv[3];
+    \$content = file_get_contents(\$path);
+    if (\$content === false) { fwrite(STDERR, \"Failed to read: \$path\n\"); exit(1); }
+    \$count = 0;
+    \$new = str_replace(\$search, \$replace, \$content, \$count);
+    if (\$count === 0) { fwrite(STDERR, \"No matches found for: \$search\n\"); exit(1); }
+    file_put_contents(\$path, \$new);
+    echo \"Replaced \$count occurrence(s) in \$path\n\";
+  " "$path" "$search" "$replace"
+}
+
+# ── grep <pattern> [path] — Search file contents ───────────────
+cmd_grep() {
+  local pattern="${1:-}" path="${2:-.}"
+  [ -z "$pattern" ] && die "Usage: bapXphp grep <pattern> [path]"
+
+  if command -v rg >/dev/null 2>&1; then
+    rg --line-number --color=auto "$pattern" "$path"
+  elif command -v grep >/dev/null 2>&1; then
+    grep -rn --color=auto "$pattern" "$path"
+  else
+    find "$path" -type f -exec grep -n "$pattern" {} +
+  fi
+}
+
+# ── find <glob> — Find files by glob pattern ───────────────────
+cmd_find() {
+  local pattern="${1:-}"
+  [ -z "$pattern" ] && die "Usage: bapXphp find <glob-pattern>"
+
+  # Use php glob for cross-platform consistency
+  php -r "
+    \$pattern = \$argv[1];
+    \$matches = glob(\$pattern, GLOB_BRACE);
+    if (\$pattern === '.' || \$pattern === './') { \$matches = ['']; }
+    if (empty(\$matches) || (\$matches === [\$pattern] && !file_exists(\$pattern))) {
+      // Try recursive
+      \$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('.'));
+      \$regex = '/' . preg_quote(\$pattern, '/') . '/i';
+      foreach (\$it as \$file) {
+        if (preg_match(\$regex, \$file->getPathname())) {
+          echo \$file->getPathname() . \"\n\";
+        }
+      }
+      exit(0);
+    }
+    foreach (\$matches as \$m) { echo \$m . \"\n\"; }
+  " "$pattern"
+}
+
+# ── run <command...> — Execute any shell command through the CLI ─
+cmd_run() {
+  [ $# -eq 0 ] && die "Usage: bapXphp run <command...>"
+  eval "$@"
+}
+
+# ── todo — Task management (todowrite) ─────────────────────────────────
+cmd_todo() {
+  require_php
+  local dir="$ROOT/.agents/todo"
+  mkdir -p "$dir"
+  local file="$dir/tasks.json"
+  local action="${1:-list}" arg="${2:-}"
+
+  case "$action" in
+    list|ls|status)
+      if [ -f "$file" ]; then
+        php -r '
+          $tasks = json_decode(file_get_contents($argv[1]), true) ?: [];
+          if (empty($tasks)) { echo "No tasks.\n"; exit(0); }
+          printf("%-4s %-14s %s\n", "ID", "STATUS", "DESCRIPTION");
+          $i = 0;
+          foreach ($tasks as $t) {
+            printf("%-4d %-14s %s\n", $i, $t["status"] ?? "pending", $t["content"] ?? "");
+            $i++;
+          }
+        ' "$file"
+      else
+        echo "No tasks. Use: bapXphp todo add \"<description>\""
+      fi ;;
+    add|new)
+      [ -z "$arg" ] && die "Usage: bapXphp todo add \"<description>\""
+      php -r '
+        $file = $argv[1]; $content = $argv[2];
+        $tasks = is_file($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
+        $tasks[] = ["content" => $content, "status" => "pending", "created_at" => date("c")];
+        file_put_contents($file, json_encode($tasks, JSON_PRETTY_PRINT));
+        echo "Added task: $content\n";
+      ' "$file" "$arg" ;;
+    update|mod)
+      local id="${2:-}" status="${3:-}"
+      [ -z "$id" ] && die "Usage: bapXphp todo update <id> <status>"
+      [ -z "$status" ] && die "Status required: pending, in_progress, completed, cancelled"
+      php -r '
+        $file = $argv[1]; $id = (int)$argv[2]; $status = $argv[3];
+        $tasks = is_file($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
+        if (!isset($tasks[$id])) { fprintf(STDERR, "Task #%d not found\n", $id); exit(1); }
+        $tasks[$id]["status"] = $status;
+        $tasks[$id]["updated_at"] = date("c");
+        file_put_contents($file, json_encode($tasks, JSON_PRETTY_PRINT));
+        echo "Task #$id → $status\n";
+      ' "$file" "$id" "$status" ;;
+    done|complete|finish)
+      [ -z "$arg" ] && die "Usage: bapXphp todo done <id>"
+      php -r '
+        $file = $argv[1]; $id = (int)$argv[2];
+        $tasks = is_file($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
+        if (!isset($tasks[$id])) { fprintf(STDERR, "Task #%d not found\n", $id); exit(1); }
+        $tasks[$id]["status"] = "completed";
+        $tasks[$id]["updated_at"] = date("c");
+        file_put_contents($file, json_encode($tasks, JSON_PRETTY_PRINT));
+        echo "Task #$id completed: " . $tasks[$id]["content"] . "\n";
+      ' "$file" "$arg" ;;
+    *)
+      echo "Usage: bapXphp todo [list|add|update|done]"
+      echo "  todo               — list all tasks"
+      echo "  todo add <desc>    — add a new task"
+      echo "  todo update <id> <status> — update task status"
+      echo "  todo done <id>     — mark task completed"
+      exit 1 ;;
+  esac
+}
+
+# ── objective — Read/update OBJECTIVE.md ───────────────────────────
+cmd_objective() {
+  require_php
+  local action="${1:-read}" arg="${2:-}"
+  local objFile="$ROOT/OBJECTIVE.md"
+
+  case "$action" in
+    read|show|cat)
+      [ -f "$objFile" ] || die "OBJECTIVE.md not found"
+      php -r '
+        $lines = file($argv[1]);
+        $capture = false;
+        foreach ($lines as $line) {
+          if (preg_match("/^## /", $line)) $capture = true;
+          if ($capture) echo $line;
+        }
+      ' "$objFile"
+      echo ""
+      echo "── Full path: $objFile ──"
+      echo "Use: bapXphp objective update to modify" ;;
+    update|write|edit)
+      if [ -n "$arg" ] && [ "$arg" != "-" ]; then
+        echo "$arg" >> "$objFile"
+        echo "Appended to OBJECTIVE.md"
+      else
+        echo "Paste content (Ctrl+D to finish):"
+        cat >> "$objFile"
+        echo "Appended to OBJECTIVE.md"
+      fi ;;
+    *)
+      echo "Usage: bapXphp objective read"
+      echo "       bapXphp objective update <text>"
+      echo "       bapXphp objective update (paste with Ctrl+D)"
+      exit 1 ;;
+  esac
+}
+
+# ── task — Dispatch a sub-agent task ─────────────────────────────────
+cmd_task() {
+  require_php
+  local dir="$ROOT/.agents/tasks"
+  mkdir -p "$dir"
+  local action="${1:-list}" arg="${2:-}"
+
+  case "$action" in
+    list|ls)
+      local count=0
+      for f in "$dir"/*.json; do
+        [ -f "$f" ] || continue
+        count=$((count + 1))
+        local desc; desc=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["description"] ?? "?";' "$f") || true
+        local status; status=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["status"] ?? "?";' "$f") || true
+        printf "  %s  %s  %s\n" "$(basename "$f" .json)" "$status" "$desc"
+      done
+      [ "$count" -eq 0 ] && echo "No tasks." ;;
+    run|dispatch|create)
+      [ -z "$arg" ] && die "Usage: bapXphp task run \"<description>\""
+      local id; id=$(date +%s | md5 | head -8) || id="task_$(date +%s)"
+      php -r '
+        $task = [
+          "id" => $argv[1],
+          "description" => $argv[2],
+          "status" => "dispatched",
+          "created_at" => date("c"),
+          "evidence" => [],
+        ];
+        file_put_contents($argv[3] . "/" . $argv[1] . ".json", json_encode($task, JSON_PRETTY_PRINT));
+        echo "Task dispatched: " . $argv[1] . "\n";
+        echo "  Description: " . $argv[2] . "\n";
+        echo "  File: " . $argv[3] . "/" . $argv[1] . ".json\n";
+      ' "$id" "$arg" "$dir" ;;
+    status)
+      [ -z "$arg" ] && die "Usage: bapXphp task status <id>"
+      local f="$dir/$arg.json"
+      [ -f "$f" ] || die "Task not found: $arg"
+      php -r '
+        $t = json_decode(file_get_contents($argv[1]), true);
+        printf("ID:     %s\nDescription: %s\nStatus:  %s\nCreated: %s\n",
+          $t["id"] ?? "?", $t["description"] ?? "?", $t["status"] ?? "?", $t["created_at"] ?? "?");
+      ' "$f" ;;
+    *)
+      echo "Usage: bapXphp task run \"<description>\""
+      echo "       bapXphp task list"
+      echo "       bapXphp task status <id>"
+      exit 1 ;;
+  esac
+}
+
+# ── question — Ask the user a question ───────────────────────────────
+cmd_question() {
+  local text="${*:-}"
+  [ -z "$text" ] && die "Usage: bapXphp question <text>"
+
+  echo ""
+  echo "╔══════════════════════════════════════════╗"
+  echo "║  QUESTION                                ║"
+  echo "╚══════════════════════════════════════════╝"
+  echo ""
+  echo "$text"
+  echo ""
+  echo "────────────────────────────────────────────"
+  echo -n "→ "
+  read -r response
+  echo "────────────────────────────────────────────"
+  echo "Answer: $response"
+  memory_append "question" "$text" "" && memory_append "user" "$response" ""
+}
+
+# ── Session Memory ──────────────────────────────────────────────────
+# Continuous JSON conversation log in .tmp/session.json
+# Format: {"entries": [{"id":n, "role":"user|cto", "content":"...", "timestamp":"...", "attachments":[...]}]}
+# Role: user = input prompt, cto = CTO/handler reply, question = tool question, answer = user answer
+
+memory_file() { echo "$ROOT/.tmp/session.json"; }
+
+memory_init() {
+  local f; f=$(memory_file)
+  mkdir -p "$ROOT/.tmp"
+  [ -f "$f" ] && return
+  php -r '
+    $data = [
+      "session_id" => uniqid("ses_"),
+      "created_at" => date("c"),
+      "updated_at" => date("c"),
+      "entries" => []
+    ];
+    file_put_contents($argv[1], json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+  ' "$f"
+}
+
+memory_append() {
+  local role="${1:-user}" content="${2:-}" attachments="${3:-[]}"
+  memory_init
+  local f; f=$(memory_file)
+  php -r '
+    $f = $argv[1]; $role = $argv[2]; $content = $argv[3]; $attach = $argv[4];
+    $data = json_decode(file_get_contents($f), true);
+    $entry = [
+      "id" => count($data["entries"]) + 1,
+      "role" => $role,
+      "content" => $content,
+      "timestamp" => date("c"),
+      "attachments" => json_decode($attach, true) ?: []
+    ];
+    $data["entries"][] = $entry;
+    $data["updated_at"] = date("c");
+    file_put_contents($f, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    echo "[memory] #" . $entry["id"] . " " . $role . " logged\n";
+  ' "$f" "$role" "$content" "$attachments"
+}
+
+cmd_memory() {
+  local action="${1:-list}" arg="${2:-}" arg2="${3:-}"
+  local f; f=$(memory_file)
+
+  case "$action" in
+    init)
+      memory_init
+      echo "Session memory initialized at $f" ;;
+    add|append)
+      local role="${2:-user}" text="${3:-}"
+      shift 2; [ $# -eq 0 ] && die "Usage: bapXphp memory add <role> <content>"
+      memory_append "$role" "$*" "" ;;
+    list|ls|all)
+      [ -f "$f" ] || die "No session memory. Start with: bapXphp memory init"
+      php -r '
+        $data = json_decode(file_get_contents($argv[1]), true);
+        $entries = $data["entries"] ?? [];
+        if (empty($entries)) { echo "Empty session.\n"; exit(0); }
+        echo "Session: " . ($data["session_id"] ?? "?") . "  (" . count($entries) . " entries)\n";
+        echo str_repeat("-", 72) . "\n";
+        foreach ($entries as $e) {
+          $ts = substr($e["timestamp"] ?? "?", 11, 8);
+          $role = str_pad($e["role"] ?? "?", 8);
+          $text = substr($e["content"] ?? "", 0, 60);
+          $ats = count($e["attachments"] ?? []);
+          $att = $ats > 0 ? " [{$ats}att]" : "";
+          echo "  #{$e["id"]} {$ts} {$role} {$text}{$att}\n";
+        }
+      ' "$f" ;;
+    search|grep)
+      [ -z "$arg" ] && die "Usage: bapXphp memory search <text>"
+      [ -f "$f" ] || die "No session memory."
+      php -r '
+        $q = $argv[1]; $data = json_decode(file_get_contents($argv[2]), true);
+        foreach (($data["entries"] ?? []) as $e) {
+          if (mb_stripos($e["content"] ?? "", $q) !== false) {
+            $ts = substr($e["timestamp"] ?? "?", 11, 8);
+            printf("#%-4d %s [%-8s] %s\n", $e["id"], $ts, $e["role"], mb_substr($e["content"], 0, 80));
+          }
+        }
+      ' "$arg" "$f" ;;
+    export|json)
+      [ -f "$f" ] && cat "$f" || echo "No session memory." ;;
+    export-jsonl|jsonl)
+      [ -f "$f" ] || die "No session memory."
+      php -r '
+        $data = json_decode(file_get_contents($argv[1]), true);
+        foreach (($data["entries"] ?? []) as $e) { echo json_encode($e) . "\n"; }
+      ' "$f" ;;
+    last|recent)
+      local count="${2:-5}"
+      [ -f "$f" ] || die "No session memory."
+      php -r '
+        $n = (int)$argv[1]; $data = json_decode(file_get_contents($argv[2]), true);
+        $entries = array_slice($data["entries"] ?? [], -$n);
+        echo "Last " . count($entries) . " entries:\n" . str_repeat("-",72) . "\n";
+        foreach ($entries as $e) {
+          $ts = substr($e["timestamp"] ?? "?", 11, 8);
+          echo "  #{$e["id"]} {$ts} [{$e["role"]}] {$e["content"]}\n";
+        }
+      ' "$count" "$f" ;;
+    info|stats)
+      [ -f "$f" ] || die "No session memory."
+      php -r '
+        $data = json_decode(file_get_contents($argv[1]), true);
+        $entries = $data["entries"] ?? [];
+        $roles = []; $total = strlen(json_encode($data));
+        foreach ($entries as $e) { $r = $e["role"] ?? "?"; $roles[$r] = ($roles[$r] ?? 0) + 1; }
+        echo "Session:    " . ($data["session_id"] ?? "?") . "\n";
+        echo "Created:    " . ($data["created_at"] ?? "?") . "\n";
+        echo "Updated:    " . ($data["updated_at"] ?? "?") . "\n";
+        echo "Entries:    " . count($entries) . "\n";
+        echo "File size:  " . $total . " bytes\n";
+        echo "Breakdown:  "; foreach ($roles as $r => $c) { echo "{$r}={$c} "; }; echo "\n";
+      ' "$f" ;;
+    clear|reset)
+      rm -f "$f"
+      echo "Session memory cleared." ;;
+    *)
+      echo "Usage: bapXphp memory <action> [args]"
+      echo ""
+      echo "Actions:"
+      echo "  init                      Initialize new session memory"
+      echo "  add <role> <content>      Append an entry (role: user|cto)"
+      echo "  list                      Show all entries (summary)"
+      echo "  search <text>             Search entries by content"
+      echo "  last [n]                  Show last n entries (default 5)"
+      echo "  export                    Dump full JSON"
+      echo "  export-jsonl              Dump as JSONL (one JSON per line)"
+      echo "  info                      Session stats"
+      echo "  clear                     Erase session memory"
+      exit 1 ;;
+  esac
+}
+
+# ── Context Extract ──────────────────────────────────────────────
+# Extract last N hours of opencode + codex sessions + git commits
+# into XML for feeding back as context to LLM agents
+cmd_context_extract() {
+  local hours=48 output="$ROOT/.tmp/context-extract.xml"
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --hours) hours="$2"; shift 2 ;;
+      --output|-o) output="$2"; shift 2 ;;
+      *) err "Unknown option: $1"; exit 1 ;;
+    esac
+  done
+
+  mkdir -p "$(dirname "$output")"
+  require_php
+
+  php -r '
+    $hours = (int)$argv[1];
+    $output = $argv[2];
+    $project = "'"$ROOT"'";
+    $now = time();
+    $cutoff = $now - ($hours * 3600);
+
+    // Helper: safe CDATA (escape ]]> sequences + strip invalid XML control chars)
+    function cdata($s) {
+      // Strip ASCII control chars except tab(9), LF(10), CR(13)
+      $s = preg_replace("/[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]/", "", $s);
+      return str_replace("]]>", "]]]]><![CDATA[>", $s);
+    }
+
+    // Detect marker commands that the user types as conversation section dividers
+    function isMarker($text) {
+      $t = trim(mb_strtolower($text));
+      return $t === "bapxphp opencode compact" || $t === "bapxphp codex compact";
+    }
+
+    $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    $xml .= "<context-extract generated=\"" . date("c") . "\" project=\"" . htmlspecialchars(basename($project)) . "\" hours=\"{$hours}\">\n";
+
+    // ── 1. Git commits ──
+    $xml .= "  <git-log>\n";
+    $cmd = sprintf("git -C %s log --since=\"%d hours ago\" --format=\"<commit sha=\\\"%%H\\\" date=\\\"%%ai\\\" author=\\\"%%an\\\"><subject>%%s</subject><body>%%b</body></commit>\"", escapeshellarg($project), $hours);
+    $gitOut = shell_exec($cmd);
+    if ($gitOut) {
+      $xml .= "    <![CDATA[" . cdata($gitOut) . "]]>\n";
+    }
+    $xml .= "  </git-log>\n";
+
+    // ── 2. Git diff stats ──
+    $xml .= "  <git-diff>\n";
+    $cmd2 = sprintf("git -C %s diff --stat @{ago=\"%d hours\"} 2>/dev/null", escapeshellarg($project), $hours);
+    $diffOut = shell_exec($cmd2);
+    if ($diffOut && trim($diffOut)) {
+      $xml .= "    <![CDATA[" . cdata($diffOut) . "]]>\n";
+    }
+    $xml .= "  </git-diff>\n";
+
+    // ── 3. OpenCode sessions (from SQLite) ──
+    $ocDb = $_SERVER["HOME"] . "/.local/share/opencode/opencode.db";
+    $xml .= "  <sessions source=\"opencode\">\n";
+    if (file_exists($ocDb)) {
+      try {
+        $db = new SQLite3($ocDb, SQLITE3_OPEN_READONLY);
+        $db->exec("PRAGMA synchronous = OFF");
+
+        // Find sessions for this project within time window
+        $stmt = $db->prepare("SELECT s.id, s.title, s.agent, s.time_created, s.time_updated
+          FROM session s
+          WHERE s.directory = :dir
+            AND (s.time_updated >= :cutoff OR s.time_created >= :cutoff)
+          ORDER BY s.time_updated DESC");
+        $stmt->bindValue(":dir", $project, SQLITE3_TEXT);
+        $stmt->bindValue(":cutoff", (int)($cutoff * 1000), SQLITE3_INTEGER); // ms
+        $res = $stmt->execute();
+
+        while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
+          $sid = htmlspecialchars($row["id"]);
+          $title = htmlspecialchars($row["title"] ?? "?");
+          $agent = htmlspecialchars($row["agent"] ?? "?");
+          $created = $row["time_created"] ? date("c", (int)($row["time_created"] / 1000)) : "?";
+          $updated = $row["time_updated"] ? date("c", (int)($row["time_updated"] / 1000)) : "?";
+
+          $xml .= "    <session id=\"{$sid}\" title=\"{$title}\" agent=\"{$agent}\" created=\"{$created}\" updated=\"{$updated}\">\n";
+
+          // Get messages for this session (from message + part tables)
+          $msgStmt = $db->prepare("SELECT m.id as msg_id, m.time_created, m.data as msg_data
+            FROM message m
+            WHERE m.session_id = :sid
+            ORDER BY m.time_created ASC");
+          $msgStmt->bindValue(":sid", $row["id"], SQLITE3_TEXT);
+          $msgRes = $msgStmt->execute();
+          $mseq = 0;
+
+          while ($msgRow = $msgRes->fetchArray(SQLITE3_ASSOC)) {
+            $ts = $msgRow["time_created"] ? date("c", (int)($msgRow["time_created"] / 1000)) : "?";
+            $rawData = $msgRow["msg_data"];
+            $msgData = json_decode($rawData, true);
+            if (!$msgData) continue;
+
+            $role = $msgData["role"] ?? "?";
+            // Detect compaction from agent info in message data
+            $msgAgent = $msgData["mode"] ?? $msgData["agent"] ?? $agent;
+            $isCompaction = ($role === "assistant" && $msgAgent === "compaction");
+
+            // Get parts from part table
+            $partStmt = $db->prepare("SELECT data FROM part WHERE message_id = :mid ORDER BY time_created ASC");
+            $partStmt->bindValue(":mid", $msgRow["msg_id"], SQLITE3_TEXT);
+            $partRes = $partStmt->execute();
+
+            while ($partRow = $partRes->fetchArray(SQLITE3_ASSOC)) {
+              $pData = json_decode($partRow["data"], true);
+              if (!$pData) continue;
+              $ptype = $pData["type"] ?? "";
+
+              if ($ptype === "text" && !empty($pData["text"])) {
+                $text = $pData["text"];
+                if ($isCompaction) {
+                  $xml .= "      <compaction seq=\"{$mseq}\" time=\"{$ts}\">\n";
+                  $xml .= "        <![CDATA[" . cdata($text) . "]]>\n";
+                  $xml .= "      </compaction>\n";
+                } else {
+                  $trunc = mb_substr($text, 0, 5000);
+                  if ($role === "user" && isMarker($text)) {
+                    $xml .= "      <marker seq=\"{$mseq}\" time=\"{$ts}\"><![CDATA[" . cdata($trunc) . "]]></marker>\n";
+                    continue;
+                  }
+                  $xml .= "      <message seq=\"{$mseq}\" role=\"{$role}\" agent=\"" . htmlspecialchars($msgAgent) . "\" time=\"{$ts}\">\n";
+                  $xml .= "        <![CDATA[" . cdata($trunc) . "]]>\n";
+                  $xml .= "      </message>\n";
+                }
+              }
+              if ($ptype === "reasoning" && !$isCompaction && !empty($pData["text"])) {
+                $text = mb_substr($pData["text"], 0, 2000);
+                $xml .= "      <reasoning seq=\"{$mseq}\" time=\"{$ts}\"><![CDATA[" . cdata($text) . "]]></reasoning>\n";
+              }
+              if ($ptype === "tool" && !$isCompaction) {
+                $state = $pData["state"] ?? [];
+                $toolName = $pData["tool"] ?? "?";
+                $status = $state["status"] ?? "?";
+                $tl = $state["title"] ?? "";
+                $out = mb_substr($state["output"] ?? "", 0, 1000);
+                $xml .= "      <tool-call seq=\"{$mseq}\" name=\"" . htmlspecialchars($toolName) . "\" status=\"{$status}\"";
+                if ($tl) $xml .= " title=\"" . htmlspecialchars($tl) . "\"";
+                $xml .= " time=\"{$ts}\">\n";
+                if ($out) $xml .= "        <![CDATA[" . cdata($out) . "]]>\n";
+                $xml .= "      </tool-call>\n";
+              }
+            }
+            $mseq++;
+          }
+          $xml .= "    </session>\n";
+        }
+        $db->close();
+      } catch (Exception $e) {
+        $xml .= "    <note>SQLite error: " . htmlspecialchars($e->getMessage()) . "</note>\n";
+      }
+    }
+    $xml .= "  </sessions>\n";
+
+    // ── 4. Codex sessions (from state_5.sqlite threads + JSONL rollout files) ──
+    $xml .= "  <sessions source=\"codex\">\n";
+    $codexDbPath = $_SERVER["HOME"] . "/.codex/state_5.sqlite";
+    if (file_exists($codexDbPath)) {
+      try {
+        $cdb = new SQLite3($codexDbPath, SQLITE3_OPEN_READONLY);
+        $cdb->exec("PRAGMA synchronous = OFF");
+        // Only threads matching this project directory, updated within window
+        $cstmt = $cdb->prepare("SELECT id, rollout_path, title, updated_at_ms, agent_nickname
+          FROM threads
+          WHERE cwd = :dir
+            AND updated_at_ms >= :cutoff_ms
+            AND thread_source = :tsrc
+          ORDER BY updated_at_ms DESC");
+        $cstmt->bindValue(":dir", $project, SQLITE3_TEXT);
+        $cstmt->bindValue(":cutoff_ms", $cutoff * 1000, SQLITE3_INTEGER);
+        $cstmt->bindValue(":tsrc", "user", SQLITE3_TEXT);
+        $cres = $cstmt->execute();
+
+        while ($crow = $cres->fetchArray(SQLITE3_ASSOC)) {
+          $sid = htmlspecialchars($crow["id"] ?? "");
+          $tname = htmlspecialchars(mb_substr($crow["title"] ?? "?", 0, 80));
+          $updatedTs = $crow["updated_at_ms"] ? date("c", (int)($crow["updated_at_ms"] / 1000)) : "?";
+          $agentNick = htmlspecialchars($crow["agent_nickname"] ?? "?");
+
+          $xml .= "    <session id=\"{$sid}\" title=\"{$tname}\" source=\"codex\" agent=\"{$agentNick}\" updated=\"{$updatedTs}\">\n";
+
+          $rolloutPath = $crow["rollout_path"];
+          if ($rolloutPath && file_exists($rolloutPath) && filesize($rolloutPath) > 0) {
+            $seq = 0;
+            $fp = @fopen($rolloutPath, "r");
+            if ($fp) {
+              while (($line = fgets($fp)) !== false) {
+                $line = trim($line);
+                if ($line === "") continue;
+                $item = json_decode($line, true);
+                if (!$item) continue;
+                $type = $item["type"] ?? "";
+                $payload = $item["payload"] ?? [];
+
+                // response_item with type=message contains conversation turns
+                if ($type === "response_item" && ($payload["type"] ?? "") === "message") {
+                  $role = $payload["role"] ?? "?";
+                  $content = "";
+                  foreach (($payload["content"] ?? []) as $cpart) {
+                    if (($cpart["type"] ?? "") === "input_text" && !empty($cpart["text"])) {
+                      $content .= $cpart["text"] . "\n";
+                    }
+                  }
+                  $content = trim($content);
+                  if (mb_strlen($content) > 5) {
+                    $trunc = mb_substr($content, 0, 5000);
+                    $ts = $item["timestamp"] ?? "?";
+                    if ($role === "user" && isMarker($content)) {
+                      $xml .= "      <marker seq=\"{$seq}\" time=\"{$ts}\"><![CDATA[" . cdata($trunc) . "]]></marker>\n";
+                    } else {
+                      $xml .= "      <message seq=\"{$seq}\" role=\"" . htmlspecialchars($role) . "\" time=\"{$ts}\"><![CDATA[" . cdata($trunc) . "]]></message>\n";
+                    }
+                    $seq++;
+                  }
+                }
+
+                // event_msg with type=user_message is user input
+                if ($type === "event_msg" && ($payload["type"] ?? "") === "user_message") {
+                  $msgText = $payload["message"] ?? "";
+                  if (mb_strlen($msgText) > 5) {
+                    $trunc = mb_substr($msgText, 0, 5000);
+                    $ts = $item["timestamp"] ?? "?";
+                    if (isMarker($msgText)) {
+                      $xml .= "      <marker seq=\"{$seq}\" time=\"{$ts}\"><![CDATA[" . cdata($trunc) . "]]></marker>\n";
+                    } else {
+                      $xml .= "      <message seq=\"{$seq}\" role=\"user\" time=\"{$ts}\"><![CDATA[" . cdata($trunc) . "]]></message>\n";
+                    }
+                    $seq++;
+                  }
+                }
+              }
+              fclose($fp);
+            }
+          } else {
+            $xml .= "      <note>Rollout file not found: " . htmlspecialchars($rolloutPath ?? "?") . "</note>\n";
+          }
+          $xml .= "    </session>\n";
+        }
+        $cdb->close();
+      } catch (Exception $e) {
+        $xml .= "    <note>Codex SQLite error: " . htmlspecialchars($e->getMessage()) . "</note>\n";
+      }
+    }
+    $xml .= "  </sessions>\n";
+
+    // ── 5. Local memory.json ──
+    $memFile = "'"$ROOT"'/.tmp/session.json";
+    if (file_exists($memFile)) {
+      $memData = json_decode(file_get_contents($memFile), true);
+      if ($memData && !empty($memData["entries"])) {
+        $xml .= "  <session-memory>\n";
+        foreach ($memData["entries"] as $e) {
+          $ts = $e["timestamp"] ?? "?";
+          $role = htmlspecialchars($e["role"] ?? "?");
+          $content = mb_substr($e["content"] ?? "", 0, 5000);
+          $xml .= "    <entry id=\"{$e["id"]}\" role=\"{$role}\" time=\"{$ts}\"><![CDATA[" . cdata($content) . "]]></entry>\n";
+        }
+        $xml .= "  </session-memory>\n";
+      }
+    }
+
+    $xml .= "</context-extract>\n";
+
+    file_put_contents($output, $xml);
+    echo "Context extracted to: $output\n";
+    echo "  Hours: $hours\n";
+    echo "  Project: " . basename($project) . "\n";
+
+    // Count elements (strip CDATA first to avoid matching XML in code examples)
+    $strip = preg_replace("/<!\[CDATA\[.*?\]\]>/s", "", $xml);
+    $sessionCount = substr_count($strip, "<session ");
+    $msgCount = substr_count($strip, "<message ");
+    $compCount = substr_count($strip, "<compaction ");
+    $toolCount = substr_count($strip, "<tool-call ");
+    $commitCount = substr_count($xml, "<commit ");    // commits are inside CDATA, count raw
+    $markerCount = substr_count($strip, "<marker ");
+    echo "  Sessions: $sessionCount\n";
+    echo "  Messages: $msgCount\n";
+    echo "  Compactions: $compCount\n";
+    echo "  Tool calls: $toolCount\n";
+    echo "  Commits: $commitCount\n";
+    echo "  Markers: $markerCount\n";
+  ' "$hours" "$output"
+}
+
+# ── context — Search extracted conversation context ──────────────
+# Usage: bapXphp context <query>
+# Searches .tmp/context-extract.xml for messages matching <query>
+# and shows surrounding context.
+cmd_context() {
+  [ $# -lt 1 ] && err "Usage: bapXphp context <query>" && return 1
+
+  local query="$1"
+  local file="$ROOT/.tmp/context-extract.xml"
+
+  [ ! -f "$file" ] && err "No context file found. Run 'bapXphp context-extract' first." && return 1
+
+  require_php
+
+  php -d memory_limit=256M -r '
+    $query = $argv[1];
+    $file = $argv[2];
+    $xml = file_get_contents($file);
+    if (!$xml) { echo "ERROR: Cannot read $file\n"; exit(1); }
+
+    // String-based search — strip CDATA to find message boundaries, but search raw text
+    // Extract all <message ...>...</message> blocks
+    $totalMsgs = 0;
+    $found = [];
+
+    // Split into session blocks to carry session context
+    $sessionBlocks = preg_split("/<\/session>\s*\n\s*<session /", $xml);
+    $queryLower = mb_strtolower($query);
+
+    foreach ($sessionBlocks as $sblock) {
+      // Extract session id/title/agent from <session ...> tag
+      $sid = "?";
+      $stitle = "?";
+      $sagent = "?";
+      if (preg_match("/<session[^>]*id=\"([^\"]+)\"/", $sblock, $m)) $sid = $m[1];
+      if (preg_match("/<session[^>]*title=\"([^\"]+)\"/", $sblock, $m)) $stitle = mb_substr($m[1], 0, 60);
+      if (preg_match("/<session[^>]*agent=\"([^\"]+)\"/", $sblock, $m)) $sagent = $m[1];
+
+      // Find all <message> blocks in this session
+      preg_match_all("/<message[^>]*>(.*?)<\/message>/s", $sblock, $msgs);
+      foreach ($msgs[0] as $msgBlock) {
+        $totalMsgs++;
+
+        // Extract text content (outside XML tags, inside CDATA)
+        $text = strip_tags($msgBlock);
+        $text = trim(preg_replace("/<!\[CDATA\[(.*?)\]\]>/s", "$1", $text));
+
+        if (mb_stripos($text, $query) !== false) {
+          // Extract attributes
+          $role = "";
+          $seq = "";
+          $ts = "";
+          $agent = "";
+          if (preg_match("/role=\"([^\"]+)\"/", $msgBlock, $m)) $role = $m[1];
+          if (preg_match("/seq=\"([^\"]+)\"/", $msgBlock, $m)) $seq = $m[1];
+          if (preg_match("/time=\"([^\"]+)\"/", $msgBlock, $m)) $ts = $m[1];
+          if (preg_match("/agent=\"([^\"]+)\"/", $msgBlock, $m)) $agent = $m[1];
+
+          // Get context lines around match
+          $lines = preg_split("/\r\n|\n|\r/", $text);
+          $matchLines = [];
+          foreach ($lines as $i => $l) {
+            if (mb_stripos($l, $query) !== false) {
+              $start = max(0, $i - 2);
+              $end = min(count($lines) - 1, $i + 2);
+              for ($j = $start; $j <= $end; $j++) {
+                $prefix = $j === $i ? ">>" : "  ";
+                $matchLines[] = $prefix . " " . mb_substr($lines[$j], 0, 200);
+              }
+              $matchLines[] = "---";
+            }
+          }
+
+          $found[] = [
+            "session" => $sid,
+            "title" => $stitle,
+            "agent" => $sagent,
+            "seq" => $seq,
+            "role" => $role,
+            "time" => $ts,
+            "lines" => $matchLines,
+          ];
+
+          if (count($found) >= 20) break 2;
+        }
+      }
+    }
+
+    if (empty($found)) {
+      echo "No matches found for: \"$query\" (searched $totalMsgs messages)\n";
+      exit(0);
+    }
+
+    echo "Matches for \"$query\" in " . count($found) . " messages (of $totalMsgs total)\n";
+    echo str_repeat("=", 60) . "\n\n";
+
+    foreach ($found as $r) {
+      echo "Session: {$r["session"]} | {$r["title"]}\n";
+      echo "  Role: {$r["role"]} | Seq: {$r["seq"]} | Agent: {$r["agent"]}\n";
+      echo "  Time: {$r["time"]}\n";
+      echo "  Context:\n";
+      foreach ($r["lines"] as $l) echo "    $l\n";
+      echo "\n";
+    }
+  ' "$query" "$file"
+}
+
+# ── skill — Load a skill SKILL.md ────────────────────────────────
+cmd_skill() {
+  local name="${1:-}"
+  [ -z "$name" ] && cmd_skills && return
+
+  local skill_file="$ROOT/.agents/skills/$name/SKILL.md"
+  if [ -f "$skill_file" ]; then
+    echo "── $name ──"
+    cat "$skill_file"
+  else
+    err "Skill not found: $name"
+    cmd_skills
+    exit 1
+  fi
+}
+
+# ── ai:config — Show AI model config from MySQL secrets ───────
+cmd_ai_config() {
+  require_php
+  php -r '
+    require "'"$ROOT"'/app/bootstrap.php";
+    $cfg = (new App\Services\SecretService())->getModelConfig();
+    echo "Provider:  " . $cfg["provider"] . "\n";
+    echo "Model:     " . $cfg["model"] . "\n";
+    echo "Endpoint:  " . $cfg["endpoint"] . "\n";
+    echo "API Key:   " . (empty($cfg["api_key"]) ? "(not set)" : substr($cfg["api_key"], 0, 8) . "..." . substr($cfg["api_key"], -4)) . "\n";
+    echo "\nOverride via env: BAPX_AI_PROVIDER, BAPX_AI_MODEL, BAPX_AI_ENDPOINT, BAPX_AI_API_KEY\n";
+  '
+}
+
+# ── Main Dispatch ──────────────────────────────────────────────
+main() {
+  [ $# -eq 0 ] && set -- help
+
+  case "$1" in
+    help|--help|-h)
+      cmd_help ;;
+    understand)
+      cmd_understand ;;
+    schema|add|remove|tool)
+      local cmd="$1"; shift
+      "cmd_${cmd}" "$@" ;;
+    test|lint|check|ci|update|serve|smoke)
+      cmd_"$1" ;;
+    dev:user|dev-user)
+      shift; cmd_dev_user "$@" ;;
+    map)
+      cmd_map ;;
+    map:gen|mapgen)
+      cmd_map_gen ;;
+    map:val|mapval)
+      cmd_map_val ;;
+    skills)
+      cmd_skills ;;
+    route:list|routes)
+      cmd_route_list ;;
+    status)
+      cmd_status ;;
+    logs)
+      shift; cmd_logs "$@" ;;
+    artifacts:clean|artifacts-clean)
+      shift; cmd_artifacts_clean "$@" ;;
+    issue|pr|merge)
+      local command="$1"; shift
+      cmd_"$command" "$@" ;;
+    handoff)
+      shift; cmd_handoff "$@" ;;
+    ai:config|ai-config|model-config)
+      cmd_ai_config ;;
+    mail:process|mail-process)
+      cmd_mail_process ;;
+    agent)
+      shift; cmd_agent "$@" ;;
+    images:optimize|images-optimize|imgopt)
+      cmd_images_optimize ;;
+    product:images|product-images)
+      shift; cmd_product_images "$@" ;;
+    blog:image|blog-image)
+      shift; cmd_blog_image "$@" ;;
+    db)
+      shift; cmd_db "$@" ;;
+    # Backward compatibility: mysql:* aliases
+    mysql:query|mysql-query)
+      warn "[DEPRECATED] Use 'bapXphp db raw' instead"
+      shift; cmd_db_raw "$@" ;;
+    mysql:import|mysql-import)
+      warn "[DEPRECATED] Use 'bapXphp db sync' instead"
+      cmd_db_sync ;;
+    docsmap)
+      cmd_docsmap ;;
+    codemap)
+      cmd_codemap ;;
+    okfgen|knowledge-graph|kg)
+      cmd_okfgen ;;
+    bloggen)
+      cmd_bloggen ;;
+    browser-agent|browser)
+      shift; cmd_browser_agent "$@" ;;
+    todo)
+      shift; cmd_todo "$@" ;;
+    objective|obj)
+      shift; cmd_objective "$@" ;;
+    task)
+      shift; cmd_task "$@" ;;
+    question|ask)
+      shift; cmd_question "$@" ;;
+    memory|mem|session)
+      shift; cmd_memory "$@" ;;
+    context-extract|ctx-extract|ctxe)
+      cmd_context_extract ;;
+    context|ctx)
+      shift; cmd_context "$@" ;;
+    skill)
+      shift; cmd_skill "$@" ;;
+    read)
+      shift; cmd_read "$@" ;;
+    write)
+      shift; cmd_write "$@" ;;
+    edit)
+      shift; cmd_edit "$@" ;;
+    grep|search|rg)
+      shift; cmd_grep "$@" ;;
+    find|glob)
+      shift; cmd_find "$@" ;;
+    run|exec|shell)
+      shift; cmd_run "$@" ;;
+    *)
+      err "Unknown command: $1"
+      cmd_help
+      exit 1 ;;
+  esac
+}
+
+main "$@"

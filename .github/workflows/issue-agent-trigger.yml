@@ -1,0 +1,96 @@
+name: Issue agent trigger
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+  contents: write
+
+concurrency:
+  group: issue-agent-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: github.actor != 'trigger-ai-bot' && endsWith(github.repository, 'bapXphpAiBackend')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create GitHub-style handoff event
+        run: |
+          ISSUE="${{ github.event.issue.number }}"
+          mkdir -p .agents/handoffs/events .agents/handoffs/active .agents/ops
+          cat > ".agents/handoffs/events/${ISSUE}.json" << EOF
+          {
+            "event_type": "issues.opened",
+            "issue": $ISSUE,
+            "actor": "${{ github.actor }}",
+            "workflow": {
+              "current_role": "cto",
+              "next_role": "worker",
+              "sequence": ["cto", "worker", "reviewer", "cto"]
+            },
+            "payload": {
+              "title": $(echo '${{ github.event.issue.title }}' | jq -Rs .),
+              "body": $(echo '${{ github.event.issue.body }}' | jq -Rs .),
+              "labels": $(echo '${{ toJSON(github.event.issue.labels) }}' | jq -c '[.[].name]')
+            },
+            "repository": {
+              "owner": "${{ github.repository_owner }}",
+              "name": "${{ github.event.repository.name }}"
+            },
+            "objectives": [{
+              "id": "OBJ-${ISSUE}-1",
+              "status": "gap",
+              "evidence": [],
+              "browser_evidence": [],
+              "unresolved": ["Handoff created — awaiting CTO"]
+            }],
+            "telemetry": {
+              "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "handoffs_completed": 0
+            }
+          }
+          EOF
+          cp ".agents/handoffs/events/${ISSUE}.json" ".agents/handoffs/active/current.json"
+          echo "Created handoff event for issue #$ISSUE → .agents/handoffs/events/${ISSUE}.json"
+      - name: Validate
+        run: jq empty ".agents/handoffs/active/current.json" && echo "Valid handoff JSON"
+      - name: Commit handoff event
+        run: |
+          git config user.name "trigger-ai-bot"
+          git config user.email "trigger-ai-bot@bapXphp.action"
+          git add .agents/handoffs/ .agents/ops/
+          git diff --cached --quiet || git commit -m "auto: handoff event for issue #${{ github.event.issue.number }}"
+          for i in 1 2 3; do
+            git pull --rebase origin "$GITHUB_REF_NAME" 2>/dev/null || true
+            if git push origin "HEAD:$GITHUB_REF_NAME" 2>/dev/null; then exit 0; fi
+            sleep 2
+          done
+          git pull --rebase origin "$GITHUB_REF_NAME" 2>/dev/null || true
+          git push --force-with-lease origin "HEAD:$GITHUB_REF_NAME"
+      - name: Label
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "sub-agent-ready" 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Handoff comment
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --body \
+            "## 🔄 Handoff dispatched
+
+            | Field | Value |
+            |-------|-------|
+            | Event | \`issues.opened\` |
+            | Next role | **CTO** — investigate and plan |
+            | Chain | CTO → Worker → Reviewer → CTO |
+            | Handoff | \`.agents/handoffs/events/${{ github.event.issue.number }}.json\` |
+
+            CTO: run \`bapXphp map && bapXphp schema list\`, then \`bapXphp handoff next ${{ github.event.issue.number }}\`.
+
+            When done, comment \`/handoff worker\` to advance the chain."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
