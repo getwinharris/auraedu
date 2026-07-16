@@ -37,6 +37,11 @@ final class RemoteDbController {
 
         $action = strtolower(trim((string)($input['action'] ?? 'query')));
 
+        if ($action === 'init') {
+            $this->initSchema();
+            return;
+        }
+
         if ($action !== 'query') {
             $this->mutate($action, $input);
             return;
@@ -58,6 +63,35 @@ final class RemoteDbController {
         } catch (\Throwable $e) {
             http_response_code(500);
             echo json_encode(['error' => 'Query failed']);
+        }
+    }
+
+    private function initSchema(): void {
+        try {
+            $db = new DatabaseService();
+            $pdo = $db->connection();
+            $schema = require app_path('storage/schema/collections.php');
+            $created = 0;
+            foreach (($schema['collections'] ?? []) as $name => $col) {
+                $table = preg_replace('/[^a-z_]/', '', $name);
+                $pdo->exec("CREATE TABLE IF NOT EXISTS `{$table}` (
+                    id VARCHAR(36) PRIMARY KEY,
+                    _data JSON NOT NULL,
+                    _owner VARCHAR(255) DEFAULT NULL,
+                    _status VARCHAR(50) DEFAULT NULL,
+                    _created_at DATETIME DEFAULT NULL,
+                    _updated_at DATETIME DEFAULT NULL,
+                    INDEX idx_owner (_owner),
+                    INDEX idx_status (_status),
+                    INDEX idx_created (_created_at)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                $created++;
+            }
+            http_response_code(200);
+            echo json_encode(['success' => true, 'tables_created' => $created]);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Schema init failed: ' . $e->getMessage()]);
         }
     }
 

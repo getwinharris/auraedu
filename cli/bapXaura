@@ -1394,34 +1394,43 @@ cmd_db_hosted_sql() {
 cmd_db_init() {
   require_php
   echo "Creating MySQL tables from collections.php schema..."
-  php -r "
-    \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
-    \$pdo = new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
-    if (!\$pdo) { fprintf(STDERR, \"Cannot connect to MySQL. Check config/database.php.\n\"); exit(1); }
 
-    \$schema = require '$SCHEMA_FILE';
-    foreach (\$schema['collections'] as \$name => \$col) {
-      \$table = preg_replace('/[^a-z_]/', '', \$name);
-      \$pdo->exec(\"CREATE TABLE IF NOT EXISTS {\$table} (
-        id VARCHAR(36) PRIMARY KEY,
-        _data JSON NOT NULL,
-        _owner VARCHAR(255) DEFAULT NULL,
-        _status VARCHAR(50) DEFAULT NULL,
-        _created_at DATETIME DEFAULT NULL,
-        _updated_at DATETIME DEFAULT NULL,
-        INDEX idx_owner (_owner),
-        INDEX idx_status (_status),
-        INDEX idx_created (_created_at)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\");
-      echo \"  CREATED TABLE \$table\n\";
-      if (\$name === 'consultation_signals') {
-        try { \$pdo->exec(\"ALTER TABLE consultation_signals ADD COLUMN appointment_id VARCHAR(36) GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(_data, '$.appointment_id'))) STORED\"); } catch (\PDOException \$e) {}
-        try { \$pdo->exec(\"CREATE INDEX idx_signals_appointment_id ON consultation_signals (appointment_id)\"); } catch (\PDOException \$e) {}
-        echo \"  INDEXED consultation_signals.appointment_id\n\";
+  # Prefer direct MySQL when reachable (e.g. on the host / SSH).
+  if php -r "
+    \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
+    try { new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]); echo 'OK'; exit(0); }
+    catch (\Throwable \$e) { exit(1); }
+  " >/dev/null 2>&1; then
+    php -r "
+      \$dsn = 'mysql:host=$MYSQL_HOST;port=$MYSQL_PORT;dbname=$MYSQL_DB;charset=utf8mb4';
+      \$pdo = new PDO(\$dsn, '$MYSQL_USER', '$MYSQL_PASS', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
+      \$schema = require '$SCHEMA_FILE';
+      foreach (\$schema['collections'] as \$name => \$col) {
+        \$table = preg_replace('/[^a-z_]/', '', \$name);
+        \$pdo->exec(\"CREATE TABLE IF NOT EXISTS {\$table} (
+          id VARCHAR(36) PRIMARY KEY,
+          _data JSON NOT NULL,
+          _owner VARCHAR(255) DEFAULT NULL,
+          _status VARCHAR(50) DEFAULT NULL,
+          _created_at DATETIME DEFAULT NULL,
+          _updated_at DATETIME DEFAULT NULL,
+          INDEX idx_owner (_owner),
+          INDEX idx_status (_status),
+          INDEX idx_created (_created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\");
+        echo \"  CREATED TABLE \$table\n\";
       }
-    }
-    echo \"Done. \" . count(\$schema['collections']) . \" tables created.\n\";
-  "
+      echo \"Done. \" . count(\$schema['collections']) . \" tables created.\n\";
+    "
+    return 0
+  fi
+
+  # Fallback: run init through the /remoteDB endpoint (works from anywhere).
+  echo "Direct MySQL unavailable; using $REMOTE_DB_URL ..."
+  curl -fsS --max-time 30 -X POST "$REMOTE_DB_URL" \
+    -H "Content-Type: application/json" \
+    -d "$(php -r 'echo json_encode(["action" => "init"]);')" 2>&1 \
+    | php -r '$r = json_decode(file_get_contents("php://stdin"), true); if (!empty($r["error"])) { fprintf(STDERR, "Error: %s\n", $r["error"]); exit(1); } echo "  " . ($r["tables_created"] ?? 0) . " tables created via remote endpoint.\n";'
 }
 
 # ── db sync — Push JSON data files → MySQL tables ──────────────
