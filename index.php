@@ -47,8 +47,8 @@ if ($uri === '/admin/manifest.json' || $uri === '/astrologer/manifest.json') {
         'start_url' => $isAdmin ? '/admin' : '/astrologer',
         'scope' => $isAdmin ? '/admin/' : '/astrologer/',
         'display' => 'standalone',
-        'background_color' => $isAdmin ? '#222222' : '#240002',
-        'theme_color' => '#3a0003',
+        'background_color' => $isAdmin ? '#222222' : '#08A900',
+        'theme_color' => '#08A900',
         'icons' => [
             ['src' => '/assets/images/logo-square.jpeg', 'sizes' => '192x192', 'type' => 'image/jpeg'],
             ['src' => '/assets/images/logo.jpeg', 'sizes' => '512x512', 'type' => 'image/jpeg'],
@@ -73,7 +73,7 @@ if ($uri === '/admin/sw.js' || $uri === '/astrologer/sw.js') {
 }
 
 // Remote DB query endpoint
-if ($uri === '/remotedb') {
+if (strtolower($uri) === '/remotedb') {
     require __DIR__ . '/app/bootstrap.php';
     header('Content-Type: application/json');
     (new \App\Controllers\RemoteDbController())();
