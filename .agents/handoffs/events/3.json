@@ -1,0 +1,32 @@
+{
+  "event_type": "issues.opened",
+  "issue": 3,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "fix: replace Google Maps link on contact page with embedded iframe map",
+    "body": "Contact page /contact had a plain text link to Google Maps instead of an embedded interactive map. Replace with a proper Google Maps iframe embed showing the Aura Medical Institute campus location at 10/6A, VKV Kumaraguru Nagar, Saravanampatti, Coimbatore.",
+    "labels": ["bug", "frontend"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-MAP-EMBED-1",
+      "status": "pass",
+      "evidence": ["views/public/contact.php: replaced 'View on Google Maps' link with <iframe> embed using maps.google.com/maps?q=...+output=embed", "Map shows campus location at full width (100%), 400px height, with allowfullscreen and lazy loading", "Link to open in Google Maps preserved below the embed"],
+      "browser_evidence": [],
+      "unresolved": []
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

@@ -90,16 +90,29 @@
                 </div>
             </div>
         </div>
-        <div class="contact-info-grid" style="margin-top:var(--space-2xl);">
-            <div class="contact-card reveal" style="grid-column:1/-1;">
-                <div class="contact-card__body" style="text-align:center;">
+        <div class="contact-map-section" style="margin-top:var(--space-2xl);">
+            <div class="contact-card reveal" style="grid-column:1/-1; padding:0; overflow:hidden;">
+                <div class="contact-card__body" style="text-align:center; padding:var(--space-lg) var(--space-lg) 0;">
                     <span class="contact-card__eyebrow">Visit Us</span>
                     <h3>Our Campus &amp; Hospital</h3>
-                    <p style="color:var(--color-text-muted); margin-bottom:var(--space-md);">Aura Medical Institute of Electropathy and Hospital, Kalapatti, Coimbatore.</p>
-                    <a href="https://maps.app.goo.gl/ipJSYLJxdokpJt6T8" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="display:inline-flex;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:var(--space-xs);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        View on Google Maps
+                    <p style="color:var(--color-text-muted); margin-bottom:var(--space-md);">
+                        10/6A, VKV Kumaraguru Nagar, Saravanampatti, Coimbatore, Tamil Nadu 641035
+                    </p>
+                    <a href="https://maps.app.goo.gl/ipJSYLJxdokpJt6T8" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent); font-size:0.875rem;">
+                        Open in Google Maps →
                     </a>
+                </div>
+                <div style="margin-top:var(--space-md); line-height:0;">
+                    <iframe
+                        src="https://maps.google.com/maps?q=10%2F6A%20VKV%20Kumaraguru%20Nagar%20Saravanampatti%20Coimbatore%20641035&output=embed"
+                        width="100%"
+                        height="400"
+                        style="border:0; display:block;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Aura Medical Institute of Electropathy and Hospital location on Google Maps">
+                    </iframe>
                 </div>
             </div>
         </div>

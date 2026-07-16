@@ -1,0 +1,32 @@
+{
+  "event_type": "issues.opened",
+  "issue": 5,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "fix: /temples route 500 error and migrate spiritual content to hospital content",
+    "body": "GET /temples returns 500 on live because TempleService->all() queries MySQL 'temples' table which may not exist or returns data the views can't handle. Fix: 1) Add try/catch in TempleService to return empty array on DB failure, 2) Rewrite views/public/temples.php and temple.php from temple/spiritual copy to hospital/facility content, 3) Update PublicController SEO strings for medical/hospital context.",
+    "labels": ["bug", "content"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-TEMPLE-FIX-1",
+      "status": "pass",
+      "evidence": ["app/Services/TempleService.php: added try/catch to all() method returning [] on DB failure", "views/public/temples.php: rewritten — 'Our Temples' → 'Campus & Hospital Locations', 'Sacred Spaces' → 'Our Facilities', removed all pooja/temple/spiritual copy, replaced temple SVG with building icon", "views/public/temple.php: rewritten — 'Sacred Space' → 'Our Facility', 'Temple Not Found' → 'Facility Not Found', maroon icons → accent, removed pooja_types section, removed 'Contact Us for Pooja' CTA", "app/Controllers/PublicController.php: SEO strings updated — no more 'pooja', 'darshan', 'sacred' references"],
+      "browser_evidence": [],
+      "unresolved": ["MySQL 'temples' table data still needs hospital content — empty state displays gracefully now"]
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

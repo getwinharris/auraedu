@@ -1,0 +1,32 @@
+{
+  "event_type": "issues.opened",
+  "issue": 6,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "schema: rename 'temples' collection to 'hospitals' for Aura Medical context",
+    "body": "The MySQL schema collection 'temples' still uses the old temple/spiritual naming. Rename to 'hospitals' for the Aura Medical Institute repositioning. Add deprecated_alias field for backward compatibility during the transition. Next deploy should rename the MySQL table.",
+    "labels": ["schema", "enhancement"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-SCHEMA-1",
+      "status": "pass",
+      "evidence": ["storage/schema/collections.php: renamed 'temples' key to 'hospitals', added deprecated_alias: 'temples' for backward compat", "Fields unchanged — address, timings, phone, map_link, map_embed_url all work for hospital facilities"],
+      "browser_evidence": [],
+      "unresolved": ["MySQL table rename from 'temples' to 'hospitals' needs remote DB access on Hostinger"]
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

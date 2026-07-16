@@ -143,10 +143,10 @@ final class PublicController extends BaseController {
     public function temple(string $slug): void { 
         $this->detectApiRequest();
         $temple = (new TempleService())->findBySlug($slug);
-        $this->seoKey = 'temple';
+        $this->seoKey = 'temples';
         $this->seoOverrides = [
-            'title' => ($temple['name'] ?? 'Temple') . ' – Temple Timings, Address, Pooja & Darshan at AuraEdu',
-            'description' => 'Explore ' . ($temple['name'] ?? 'this temple') . ' with detailed guide including timings, address, location map, and available pooja services. ' . ($temple['description'] ?? ''),
+            'title' => ($temple['name'] ?? 'Facility') . ' – Aura Medical Campus & Hospital Facilities',
+            'description' => ($temple['name'] ?? 'This facility') . ' at Aura Medical Institute of Electropathy and Hospital, Coimbatore. ' . ($temple['description'] ?? ''),
             'og_image' => $temple['image_url'] ?? '',
         ];
         $this->render('public/temple', ['slug' => $slug, 'temple' => $temple]); 

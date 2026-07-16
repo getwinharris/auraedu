@@ -1,0 +1,32 @@
+{
+  "event_type": "issues.opened",
+  "issue": 4,
+  "actor": "getwinharris",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": ["cto", "worker", "reviewer", "cto"]
+  },
+  "payload": {
+    "title": "fix: replace hero screenshot with real campus photos, delete screenshot files",
+    "body": "Homepage hero used a 2.8MB screenshot of Google Maps (maps1-campus.png) as the first slide. Replace with real campus photos that already exist in assets/images/institute/ and delete the screenshot files.",
+    "labels": ["bug", "frontend", "performance"]
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-HERO-IMG-1",
+      "status": "pass",
+      "evidence": ["views/public/home.php: replaced maps1-campus.png with students-campus.jpg as hero slide 1", "Replaced esic-students.jpg with student-group.jpg as slide 3", "Deleted: assets/images/institute/maps1-campus.png (2.8MB), maps2-hospital.png (2.8MB), maps-hospital-snapshot.txt", "Hero now shows only real photographs of the campus and students"],
+      "browser_evidence": [],
+      "unresolved": []
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-07-17T00:00:00Z",
+    "handoffs_completed": 0
+  }
+}

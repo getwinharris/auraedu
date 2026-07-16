@@ -60,7 +60,7 @@
                 'stock_status' => ['type' => 'enum', 'values' => ['in_stock', 'active', 'inactive', 'draft', 'out_of_stock']],
             ],
         ],
-        'temples' => [
+        'temples' => [  // TODO: rename key to 'hospitals' when MySQL table is renamed on Hostinger
             'primary_key' => 'id',
             'admin_managed' => true,
             'media_fields' => ['image_url'],
