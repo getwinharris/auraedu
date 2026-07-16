@@ -1007,10 +1007,35 @@ $tests['pull requests use non mutating CI with fresh project and documentation m
     $workflow = file_get_contents(app_path('.github/workflows/ci.yml'));
     $cli = file_get_contents(app_path('cli/bapXphp'));
     foreach (['pull_request:', 'branches: [main]', './bapXphp ci'] as $needle) assertTrue(str_contains($workflow, $needle), "CI workflow should include {$needle}");
-    foreach (['cmd_ci()', 'validate-project-map.php', 'validate-docs-map.php', 'cmd_update()', 'cmd_ci\n  gh pr create', 'cmd_ci\n  gh pr merge'] as $needle) {
+    foreach (['cmd_ci()', 'validate-project-map.php', 'validate-docs-map.php', 'cmd_update()', 'cmd_hooks()', 'cmd_tui()', 'cmd_ai_probe()'] as $needle) {
         assertTrue(str_contains($cli, str_replace('\\n', "\n", $needle)), "CLI should include {$needle}");
     }
+    foreach (['require_gh', 'cmd_issue()', 'cmd_pr()', 'cmd_merge()', 'gh issue list', 'gh pr list'] as $needle) {
+        assertTrue(!str_contains($cli, $needle), "CLI should not depend on {$needle}");
+    }
     assertTrue(!str_contains(substr($cli, strpos($cli, 'cmd_ci()'), strpos($cli, 'cmd_check()') - strpos($cli, 'cmd_ci()')), 'generate-project-map.php'), 'CI validation must not regenerate the project map before checking freshness');
+};
+
+$tests['repository operations use git and GitHub Actions without duplicate agent folders'] = function (): void {
+    assertTrue(is_file(app_path('.agents/skills/git/SKILL.md')), 'Plain Git skill should exist');
+    assertTrue(!is_file(app_path('.agents/skills/gh-cli/SKILL.md')), 'GitHub CLI skill should be removed');
+    assertTrue(!is_dir(app_path('.claude')), 'Duplicate .claude agent folder should not exist');
+    assertTrue(is_file(app_path('.github/workflows/branch-pr.yml')), 'Branch pushes should have an Actions-owned PR workflow');
+    assertTrue(!str_contains(file_get_contents(app_path('.github/workflows/sync-upstream.yml')), 'workflows: write'), 'Workflow permissions should use supported GitHub Actions keys');
+
+    $activeFiles = [
+        app_path('AGENTS.md'),
+        app_path('README.md'),
+        app_path('cli/bapXphp'),
+        app_path('.agents/workflows/browser-tester.md'),
+        app_path('.agents/workflows/cto-workflow.md'),
+        app_path('.agents/skills/git/SKILL.md'),
+        app_path('.agents/skills/deployment/SKILL.md'),
+    ];
+    foreach ($activeFiles as $path) {
+        $source = file_get_contents($path);
+        assertTrue(!preg_match('/\bgh\s+(issue|pr|api|workflow|repo)\b/', $source), basename($path) . ' should not require GitHub CLI');
+    }
 };
 
 $tests['local smoke tool source covers key routes and CSRF protection'] = function (): void {
@@ -1021,6 +1046,8 @@ $tests['local smoke tool source covers key routes and CSRF protection'] = functi
         assertTrue(str_contains($source, $path), "Local smoke tool should cover {$path}");
     }
     assertTrue(str_contains($source, 'CSRF protected'), 'Local smoke should verify payment CSRF protection');
+    assertTrue(str_contains($source, "'BAPX_TEST_MODE' => '1'"), 'Local smoke should not depend on the production database or network');
+    assertTrue(str_contains(file_get_contents(app_path('app/Services/DatabaseService.php')), "getenv('BAPX_TEST_MODE') === '1'"), 'Database service should expose an explicit smoke-test boundary');
     assertTrue(str_contains($source, 'PASS local smoke'), 'Local smoke should provide an authoritative success signal');
 };
 
@@ -1132,6 +1159,9 @@ $tests['product payment remains production gated after wallet removal'] = functi
     assertTrue(str_contains($secrets, 'razorpayReadyForCurrentHost'), 'Selected Razorpay credentials should be checked against the current host');
     assertTrue(str_contains($secrets, "=== 'live'"), 'Production hosts should require live Razorpay mode');
     assertTrue(str_contains($secrets, "?? '') === 'app_secrets'") && str_contains($secrets, 'array_filter($env'), 'Remote app_secrets should override environment fallbacks and legacy rows');
+    foreach (['openssl_encrypt', 'openssl_decrypt', "'iv' =>", "'ciphertext' =>", "'agent_api_key'", "'gemma-4-31b-it'", "'configured' =>"] as $needle) {
+        assertTrue(str_contains($secrets, $needle), "Remote integration secrets should include {$needle}");
+    }
     assertTrue(!is_file(app_path('app/Controllers/WalletController.php')) && !is_file(app_path('views/account/wallet.php')), 'Wallet controller and customer view should be removed');
 };
 

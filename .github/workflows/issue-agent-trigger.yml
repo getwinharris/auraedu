@@ -73,24 +73,29 @@ jobs:
           done
           git pull --rebase origin "$GITHUB_REF_NAME" 2>/dev/null || true
           git push --force-with-lease origin "HEAD:$GITHUB_REF_NAME"
-      - name: Label
-        run: gh issue edit ${{ github.event.issue.number }} --add-label "sub-agent-ready" 2>/dev/null || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Handoff comment
-        run: |
-          gh issue comment ${{ github.event.issue.number }} --body \
-            "## 🔄 Handoff dispatched
+      - name: Label and comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.issue.number;
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: issue,
+              labels: ["sub-agent-ready"]
+            });
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue,
+              body: `## Handoff dispatched
 
             | Field | Value |
             |-------|-------|
             | Event | \`issues.opened\` |
-            | Next role | **CTO** — investigate and plan |
-            | Chain | CTO → Worker → Reviewer → CTO |
-            | Handoff | \`.agents/handoffs/events/${{ github.event.issue.number }}.json\` |
+            | Next role | **CTO** - investigate and plan |
+            | Chain | CTO -> Worker -> Reviewer -> CTO |
+            | Handoff | \`.agents/handoffs/events/${issue}.json\` |
 
-            CTO: run \`bapXphp map && bapXphp schema list\`, then \`bapXphp handoff next ${{ github.event.issue.number }}\`.
+            CTO: run \`bapXphp map && bapXphp schema list\`, then \`bapXphp handoff next ${issue}\`.
 
-            When done, comment \`/handoff worker\` to advance the chain."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            When done, comment \`/handoff worker\` to advance the chain.`
+            });
