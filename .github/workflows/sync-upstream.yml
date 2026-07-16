@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   sync:
-    if: github.repository == 'bapxmediahub/bapXauraAiBackend'
+    if: github.repository == 'getwinharris/auraedu'
     runs-on: ubuntu-latest
     steps:
       - name: Sync fork main from upstream

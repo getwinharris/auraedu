@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   dispatch:
-    if: github.event.action != 'closed' && github.actor != 'trigger-ai-bot' && endsWith(github.repository, 'bapXauraAiBackend')
+    if: github.event.action != 'closed' && github.actor != 'trigger-ai-bot' && endsWith(github.repository, 'auraedu')
     runs-on: ubuntu-latest
     env:
       ISSUE: ${{ github.event.issue.number || inputs.issue_number }}
@@ -119,7 +119,7 @@ jobs:
             });
 
   cleanup:
-    if: github.event.action == 'closed' && endsWith(github.repository, 'bapXauraAiBackend')
+    if: github.event.action == 'closed' && endsWith(github.repository, 'auraedu')
     runs-on: ubuntu-latest
     env:
       ISSUE: ${{ github.event.issue.number }}
