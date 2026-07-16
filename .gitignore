@@ -26,3 +26,8 @@ homepage.yml
 .tmp/
 storage/.bin/chrome-linux/
 storage/.bin/kitten-tts/
+
+# Secrets — never commit
+.env
+.env.mysql
+.env.test-user
