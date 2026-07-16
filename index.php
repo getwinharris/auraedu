@@ -41,9 +41,9 @@ if (isset($pwaFiles[$uri])) {
 if ($uri === '/admin/manifest.json' || $uri === '/astrologer/manifest.json') {
     $isAdmin = $uri === '/admin/manifest.json';
     $manifest = [
-        'name' => $isAdmin ? 'SPS Admin' : 'SPS Consultant',
-        'short_name' => $isAdmin ? 'SPS Admin' : 'SPS Con',
-        'description' => $isAdmin ? 'Admin panel for Sri Panchami Spiritual.' : 'Astrologer consultation workspace.',
+        'name' => $isAdmin ? 'AuraEdu Admin' : 'AuraEdu Consultant',
+        'short_name' => $isAdmin ? 'AuraEdu Admin' : 'AuraEdu Con',
+        'description' => $isAdmin ? 'Admin panel for AuraEdu.' : 'Astrologer consultation workspace.',
         'start_url' => $isAdmin ? '/admin' : '/astrologer',
         'scope' => $isAdmin ? '/admin/' : '/astrologer/',
         'display' => 'standalone',
@@ -61,7 +61,7 @@ if ($uri === '/admin/manifest.json' || $uri === '/astrologer/manifest.json') {
 }
 if ($uri === '/admin/sw.js' || $uri === '/astrologer/sw.js') {
     $role = $uri === '/admin/sw.js' ? 'admin' : 'consultant';
-    $cacheName = 'sps-cache-' . $role . '-v1';
+    $cacheName = 'auraedu-cache-' . $role . '-v1';
     $precache = json_encode($role === 'admin' ? ['/admin', '/login'] : ['/astrologer', '/login']);
     header('Content-Type: application/javascript; charset=utf-8');
     header('Cache-Control: no-cache');
@@ -94,7 +94,7 @@ if ($uri !== null && $uri !== '/' && str_ends_with($uri, '/')) {
 }
 
 // PHP routes (admin + public pages)
-$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/temples','/consult','/consultation','/astrologer','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-spiritual','/spiritual','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
+$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/temples','/consult','/consultation','/astrologer','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
 $isPhpRoute = false;
 foreach ($phpRoutes as $route) {
     if (strpos($uri, $route . '/') === 0 || $uri === $route) {

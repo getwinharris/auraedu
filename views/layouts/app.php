@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="format-detection" content="telephone=no">
-<title><?= e($pageTitle ?? 'Sri Panchami Spiritual') ?></title>
-<meta name="description" content="<?= e($metaDescription ?? 'Book a private consultant appointment and shop spiritual products, rudraksha, pooja items, and sacred jewellery.') ?>">
+<title><?= e($pageTitle ?? 'AuraEdu') ?></title>
+<meta name="description" content="<?= e($metaDescription ?? 'Book a private consultant appointment and shop education products, rudraksha, pooja items, and sacred jewellery.') ?>">
 <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
 <?php $__seoKeywords = $seo['keywords'] ?? ''; if ($__seoKeywords !== ''): ?><meta name="keywords" content="<?= e($__seoKeywords) ?>"><?php endif; ?>
 <?php
 $__settings = (new \App\Services\SettingsService())->public();
 $__logo = $__settings['logo_url'] ?? '/assets/images/logo-small.jpeg';
-$__favicon = $__settings['favicon_url'] ?? '/assets/images/sps-favicon.svg';
+$__favicon = $__settings['favicon_url'] ?? '/assets/images/auraedu-favicon.svg';
 $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png';
 ?>
 <link rel="icon" type="<?= e($__faviconMime) ?>" href="<?= e($__favicon) ?>">
@@ -19,11 +19,11 @@ $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png'
 <meta name="theme-color" content="#3a0003">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sri Panchami Spiritual">
+<meta name="apple-mobile-web-app-title" content="AuraEdu">
 <link rel="apple-touch-icon" href="/assets/images/logo-square.jpeg">
 <link rel="canonical" href="https://<?= e($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>">
 <meta property="og:type" content="<?= e($seo['og_type'] ?? 'website') ?>">
-<meta property="og:site_name" content="<?= e($seo['og_site_name'] ?? 'Sri Panchami Spiritual') ?>">
+<meta property="og:site_name" content="<?= e($seo['og_site_name'] ?? 'AuraEdu') ?>">
 <meta property="og:title" content="<?= e($seo['og_title'] ?? $pageTitle) ?>">
 <meta property="og:description" content="<?= e($seo['og_description'] ?? $metaDescription) ?>">
 <meta property="og:url" content="<?= e($seo['og_url'] ?? 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>">
@@ -248,9 +248,9 @@ echo $__palette_css;
 @media(max-width:900px){.blog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.document-index,.blog-grid{grid-template-columns:1fr}.blog-page{padding:var(--space-2xl) 0}}
 </style>
 <noscript><link rel="stylesheet" href="/assets/css/band.css?v=<?= filemtime(__DIR__ . '/../../assets/css/band.css') ?>"></noscript>
-<?php $__secrets_org = (new \App\Services\SecretService())->all(); $__phone = $__secrets_org['phone'] ?? ''; $__telephone = $__phone !== '' ? '["' . e($__phone) . '"]' : '["+919789444037","+919789444038"]'; ?>
+<?php $__secrets_org = (new \App\Services\SecretService())->all(); $__phone = $__secrets_org['phone'] ?? ''; $__telephone = $__phone !== '' ? '["' . e($__phone) . '"]' : '["+919790221065"]'; ?>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":["Organization","OnlineStore"],"name":"<?= e($seo['og_site_name'] ?? 'Sri Panchami Spiritual') ?>","description":"Authentic spiritual products, sacred jewellery, expert Vedic astrology consultation, and temple guidance.","url":"https://<?= e($_SERVER['HTTP_HOST']) ?>","telephone":<?= $__telephone ?>,"email":"sripanchamispiritual@gmail.com"}
+{"@context":"https://schema.org","@type":["Organization","OnlineStore"],"name":"<?= e($seo['og_site_name'] ?? 'AuraEdu') ?>","description":"Authentic education products, sacred jewellery, expert Vedic astrology consultation, and temple guidance.","url":"https://<?= e($_SERVER['HTTP_HOST']) ?>","telephone":<?= $__telephone ?>,"email":"support@auraedu.co.ingmail.com"}
 </script>
 <?php if (!empty($seo['json_ld'])): ?><?= $seo['json_ld'] ?><?php endif; ?>
 <?php
@@ -301,7 +301,7 @@ gtag('js', new Date());
 <?php $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/'; ?>
 <?php $_SESSION['csrf_token'] ??= bin2hex(random_bytes(16)); ?>
 <header class="site-header" id="site-header">
-    <a href="/" class="brand"><img src="<?= e($__logo) ?>" width="52" height="52" alt="Sri Panchami Spiritual logo"><span>Sri Panchami Spiritual</span></a>
+    <a href="/" class="brand"><img src="<?= e($__logo) ?>" width="52" height="52" alt="AuraEdu logo"><span>AuraEdu</span></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Menu">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
@@ -319,7 +319,7 @@ gtag('js', new Date());
                 <?php endforeach; ?>
             </div>
         </div>
-        <a href="/about"<?= str_starts_with($currentPath, '/about') ? ' aria-current="page"' : '' ?>>About SPS</a>
+        <a href="/about"<?= str_starts_with($currentPath, '/about') ? ' aria-current="page"' : '' ?>>About AuraEdu</a>
         <a href="/contact"<?= str_starts_with($currentPath, '/contact') ? ' aria-current="page"' : '' ?>>Contact</a>
         <?php if(!empty($_SESSION['user'])): ?>
             <a href="/account/dashboard"<?= str_starts_with($currentPath, '/account/dashboard') ? ' aria-current="page"' : '' ?>>Dashboard</a>
@@ -387,7 +387,7 @@ if ($__flash):
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
     <span class="sr-only">Support</span>
 </button>
-<section class="support-panel" id="support-panel" data-support-key="sps-support-chat-<?= !empty($_SESSION['user']['email']) ? e(strtolower((string)$_SESSION['user']['email'])) : 'guest' ?>" hidden>
+<section class="support-panel" id="support-panel" data-support-key="auraedu-support-chat-<?= !empty($_SESSION['user']['email']) ? e(strtolower((string)$_SESSION['user']['email'])) : 'guest' ?>" hidden>
     <div class="support-panel__head">
         <strong>Support</strong>
         <button type="button" class="support-panel__close" aria-label="Close support">×</button>
@@ -408,8 +408,8 @@ if ($__flash):
     <div class="container">
         <div class="footer-grid">
             <div>
-                <span class="footer-brand">Sri Panchami Spiritual</span>
-                <p class="footer-desc">Scheduled astrology consultations, authentic spiritual products, sacred jewellery, rudraksha, pooja items, and temple guidance.</p>
+                <span class="footer-brand">AuraEdu</span>
+                <p class="footer-desc">Scheduled astrology consultations, authentic education products, sacred jewellery, rudraksha, pooja items, and temple guidance.</p>
             </div>
             <div>
                 <h4 class="footer-heading">Shop</h4>
@@ -417,7 +417,7 @@ if ($__flash):
                     <li><a href="/shop">All Products</a></li>
                     <li><a href="/consult">Consult</a></li>
                     <li><a href="/temples">Temples</a></li>
-                    <li><a href="/about">About SPS</a></li>
+                    <li><a href="/about">About AuraEdu</a></li>
                     <li><a href="/blog">Blog</a></li>
                     <li><a href="/contact">Contact</a></li>
                     <li><a href="/terms">Terms</a></li>
@@ -433,20 +433,20 @@ if ($__flash):
                 <?php foreach ($__blogCats as $__cat): ?>
                 <li><a href="/blog/category/<?= e($__cat['slug'] ?? '') ?>"><?= e($__cat['name'] ?? '') ?></a></li>
                 <?php endforeach; ?>
-                <li><a href="/about">About SPS</a></li>
+                <li><a href="/about">About AuraEdu</a></li>
                 <li><a href="/contact">Contact</a></li>
             </ul>
             </div>
             <div>
                 <h4 class="footer-heading">Customer Support</h4>
                 <ul class="footer-links">
-                    <li><a href="tel:+919789444037">+91 97894 44037</a></li>
+                    <li><a href="tel:+919790221065">+91 97902 21065</a></li>
                     <li><a href="tel:+919789444038">+91 97894 44038</a></li>
-                    <li><a href="mailto:sripanchamispiritual@gmail.com">sripanchamispiritual@gmail.com</a></li>
+                    <li><a href="mailto:support@auraedu.co.ingmail.com">support@auraedu.co.ingmail.com</a></li>
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">&copy; <?= date('Y') ?> Sri Panchami Spiritual &middot; <a href="/terms">Terms</a> &middot; <a href="/privacy">Privacy</a> &middot; developed with &#10084;&#65039; by <a href="https://www.instagram.com/bapxmediahub/" target="_blank" rel="noopener noreferrer">@bapxmediahub</a></div>
+        <div class="footer-bottom">&copy; <?= date('Y') ?> AuraEdu &middot; <a href="/terms">Terms</a> &middot; <a href="/privacy">Privacy</a> &middot; developed with &#10084;&#65039; by <a href="https://www.instagram.com/bapxmediahub/" target="_blank" rel="noopener noreferrer">@bapxmediahub</a></div>
     </div>
 </footer>
 <?php endif; ?>

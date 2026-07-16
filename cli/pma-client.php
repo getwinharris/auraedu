@@ -31,7 +31,7 @@ function pmaRequest(string $url, string $cookie, string $method = 'GET', array $
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTPHEADER => ['User-Agent: bapXphp-pma-client/1.0'],
+        CURLOPT_HTTPHEADER => ['User-Agent: bapXaura-pma-client/1.0'],
     ];
     if ($method === 'POST') {
         $opts[CURLOPT_POST] = true;

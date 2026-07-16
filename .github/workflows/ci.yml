@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   validate:
-    if: github.actor != 'ci-ai-bot' && endsWith(github.repository, 'bapXphpAiBackend')
+    if: github.actor != 'ci-ai-bot' && endsWith(github.repository, 'bapXauraAiBackend')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -26,4 +26,4 @@ jobs:
           php-version: '8.2'
           extensions: curl, json, mbstring, pdo_mysql
       - name: Validate code, tests, maps, and routes
-        run: ./bapXphp ci
+        run: ./bapXaura ci

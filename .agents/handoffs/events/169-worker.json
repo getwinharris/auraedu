@@ -12,7 +12,7 @@
                 "app/Controllers/AdminController.php: added taxReport() route — date-filtered list + CSV export, renders views/admin/tax-report.php",
                 "app/Services/ProjectMapService.php: registered /account/orders/{orderId}/invoice and /admin/tax-report routes; added TaxService to service catalog; added SettingsService to checkout and verify-payment routes",
                 "app/Controllers/AdminController.php: saveSettings() now persists gstin, gst_legal_name, gst_trade_name, gst_address, gst_state, gst_state_code",
-                "bapXphp ci: all 90+ tests pass, 0 gaps, 0 failures"
+                "bapXaura ci: all 90+ tests pass, 0 gaps, 0 failures"
             ],
             "browser_evidence": [],
             "unresolved": []
@@ -91,8 +91,8 @@
     ],
     "commands_run": [
         "php -l app/Controllers/AccountController.php && php -l app/Controllers/AdminController.php && php -l app/Controllers/CommerceController.php && php -l app/Services/ProjectMapService.php && php -l storage/schema/collections.php",
-        "bapXphp update",
-        "bapXphp ci"
+        "bapXaura update",
+        "bapXaura ci"
     ],
     "risks": [
         "Existing orders without invoice fields will show partial data on invoice page; handled gracefully via ?? fallbacks in view",

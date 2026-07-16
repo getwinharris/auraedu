@@ -7,7 +7,7 @@ final class MailQueueService {
     private function wrapHtml(string $inner): string {
         $settings = (new SettingsService())->public();
         $logoUrl = $settings['logo_url'] ?? '';
-        $siteName = 'Sri Panchami Spiritual';
+        $siteName = 'AuraEdu';
         $logoHtml = $logoUrl ? "<img src=\"$logoUrl\" alt=\"$siteName\" style=\"max-width:180px;height:auto;margin-bottom:16px;\">" : "<h1 style=\"margin:0 0 16px;font-size:1.5rem;color:#3a0003;\">$siteName</h1>";
         $footerHtml = '<hr style="border:none;border-top:1px solid #e5e5e5;margin:24px 0;">'
             . '<p style="margin:0;font-size:0.8rem;color:#666;">'
@@ -15,7 +15,7 @@ final class MailQueueService {
             . 'Address: ' . e((string)($settings['gst_address'] ?? '')) . '<br>'
             . 'State: ' . e((string)($settings['gst_state'] ?? '')) . ' (' . e((string)($settings['gst_state_code'] ?? '')) . ')<br>'
             . 'PAN: ' . e((string)($settings['gst_pan'] ?? '')) . '<br>'
-            . 'Email: support@sripanchamispiritual.com | Phone: +91-XXXXXXXXXX'
+            . 'Email: support@auraedu.co.in | Phone: +91-XXXXXXXXXX'
             . '</p>'
             . '<p style="margin-top:16px;font-size:0.75rem;color:#999;">'
             . 'This is an automated email from ' . e($siteName) . '. Please do not reply.'
@@ -60,7 +60,7 @@ final class MailQueueService {
             $invoiceHtml = '<p>Invoice: <strong>' . e((string)($order['invoice_number'] ?? '')) . '</strong> — '
                 . '<a href="' . rtrim(($_ENV['APP_URL'] ?? 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')), '/') . '/account/orders/' . e((string)($order['id'] ?? '')) . '/invoice">View invoice</a></p>';
         }
-        $subject = 'Sri Panchami Spiritual payment confirmed';
+        $subject = 'AuraEdu payment confirmed';
         $html = '<p>Vanakkam ' . e((string)($order['customer_name'] ?? '')) . ',</p>'
             . '<p>Your payment for order ' . e((string)($order['id'] ?? '')) . ' is confirmed.</p>'
             . $invoiceHtml
@@ -71,7 +71,7 @@ final class MailQueueService {
     public function enqueueShipmentNotification(array $order): ?array {
         $to = trim((string)($order['customer_email'] ?? ''));
         if ($to === '') return null;
-        $subject = 'Sri Panchami Spiritual order shipped';
+        $subject = 'AuraEdu order shipped';
         $html = '<p>Your order ' . e((string)($order['id'] ?? '')) . ' has been shipped.</p>'
             . '<p>We will ask for your product review after you have had time to receive and use it.</p>';
         return $this->enqueue('shipment_notification', $to, $subject, $html, null, ['order_id' => $order['id'] ?? '']);
@@ -82,7 +82,7 @@ final class MailQueueService {
         if ($to === '') return null;
         $shippedAt = new \DateTimeImmutable((string)($order['shipped_at'] ?? 'now'));
         $availableAt = $shippedAt->modify('+' . max(1, $waitDays) . ' days');
-        $subject = 'How was your Sri Panchami Spiritual product?';
+        $subject = 'How was your AuraEdu product?';
         $html = '<p>We hope your order ' . e((string)($order['id'] ?? '')) . ' reached you well.</p>'
             . '<p>Please share your product rating from your account orders page.</p>';
         return $this->enqueue('product_review_request', $to, $subject, $html, $availableAt, ['order_id' => $order['id'] ?? '']);

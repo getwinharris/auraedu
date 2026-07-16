@@ -1,17 +1,17 @@
 <?php
 /**
- * Interactive terminal UI for bapXphp.
+ * Interactive terminal UI for bapXaura.
  *
  * Dependency-free by design (this project ships no composer/vendor):
  * raw stdin keypresses via `stty`, ANSI escape codes for color/cursor
- * movement. Arrow keys navigate, Enter runs the selected bapXphp command
+ * movement. Arrow keys navigate, Enter runs the selected bapXaura command
  * with live streamed output, 'q' or Esc quits.
  */
 
 $root = dirname(__DIR__);
 
 if (!function_exists('posix_isatty') || !posix_isatty(STDOUT)) {
-    fwrite(STDERR, "bapXphp tui needs an interactive terminal (not a pipe/redirect).\n");
+    fwrite(STDERR, "bapXaura tui needs an interactive terminal (not a pipe/redirect).\n");
     exit(1);
 }
 
@@ -90,7 +90,7 @@ function render(array $flat, int $cursor, string $root): void {
     $branch = gitBranch();
     $dirty = gitDirty() ? "\033[33mdirty\033[0m" : "\033[32mclean\033[0m";
     $handoff = activeHandoff($root);
-    echo "\033[1mbapXphp\033[0m  —  branch \033[36m{$branch}\033[0m  ({$dirty})";
+    echo "\033[1mbapXaura\033[0m  —  branch \033[36m{$branch}\033[0m  ({$dirty})";
     echo "   handoff: \033[36m{$handoff}\033[0m\n";
     echo str_repeat('─', 60) . "\n";
     foreach ($flat as $i => $row) {
@@ -130,8 +130,8 @@ function runCommand(string $root, string $cmd): void {
     echo "\033[2J\033[H";
     shell_exec('stty ' . escapeshellarg(trim(shell_exec('stty -g') ?? '')) . ' 2>/dev/null');
     shell_exec('stty sane 2>/dev/null');
-    echo "\033[?25h\$ bapXphp {$cmd}\n\n";
-    passthru('cd ' . escapeshellarg($root) . ' && ./bapXphp ' . $cmd);
+    echo "\033[?25h\$ bapXaura {$cmd}\n\n";
+    passthru('cd ' . escapeshellarg($root) . ' && ./bapXaura ' . $cmd);
     echo "\n\033[2mpress any key to return to the menu\033[0m\n";
     shell_exec('stty -icanon -echo 2>/dev/null');
     fread(STDIN, 1);

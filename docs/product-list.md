@@ -14,7 +14,7 @@ This catalog is based on the product details supplied for the ecommerce store.
 - Material: High-quality impon
 - Finish: Antique gold-tone coating
 - Theme: Guardian deity on horseback
-- Description: Karuppasamy pendant representing courage, protection, justice, and spiritual authority.
+- Description: Karuppasamy pendant representing courage, protection, justice, and education authority.
 - Package: 1 pendant charm
 
 ## Sri Maha Lakshmi Pendant
@@ -23,7 +23,7 @@ This catalog is based on the product details supplied for the ecommerce store.
 - Material: Premium quality impon
 - Finish: Antique gold-tone polish
 - Theme: Goddess Maha Lakshmi
-- Description: Lakshmi pendant for prosperity, positivity, fortune, and spiritual abundance.
+- Description: Lakshmi pendant for prosperity, positivity, fortune, and education abundance.
 - Package: 1 pendant
 
 ## Sri Vel Mayil Pendant
@@ -32,7 +32,7 @@ This catalog is based on the product details supplied for the ecommerce store.
 - Material: Premium quality impon
 - Finish: Antique gold plated coating
 - Theme: Sri Vel and Mayil associated with Lord Murugan
-- Description: Devotional pendant representing courage, wisdom, victory, and spiritual protection.
+- Description: Devotional pendant representing courage, wisdom, victory, and education protection.
 - Package: 1 pendant
 
 ## Varahi Amman Pendant
@@ -50,7 +50,7 @@ This catalog is based on the product details supplied for the ecommerce store.
 - Material: Panchaloha / Impon
 - Finish: Antique-inspired devotional finish
 - Theme: Goddess Varahi Amman
-- Description: Devotional ring for daily spiritual wear, confidence, positivity, and inner strength.
+- Description: Devotional ring for daily education wear, confidence, positivity, and inner strength.
 - Package: 1 ring
 
 ## Sri Chakra Yamthiram Pendant

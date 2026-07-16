@@ -36,7 +36,7 @@ final class SmtpMailer {
         $fromEmail = $this->fromEmail();
         $fromName = $this->fromName();
         $replyTo = trim((string)($this->settings['admin_notification_email'] ?? $fromEmail));
-        $boundary = 'sps_' . bin2hex(random_bytes(12));
+        $boundary = 'aura_' . bin2hex(random_bytes(12));
         $plain = trim(strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $html)));
         $headers = [
             'Date: ' . date(DATE_RFC2822),
@@ -115,7 +115,7 @@ final class SmtpMailer {
     }
 
     private function fromName(): string {
-        return trim((string)($this->settings['mail_from_name'] ?? $this->settings['smtp_from_name'] ?? 'Sri Panchami Spiritual'));
+        return trim((string)($this->settings['mail_from_name'] ?? $this->settings['smtp_from_name'] ?? 'AuraEdu'));
     }
 
     private function mailDomain(): string {

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   route:
-    if: github.actor != 'handoff-ai-bot' && endsWith(github.repository, 'bapXphpAiBackend') && (startsWith(github.event.comment.body, '/handoff ') || startsWith(github.event.comment.body, '/review'))
+    if: github.actor != 'handoff-ai-bot' && endsWith(github.repository, 'bapXauraAiBackend') && (startsWith(github.event.comment.body, '/handoff ') || startsWith(github.event.comment.body, '/review'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
       - name: Commit handoff
         run: |
           git config user.name "handoff-ai-bot"
-          git config user.email "handoff-ai-bot@bapXphp.action"
+          git config user.email "handoff-ai-bot@bapXaura.action"
           git add .agents/handoffs/
           git diff --cached --quiet || git commit -m "auto: handoff route to ${{ steps.parse.outputs.target }} for issue #${{ github.event.issue.number }}"
           for i in 1 2 3; do

@@ -1,9 +1,9 @@
 <section class="home-hero">
     <div class="container home-hero-inner">
         <div class="hero-copy">
-            <span class="eyebrow">Authentic spiritual products · Delivered across India</span>
-            <h1>Discover Authentic Spiritual Products</h1>
-            <p class="lede">Browse our curated collection of genuine spiritual items — from rudraksha malas and pooja kits to sacred jewellery. Every product sourced with devotion.</p>
+            <span class="eyebrow">Authentic education products · Delivered across India</span>
+            <h1>Discover Authentic education Products</h1>
+            <p class="lede">Browse our curated collection of genuine education items — from rudraksha malas and pooja kits to sacred jewellery. Every product sourced with devotion.</p>
             <div class="hero-actions">
                 <a href="/shop" class="btn btn-primary">Shop Products</a>
                 <a href="/consult" class="btn btn-outline">Book a Consultation</a>
@@ -82,20 +82,20 @@
     </div>
     <div class="trust-item">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        Spiritual Products
+        education Products
     </div>
 </div>
 
 <section class="category-section section">
     <div class="section-header">
         <h2 class="section-title">Shop by Category</h2>
-        <p class="lede">Curated collections of authentic spiritual products for every need — from rudraksha malas to complete pooja kits</p>
+        <p class="lede">Curated collections of authentic education products for every need — from rudraksha malas to complete pooja kits</p>
     </div>
     <div class="category-grid">
         <?php foreach($categories as $cat): ?>
             <a class="category-card" href="/shop?category=<?= e($cat['slug']) ?>">
                 <div class="category-img-wrap">
-                    <img src="<?= e($cat['image_url'] ?? placeholder_img($cat['name'])) ?>" alt="Buy <?= e($cat['name']) ?> online in Chennai" decoding="async">
+                    <img src="<?= e($cat['image_url'] ?? placeholder_img($cat['name'])) ?>" alt="Buy <?= e($cat['name']) ?> online in Coimbatore" decoding="async">
                 </div>
                 <h3><?= e($cat['name']) ?></h3>
                 <p><?= e($cat['description']) ?></p>
@@ -122,7 +122,7 @@
             <?php $hasOffer = !empty($item['offer_price']) && $item['offer_price'] < $item['price']; ?>
             <article class="product-card reveal">
                 <div class="product-card__image">
-                    <img src="<?= e(webp_src($item['image_url'] ?? placeholder_img($item['name']))) ?>" alt="<?= e($item['name']) ?> — Buy online at Sri Panchami Spiritual, Chennai" decoding="async">
+                    <img src="<?= e(webp_src($item['image_url'] ?? placeholder_img($item['name']))) ?>" alt="<?= e($item['name']) ?> — Buy online at AuraEdu, Coimbatore" decoding="async">
                     <?php if($hasOffer): ?>
                         <span class="product-card__badge product-card__badge--sale">Sale</span>
                     <?php endif; ?>
@@ -230,7 +230,7 @@
     <div class="section-header">
         <span class="eyebrow serif-accent">Sacred Spaces · Divine Energy</span>
         <h2 class="section-title">Panchami Temples Guide</h2>
-        <p class="lede">Explore temple guides for divine blessings, traditional pooja details, and spiritual routes around Chennai. <a href="/temples">Click here</a></p>
+        <p class="lede">Explore temple guides for divine blessings, traditional pooja details, and education routes around Coimbatore. <a href="/temples">Click here</a></p>
     </div>
     <div class="temple-carousel temple-carousel--single" data-temple-slider aria-label="Temple guide carousel">
         <div class="temple-carousel-track">
@@ -238,7 +238,7 @@
             <a class="showcase-card temple-feature-card reveal <?= $index === 0 ? 'is-active' : '' ?>" href="/temples/<?= e($temple['slug'] ?? '') ?>" aria-label="View <?= e($temple['name'] ?? 'Temple') ?>">
                 <div class="temple-feature-card__media">
                     <?php if(!empty($temple['image_url'])): ?>
-                        <img src="<?= e(webp_src($temple['image_url'])) ?>" alt="<?= e($temple['name']) ?> — Temple guide at Sri Panchami Spiritual, Chennai" decoding="async">
+                        <img src="<?= e(webp_src($temple['image_url'])) ?>" alt="<?= e($temple['name']) ?> — Temple guide at AuraEdu, Coimbatore" decoding="async">
                     <?php else: ?>
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M9 21v-4a2 2 0 012-2h2a2 2 0 012 2v4"/></svg>
                     <?php endif; ?>
@@ -285,9 +285,9 @@ document.addEventListener('DOMContentLoaded', function () {
 <section class="section section--warm">
     <div class="container">
         <div class="section-header">
-            <span class="eyebrow serif-accent">Why Sri Panchami Spiritual</span>
+            <span class="eyebrow serif-accent">Why AuraEdu</span>
             <h2 class="section-title">Faith · Trust · Tradition</h2>
-            <p class="lede">Rooted in devotion, committed to authenticity — every product and service reflects our reverence for India's spiritual heritage.</p>
+            <p class="lede">Rooted in devotion, committed to authenticity — every product and service reflects our reverence for India's education heritage.</p>
         </div>
         <div class="value-strip">
             <article class="value-card reveal">
@@ -295,14 +295,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             </div>
             <h3>Authenticity</h3>
-            <p>Every item sourced with devotion — authentic rudraksha, pure pooja essentials, and sacred jewellery verified for spiritual genuineness.</p>
+            <p>Every item sourced with devotion — authentic rudraksha, pure pooja essentials, and sacred jewellery verified for education genuineness.</p>
         </article>
         <article class="value-card reveal">
             <div class="value-card__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <h3>Spiritual Growth</h3>
-            <p>Our products are more than offerings — they are symbols of faith that help keep alive the divine traditions connecting every devotee with spirituality.</p>
+            <h3>education Growth</h3>
+            <p>Our products are more than offerings — they are symbols of faith that help keep alive the divine traditions connecting every devotee with educationity.</p>
         </article>
         <article class="value-card reveal">
             <div class="value-card__icon">
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </div>
             <h3>Community</h3>
-            <p>Fostering belonging and connection through shared spiritual experiences — bringing temples, traditions, and devotees closer together.</p>
+            <p>Fostering belonging and connection through shared education experiences — bringing temples, traditions, and devotees closer together.</p>
         </article>
     </div>
     <div class="page-cta-card reveal">
@@ -338,15 +338,15 @@ document.addEventListener('DOMContentLoaded', function () {
     "mainEntity": [
         {
             "@type": "Question",
-            "name": "Where can I buy original rudraksha online in Chennai?",
+            "name": "Where can I buy original rudraksha online in Coimbatore?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Sri Panchami Spiritual offers certified original rudraksha beads and malas online with free shipping across India. Order online through our web store."
+                "text": "AuraEdu offers certified original rudraksha beads and malas online with free shipping across India. Order online through our web store."
             }
         },
         {
             "@type": "Question",
-            "name": "Do you offer Vedic astrology consultation in Chennai?",
+            "name": "Do you offer Vedic astrology consultation in Coimbatore?",
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Yes, you can request a scheduled appointment with an expert consultant in Tamil, English, and other Indian languages. Services include kundli matching, horoscope reading, career guidance, and personalized remedies."
@@ -362,10 +362,10 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         {
             "@type": "Question",
-            "name": "Is free shipping available on spiritual products?",
+            "name": "Is free shipping available on education products?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, we offer free shipping on all spiritual products across India. Orders are carefully packed and delivered to your doorstep."
+                "text": "Yes, we offer free shipping on all education products across India. Orders are carefully packed and delivered to your doorstep."
             }
         }
     ]

@@ -45,7 +45,7 @@ try {
         '/consult' => 200,
         '/consult/shrikanth-purushothaman' => 200,
         '/temples' => 200,
-        '/sri-panchami-spiritual' => 200,
+        '/sri-panchami-education' => 200,
         '/forgot-password' => 200,
         '/reset-password' => 200,
         '/auth/google' => 302,

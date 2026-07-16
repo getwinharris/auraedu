@@ -102,7 +102,7 @@ $tests['agent workflow diagnoses before issue tracking and stays source grounded
 $tests['fork sync and runtime artifacts are properly managed'] = function (): void {
     $sync = file_get_contents(app_path('.github/workflows/sync-upstream.yml'));
     $ignore = file_get_contents(app_path('.gitignore'));
-    $cli = file_get_contents(app_path('cli/bapXphp'));
+    $cli = file_get_contents(app_path('cli/bapXaura'));
     assertTrue(str_contains($sync, 'schedule:') && str_contains($sync, '0 * * * *'), 'Fork sync should use hourly schedule');
     assertTrue(str_contains($sync, 'workflow_dispatch:'), 'Fork sync should support manual dispatch');
     assertTrue(str_contains($sync, 'merge-upstream'), 'Fork sync should use merge-upstream API');
@@ -155,13 +155,13 @@ $tests['local development router serves existing static files directly'] = funct
     assertTrue(str_contains($index, 'return false'), 'Router should let the built-in server serve existing static assets');
 };
 
-$tests['public and api routes cover spiritual and category pages without fallback gaps'] = function (): void {
+$tests['public and api routes cover education and category pages without fallback gaps'] = function (): void {
     $index = file_get_contents(app_path('index.php'));
     $routes = ProjectMapService::registry()['routes'];
     $paths = array_column($routes, 'path');
-    assertTrue(str_contains($index, "'/sri-panchami-spiritual'"), 'Router should dispatch /sri-panchami-spiritual to PHP');
-    assertTrue(in_array('/sri-panchami-spiritual', $paths, true), 'Route registry should include /sri-panchami-spiritual');
-    assertTrue(in_array('/spiritual', $paths, true), 'Route registry should include /spiritual or remove it from route detection');
+    assertTrue(str_contains($index, "'/sri-panchami-education'"), 'Router should dispatch /sri-panchami-education to PHP');
+    assertTrue(in_array('/sri-panchami-education', $paths, true), 'Route registry should include /sri-panchami-education');
+    assertTrue(in_array('/education', $paths, true), 'Route registry should include /education or remove it from route detection');
     assertTrue(in_array('/categories', $paths, true), 'API /api/categories should map through /categories route');
     assertTrue(in_array('/forgot-password', $paths, true), 'Login forgot-password link should have a GET route');
     assertTrue(in_array('/reset-password', $paths, true), 'Password reset page should have a GET route');
@@ -286,12 +286,12 @@ $tests['customer installation is an account menu workflow'] = function (): void 
 };
 
 $tests['development customer workflow is fixed remote and credential safe'] = function (): void {
-    $cli = file_get_contents(app_path('cli/bapXphp'));
+    $cli = file_get_contents(app_path('cli/bapXaura'));
     $engineering = file_get_contents(app_path('docs/roles/engineering.md'));
     assertTrue(is_string($cli) && is_string($engineering), 'Development customer workflow sources should be readable');
     assertTrue(str_contains($cli, 'dev_test_customer') && str_contains($cli, 'BAPX_TEST_USER_PASSWORD'), 'CLI should provide a fixed credential-safe development customer');
     assertTrue(str_contains($cli, 'cmd_db_upsert users'), 'Development customer should use authenticated remote DB mutation');
-    assertTrue(str_contains($engineering, 'bapXphp dev:user'), 'Engineering guide should document the fixed customer command');
+    assertTrue(str_contains($engineering, 'bapXaura dev:user'), 'Engineering guide should document the fixed customer command');
 };
 
 $tests['public registration never bootstraps admin on a live site'] = function (): void {
@@ -365,7 +365,7 @@ $tests['contact page exposes consultation request form'] = function (): void {
         assertTrue(str_contains($view, $field), "Contact form should include {$field}");
     }
     assertTrue(str_contains($view, 'Astrology Consultation'), 'Contact form should include an astrology consultation subject');
-    foreach (['tel:+919789444037', 'tel:+919789444038', 'mailto:sripanchamispiritual@gmail.com', 'contact-direct-link--mail'] as $needle) {
+    foreach (['tel:+919789444037', 'tel:+919789444038', 'mailto:support@auraedu.co.ingmail.com', 'contact-direct-link--mail'] as $needle) {
         assertTrue(str_contains($view, $needle), "Contact page should expose {$needle}");
     }
     foreach (['Online Store', 'VIP appointments only', 'Regular sessions are available through Consult'] as $needle) {
@@ -612,11 +612,11 @@ $tests['astrologer cards use consistent face focused portrait frames'] = functio
 
 $tests['home hero uses concise current copy and working cta links'] = function (): void {
     $view = file_get_contents(app_path('views/public/home.php'));
-    assertTrue(!str_contains($view, 'Spiritual Products Online in Chennai'), 'Home hero headline should not say products online in Chennai');
-    assertTrue(!str_contains($view, 'Buy Original Rudraksha, Pooja Items & Spiritual Products Online'), 'Home hero should not lead with ecommerce as the primary business');
-    assertTrue(!str_contains($view, 'Shop Spiritual Products</a>'), 'Home hero shop button should use concise text');
+    assertTrue(!str_contains($view, 'education Products Online in Coimbatore'), 'Home hero headline should not say products online in Coimbatore');
+    assertTrue(!str_contains($view, 'Buy Original Rudraksha, Pooja Items & education Products Online'), 'Home hero should not lead with ecommerce as the primary business');
+    assertTrue(!str_contains($view, 'Shop education Products</a>'), 'Home hero shop button should use concise text');
     assertTrue(!str_contains($view, 'Remote Astrology Consultation</a>'), 'Home hero astrology button should use shorter text');
-    foreach (['Discover Authentic Spiritual Products', 'href="/shop"', 'href="/consult"', '>Book a Consultation</a>', '>Shop Products</a>', 'Authentic spiritual products'] as $needle) {
+    foreach (['Discover Authentic education Products', 'href="/shop"', 'href="/consult"', '>Book a Consultation</a>', '>Shop Products</a>', 'Authentic education products'] as $needle) {
         assertTrue(str_contains($view, $needle), "Home hero should include {$needle}");
     }
     assertTrue(!str_contains($view, '<div class="hero-stat-value">3</div>'), 'Home hero stat value should not be stale');
@@ -627,7 +627,7 @@ $tests['home temple guide uses admin driven dissolve carousel'] = function (): v
     $view = file_get_contents(app_path('views/public/home.php'));
     $css = file_get_contents(app_path('assets/css/band.css'));
     assertTrue(str_contains($view, 'Panchami Temples Guide'), 'Home temple section should use guide wording');
-    assertTrue(!str_contains($view, 'Our Temples in Chennai'), 'Home temple section should not use the old heading');
+    assertTrue(!str_contains($view, 'Our Temples in Coimbatore'), 'Home temple section should not use the old heading');
     assertTrue(str_contains($view, 'foreach(array_values($temples)'), 'Home temple carousel should use the admin-published temple list directly');
     assertTrue(!str_contains($view, 'array_merge($temples, $temples)'), 'Home temple carousel should not duplicate admin temple records for a dissolve transition');
     assertTrue(str_contains($view, 'data-temple-slider'), 'Home temple section should auto-advance one full-width temple at a time');
@@ -724,8 +724,8 @@ $tests['cart quantity controls update progressively and remove at zero'] = funct
     assertTrue(str_contains($controller, 'if ($this->wantsJson()) $this->jsonResponse($this->cartState($slug));'), 'Add-to-cart should support progressive JSON updates');
 };
 
-$tests['bapXphp product media workflow is safe and mapped'] = function (): void {
-    $cli = file_get_contents(app_path('cli/bapXphp'));
+$tests['bapXaura product media workflow is safe and mapped'] = function (): void {
+    $cli = file_get_contents(app_path('cli/bapXaura'));
     $reader = file_get_contents(app_path('cli/product-read.php'));
     $importer = file_get_contents(app_path('cli/import-product-images.php'));
     $map = file_get_contents(app_path('app/Services/ProjectMapService.php'));
@@ -836,7 +836,7 @@ $tests['saved addresses select the default and allow another checkout address'] 
 $tests['remote database uses password auth via admin UI or env'] = function (): void {
     $controller = file_get_contents(app_path('app/Controllers/RemoteDbController.php'));
     $database = file_get_contents(app_path('app/Services/DatabaseService.php'));
-    $cli = file_get_contents(app_path('cli/bapXphp'));
+    $cli = file_get_contents(app_path('cli/bapXaura'));
     assertTrue(str_contains($controller, 'requirePassword'), 'Remote controller should have requirePassword');
     assertTrue(str_contains($controller, 'hash_equals'), 'Remote controller should verify password with timing-safe compare');
     assertTrue(str_contains($controller, 'SecretService'), 'Remote controller should read password from SecretService');
@@ -944,7 +944,7 @@ $tests['architecture and deployment docs describe current php template stack'] =
         assertTrue(str_contains($readme, $needle), "README should describe {$needle}");
     }
     assertTrue(is_file(app_path('docs/README.md')), 'Documentation index should exist and be linked from README');
-    assertTrue(!str_contains($readme, 'https://sripanchamispiritual.com'), 'README should not hardcode the production website URL; use APP_URL in .env');
+    assertTrue(!str_contains($readme, 'https://auraedu.co.in'), 'README should not hardcode the production website URL; use APP_URL in .env');
     assertTrue(str_contains($architecture, 'PHP-rendered public, account, and admin templates'), 'Architecture docs should describe the current PHP template frontend');
     assertTrue(str_contains($deployment, 'PHP-rendered templates'), 'Deployment docs should describe the current PHP template frontend');
 };
@@ -990,7 +990,7 @@ $tests['php 404 page uses themed template classes'] = function (): void {
 $tests['documentation has deployment agent instructions and no one-line placeholder pages'] = function (): void {
     assertTrue(is_file(app_path('AGENTS.md')), 'Agent operating guide should exist');
     $agent = file_get_contents(app_path('AGENTS.md'));
-    foreach (['Repository Contract', 'docs/systematic-map.mmd', 'bapXphp update', 'bapXphp ci', 'After meaningful edits', 'Before pushing to `main`'] as $needle) {
+    foreach (['Repository Contract', 'docs/systematic-map.mmd', 'bapXaura update', 'bapXaura ci', 'After meaningful edits', 'Before pushing to `main`'] as $needle) {
         assertTrue(str_contains($agent, $needle), "Agent guide should mention {$needle}");
     }
     foreach (glob(app_path('docs/pages/*.md')) ?: [] as $path) {
@@ -1007,8 +1007,8 @@ $tests['documentation has deployment agent instructions and no one-line placehol
 
 $tests['pull requests use non mutating CI with fresh project and documentation maps'] = function (): void {
     $workflow = file_get_contents(app_path('.github/workflows/ci.yml'));
-    $cli = file_get_contents(app_path('cli/bapXphp'));
-    foreach (['pull_request:', 'branches: [main]', './bapXphp ci'] as $needle) assertTrue(str_contains($workflow, $needle), "CI workflow should include {$needle}");
+    $cli = file_get_contents(app_path('cli/bapXaura'));
+    foreach (['pull_request:', 'branches: [main]', './bapXaura ci'] as $needle) assertTrue(str_contains($workflow, $needle), "CI workflow should include {$needle}");
     foreach (['cmd_ci()', 'validate-project-map.php', 'validate-docs-map.php', 'cmd_update()', 'cmd_hooks()', 'cmd_tui()', 'cmd_ai_probe()'] as $needle) {
         assertTrue(str_contains($cli, str_replace('\\n', "\n", $needle)), "CLI should include {$needle}");
     }
@@ -1028,7 +1028,7 @@ $tests['repository operations use git and GitHub Actions without duplicate agent
     $activeFiles = [
         app_path('AGENTS.md'),
         app_path('README.md'),
-        app_path('cli/bapXphp'),
+        app_path('cli/bapXaura'),
         app_path('.agents/workflows/browser-tester.md'),
         app_path('.agents/workflows/cto-workflow.md'),
         app_path('.agents/skills/git/SKILL.md'),
@@ -1074,7 +1074,7 @@ $tests['systematic project map, docs/map.mmd, and root map.mmd are the generated
         assertTrue(str_contains($map, $needle), "Systematic map should include {$needle}");
     }
     $dmap = file_get_contents(app_path('docs/map.mmd'));
-    foreach (['CLI (bapXphp)', 'Agent Skills', 'Blog & Content', 'Application Architecture', 'Data Layer'] as $needle) {
+    foreach (['CLI (bapXaura)', 'Agent Skills', 'Blog & Content', 'Application Architecture', 'Data Layer'] as $needle) {
         assertTrue(str_contains($dmap, $needle), "docs/map.mmd should include {$needle}");
     }
     $cmap = file_get_contents(app_path('map.mmd'));
@@ -1117,7 +1117,7 @@ $tests['blog uses an editorial index and readable markdown article surface'] = f
     $index = file_get_contents(app_path('views/public/blog.php'));
     $article = file_get_contents(app_path('views/public/blog-post.php'));
     $css = file_get_contents(app_path('assets/css/band.css'));
-    foreach (['Sri Panchami Journal', 'blog-card--featured', 'blog-card__media', 'Read article'] as $needle) {
+    foreach (['AuraEdu Journal', 'blog-card--featured', 'blog-card__media', 'Read article'] as $needle) {
         assertTrue(str_contains($index, $needle), "Blog index should include {$needle}");
     }
     assertTrue(str_contains($article, "\$schemaBase . '/blog'"), 'Article breadcrumbs should use the canonical blog URL');
@@ -1130,7 +1130,7 @@ $tests['blog media uses one screenshot crop for cards and article pages'] = func
     $admin = file_get_contents(app_path('views/admin/blog.php'));
     $index = file_get_contents(app_path('views/public/blog.php'));
     $article = file_get_contents(app_path('views/public/blog-post.php'));
-    $cli = file_get_contents(app_path('cli/bapXphp'));
+    $cli = file_get_contents(app_path('cli/bapXaura'));
     $crop = file_get_contents(app_path('cli/blog-image.php'));
     foreach (['type', 'summary', 'order', 'og_image', 'image_alt', 'source_url', 'template'] as $field) {
         assertTrue(str_contains($service, "'{$field}'"), "Blog service should persist {$field}");

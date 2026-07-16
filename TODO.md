@@ -30,7 +30,7 @@ category: root
   - [ ] `ping` — Health check
 - [ ] Register MCP routes in `ProjectMapService.php`
 - [ ] Add MCP route to `index.php`
-- [ ] MCP tools: `query_database`, `read_collection`, `read_schema`, `read_project_map`, `run_bapXphp`, `list_skills`, `list_handoffs`
+- [ ] MCP tools: `query_database`, `read_collection`, `read_schema`, `read_project_map`, `run_bapXaura`, `list_skills`, `list_handoffs`
 - [ ] MCP resources: `schema://collections`, `map://systematic`, `docs://{path}`, `handoffs://{issue}`
 - [ ] MCP prompts: `analyze_issue`, `create_objective`, `review_changes`
 
@@ -49,25 +49,25 @@ category: root
 
 ## Phase E: CLI Gaps (High Priority)
 
-- [ ] `bapXphp websearch <query>` — Search the web
-- [ ] `bapXphp webfetch <url>` — Fetch URL content
-- [ ] `bapXphp browser navigate <url>` — Playwright-style browser control
-- [ ] `bapXphp browser click <selector>`
-- [ ] `bapXphp browser snapshot [file]`
-- [ ] `bapXphp browser screenshot [file]`
-- [ ] `bapXphp browser fill <selector> <value>`
-- [ ] `bapXphp browser evaluate <js>`
-- [ ] `bapXphp browser wait <text>`
-- [ ] `bapXphp task <objective>` — Sub-agent dispatch
-- [ ] `bapXphp skill load <name>` — Load a skill
-- [ ] `bapXphp todo add/list/update` — Task tracking
-- [ ] `bapXphp question <prompt>` — Ask user for input
+- [ ] `bapXaura websearch <query>` — Search the web
+- [ ] `bapXaura webfetch <url>` — Fetch URL content
+- [ ] `bapXaura browser navigate <url>` — Playwright-style browser control
+- [ ] `bapXaura browser click <selector>`
+- [ ] `bapXaura browser snapshot [file]`
+- [ ] `bapXaura browser screenshot [file]`
+- [ ] `bapXaura browser fill <selector> <value>`
+- [ ] `bapXaura browser evaluate <js>`
+- [ ] `bapXaura browser wait <text>`
+- [ ] `bapXaura task <objective>` — Sub-agent dispatch
+- [ ] `bapXaura skill load <name>` — Load a skill
+- [ ] `bapXaura todo add/list/update` — Task tracking
+- [ ] `bapXaura question <prompt>` — Ask user for input
 
 ## Phase F: Playwright MCP Integration
 
 - [ ] Install `@playwright/mcp` as project dependency
 - [ ] Create `cli/browser-tester.php` — PHP wrapper for Playwright MCP
-- [ ] Wire into `bapXphp browser` subcommand
+- [ ] Wire into `bapXaura browser` subcommand
 - [ ] Support all Playwright MCP tools: navigate, click, snapshot, screenshot, fill, evaluate, network, wait, console, hover, select, upload, resize, drag, tabs
 
 ## Phase G: Bug Fixes & Known Issues

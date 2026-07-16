@@ -51,7 +51,7 @@ final class KnowledgeGraphService {
             file_put_contents($typeDir . '/' . $id . '.md', $frontmatter . "\n" . $body);
         }
 
-        $this->writeIndexFile($okfDir, "Knowledge Bundle — bapXphp", "okf_version: \"0.1\"\n", [
+        $this->writeIndexFile($okfDir, "Knowledge Bundle — bapXaura", "okf_version: \"0.1\"\n", [
             "Systematic map: [docs/systematic-map.mmd](../docs/systematic-map.mmd)",
             "Knowledge map: [docs/map.mmd](../docs/map.mmd)",
             "Concepts: " . count($this->concepts) . ", Edges: " . count($this->edges),

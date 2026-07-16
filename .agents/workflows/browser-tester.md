@@ -12,7 +12,7 @@ this file
 Run only if assigned a specific issue/objective:
 
 ```bash
-bapXphp map        # read project map — understand routes to test
+bapXaura map        # read project map — understand routes to test
 ```
 
 This is NOT optional. The map tells you which pages exist and

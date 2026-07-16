@@ -26,23 +26,23 @@ Roles: `user` = input prompt, `cto` = handler response, `question` = tool questi
 
 | Command | Description |
 |---|---|
-| `bapXphp memory init` | Initialize `.tmp/session.json` |
-| `bapXphp memory add <role> <content>` | Append entry |
-| `bapXphp memory list` | Show all entries (summary) |
-| `bapXphp memory search <text>` | Search entries by content |
-| `bapXphp memory last [n]` | Show last n entries |
-| `bapXphp memory export` | Dump full JSON |
-| `bapXphp memory export-jsonl` | Dump as JSONL (one JSON per line) |
-| `bapXphp memory info` | Session stats |
-| `bapXphp memory clear` | Erase session memory |
+| `bapXaura memory init` | Initialize `.tmp/session.json` |
+| `bapXaura memory add <role> <content>` | Append entry |
+| `bapXaura memory list` | Show all entries (summary) |
+| `bapXaura memory search <text>` | Search entries by content |
+| `bapXaura memory last [n]` | Show last n entries |
+| `bapXaura memory export` | Dump full JSON |
+| `bapXaura memory export-jsonl` | Dump as JSONL (one JSON per line) |
+| `bapXaura memory info` | Session stats |
+| `bapXaura memory clear` | Erase session memory |
 
 ## Usage
 
-1. At session start: `bapXphp memory init`
-2. Log each user prompt: `bapXphp memory add user "<exact prompt>"`
-3. Log each CTO response: `bapXphp memory add cto "<response summary>"`
-4. Search later: `bapXphp memory search "<keyword>"`
-5. Fork/export to new session: `bapXphp memory export > context.json`
+1. At session start: `bapXaura memory init`
+2. Log each user prompt: `bapXaura memory add user "<exact prompt>"`
+3. Log each CTO response: `bapXaura memory add cto "<response summary>"`
+4. Search later: `bapXaura memory search "<keyword>"`
+5. Fork/export to new session: `bapXaura memory export > context.json`
 
 ## Important
 

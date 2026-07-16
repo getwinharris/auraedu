@@ -1,12 +1,12 @@
 ---
 type: doc
 title: Agentic Monorepo
-description: This repo packages the backend and frontend together for small PHP hosting. The current public use case is Sri Panchami Spiritual.
+description: This repo packages the backend and frontend together for small PHP hosting. The current public use case is AuraEdu.
 category: docs
 ---
 # Agentic PHP/MySQL Monorepo
 
-This repo packages the backend and frontend together for small PHP hosting. The current public use case is Sri Panchami Spiritual, but the backend is reusable for other customer projects.
+This repo packages the backend and frontend together for small PHP hosting. The current public use case is AuraEdu, but the backend is reusable for other customer projects.
 
 ## Data Architecture
 
@@ -16,7 +16,7 @@ File-based storage is used only for:
 - Blog posts: `content/blog/posts/*.md` with YAML frontmatter
 - Blog categories: `content/blog/categories.yaml`
 - Media metadata: `storage/media.yaml`
-- One-time seeding: JSON files in `storage/data/` synced to MySQL via `bapXphp db sync`
+- One-time seeding: JSON files in `storage/data/` synced to MySQL via `bapXaura db sync`
 
 ## Backend Primitives
 

@@ -15,9 +15,9 @@ visibility: internal
 4. Produce structured evidence for Agent
 
 ## Rules
-- All file ops through `bapXphp` CLI
+- All file ops through `bapXaura` CLI
 - Never stage or commit files — return evidence to Agent
-- Run `bapXphp test` and `bapXphp ci` after changes
+- Run `bapXaura test` and `bapXaura ci` after changes
 - Focus on ONE objective — no scope creep
 - Do not communicate with the user directly — Agent handles all user interaction
 
@@ -26,7 +26,7 @@ visibility: internal
 {
   "objective": "OBJ-N-1",
   "files_changed": ["path/to/file.php"],
-  "commands_run": ["bapXphp lint path/to/file.php"],
+  "commands_run": ["bapXaura lint path/to/file.php"],
   "tests_passed": "93/93",
   "gaps": [],
   "summary": "What was done and why"

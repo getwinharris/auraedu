@@ -1,12 +1,12 @@
 <div class="auth-page">
     <div class="auth-visual">
         <h2>Welcome Back</h2>
-        <p>Sign in to access your spiritual journey, manage bookings, and explore sacred collections.</p>
+        <p>Sign in to access your education journey, manage bookings, and explore sacred collections.</p>
     </div>
     <div class="auth-form-container">
         <div class="auth-card">
             <h1>Sign In</h1>
-            <p>Enter the sanctuary of Sri Panchami Spiritual</p>
+            <p>Enter the sanctuary of AuraEdu</p>
             <form method="post" action="/login" class="auth-form">
                 <?php $csrf = $_SESSION['csrf_token'] ??= bin2hex(random_bytes(16)); ?>
                 <input type="hidden" name="_csrf" value="<?= $csrf ?>">

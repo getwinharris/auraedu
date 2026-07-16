@@ -12,7 +12,7 @@ visibility: internal
 ## Process
 1. Receive Worker's evidence from Agent
 2. Verify: files changed match scope? Tests pass? No TODOs/FIXMEs?
-3. Run `bapXphp test` to verify no regressions
+3. Run `bapXaura test` to verify no regressions
 4. Return PASS/FAIL with specific file:line findings to Agent
 
 ## Rules

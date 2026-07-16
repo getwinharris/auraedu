@@ -14,16 +14,16 @@ flowchart LR
     arch_views["> Views: 49"]:::arch
     arch_data["> Collections: 22 schema | 0 files"]:::arch
     arch_tools["> Tools: 24"]:::arch
-    arch_gaps["> Gaps: 0"]:::arch
+    arch_gaps["> Gaps: 2"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
 
   subgraph ROUTES_PUBLIC["PUBLIC Routes"]
     route_get["GET / — Home page — hero, categories, featured products, astrologers"]:::route
-    route_get_about["GET /about — About SPS — story, values, CTA"]:::route
-    route_get_sri_panchami_spiritual["GET /sri-panchami-spiritual — Sri Panchami Spiritual landing page"]:::route
-    route_get_spiritual["GET /spiritual — Short spiritual landing redirect-equivalent page"]:::route
+    route_get_about["GET /about — About AuraEdu — story, values, CTA"]:::route
+    route_get_sri_panchami_education["GET /sri-panchami-education — AuraEdu landing page"]:::route
+    route_get_education["GET /education — Short education landing redirect-equivalent page"]:::route
     route_get_terms["GET /terms — Terms of Service — 15 sections, legal"]:::route
     route_get_privacy["GET /privacy — Privacy Policy — 14 sections, data handling"]:::route
     route_get_consult["GET /consult — Astrologer marketplace — browse and book"]:::route
@@ -342,11 +342,12 @@ flowchart LR
     tool_tui["tui"]:::tool
     tool_validate_docs_map["validate-docs-map"]:::tool
     tool_validate_project_map["validate-project-map"]:::tool
-    tool_bapxphp["bapXphp"]:::tool
+    tool_bapxaura["bapXaura"]:::tool
   end
 
   subgraph GAPS["Gaps & Missing Links"]
-    no_gaps["No detected gaps"]:::data
+    gap_0bd02c5615["missing_view_files: public/education"]:::gap
+    gap_a852d47145["unwired_views: public/spiritual"]:::gap
   end
 
   route_get --> controller_publiccontroller
@@ -357,10 +358,10 @@ flowchart LR
   controller_publiccontroller -. renders .-> view_public_home
   route_get_about --> controller_publiccontroller
   controller_publiccontroller -. renders .-> view_public_about
-  route_get_sri_panchami_spiritual --> controller_publiccontroller
-  controller_publiccontroller -. renders .-> view_public_spiritual
-  route_get_spiritual --> controller_publiccontroller
-  controller_publiccontroller -. renders .-> view_public_spiritual
+  route_get_sri_panchami_education --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_education
+  route_get_education --> controller_publiccontroller
+  controller_publiccontroller -. renders .-> view_public_education
   route_get_terms --> controller_publiccontroller
   controller_publiccontroller -. renders .-> view_public_terms
   route_get_privacy --> controller_publiccontroller
@@ -919,3 +920,5 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
+  gap_0bd02c5615 -. missing .-> view_public_education
+  gap_a852d47145 -. missing .-> view_public_spiritual

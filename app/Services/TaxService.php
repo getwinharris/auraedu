@@ -79,7 +79,7 @@ final class TaxService {
         return [
             'invoice_sequence' => $sequence,
             'invoice_financial_year' => $financialYear,
-            'invoice_number' => sprintf('SPS/%s/%05d', $financialYear, $sequence),
+            'invoice_number' => sprintf('AuraEdu/%s/%05d', $financialYear, $sequence),
             'invoice_date' => $at->format('c'),
         ];
     }

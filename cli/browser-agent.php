@@ -79,7 +79,7 @@ function req_headers(): array {
     if ($cfg['tracing'] ?? false) {
         $rid = bin2hex(random_bytes(8));
         $headers[] = "X-Request-Id: ba-{$rid}";
-        $headers[] = "X-Browser-Agent: bapXphp/1.0";
+        $headers[] = "X-Browser-Agent: bapXaura/1.0";
     }
     return [$ua, $headers];
 }
@@ -1167,7 +1167,7 @@ try {
         case 'console':
             $url = $args[1] ?? ($session['url'] ?? '');
             if (!$url) { fwrite(STDERR, "Usage: browser-agent console <url>\n"); exit(1); }
-            $ch = curl_init(); curl_setopt_array($ch, [CURLOPT_URL=>$url, CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>true, CURLOPT_TIMEOUT=>10, CURLOPT_HEADER=>true, CURLOPT_USERAGENT=>'bapXphp-browser-agent/1.0']); $resp = curl_exec($ch);
+            $ch = curl_init(); curl_setopt_array($ch, [CURLOPT_URL=>$url, CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>true, CURLOPT_TIMEOUT=>10, CURLOPT_HEADER=>true, CURLOPT_USERAGENT=>'bapXaura-browser-agent/1.0']); $resp = curl_exec($ch);
             echo "HTTP " . curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
             echo "Content-Type: " . curl_getinfo($ch, CURLINFO_CONTENT_TYPE) . "\n";
             if ($r = curl_getinfo($ch, CURLINFO_REDIRECT_URL)) echo "Redirect: {$r}\n";
@@ -1260,7 +1260,7 @@ try {
         case 'close':
 
         case 'help': default:
-            echo "bapXphp browser-agent — PHP browser automation\n\n";
+            echo "bapXaura browser-agent — PHP browser automation\n\n";
             echo "HTTP mode (default, pure PHP):\n";
             echo "  open <url>          fetch page → YAML snapshot (max 500 elems, depth 10)\n";
             echo "  search <query>      web search (DuckDuckGo by default), parse organic results\n";

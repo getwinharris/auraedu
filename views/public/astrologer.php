@@ -29,7 +29,7 @@
                     <span class="eyebrow">Appointment consultation</span>
                     <h2>About</h2>
                     <p>
-                        <?= e($astrologer['description'] ?? 'Connect for practical spiritual guidance, horoscope clarity and family ritual support.') ?>
+                        <?= e($astrologer['description'] ?? 'Connect for practical education guidance, horoscope clarity and family ritual support.') ?>
                     </p>
                     <p>
                         Choose your preferred date and time below. The consultant will review and confirm your appointment request.
@@ -66,7 +66,7 @@
                 </section>
 
                 <section class="consultation-panel__contact reveal">
-                    <h3 style="font-family:var(--font-serif); margin:0 0 var(--space-xs);">Contact Sri Panchami Spiritual</h3>
+                    <h3 style="font-family:var(--font-serif); margin:0 0 var(--space-xs);">Contact AuraEdu</h3>
                     <p style="margin:0 0 var(--space-sm); color:var(--color-text-muted); font-size:0.9rem;">For ritual requests and support-assisted sessions.</p>
                 </section>
             </aside>

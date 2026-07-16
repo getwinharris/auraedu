@@ -2,8 +2,8 @@
   <div class="container">
     <header class="blog-editorial__header">
       <span class="eyebrow serif-accent">Ideas, rituals and guidance</span>
-      <h1 class="page-title"><?= e($categoryName ?? 'Sri Panchami Journal') ?></h1>
-      <p>Practical spiritual guidance, astrology explainers, and thoughtful updates from our consultants and team.</p>
+      <h1 class="page-title"><?= e($categoryName ?? 'AuraEdu Journal') ?></h1>
+      <p>Practical education guidance, astrology explainers, and thoughtful updates from our consultants and team.</p>
     </header>
 
     <?php if (!empty($categories)): ?>
@@ -20,7 +20,7 @@
 
     <?php if (empty($posts)): ?>
       <div class="empty-state">
-        <p>No blog posts yet. Check back soon for updates, features, and spiritual insights.</p>
+        <p>No blog posts yet. Check back soon for updates, features, and education insights.</p>
       </div>
     <?php else: ?>
       <div class="blog-grid">

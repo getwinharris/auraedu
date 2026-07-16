@@ -17,8 +17,8 @@ All collections defined in `collections.php` map to remote MySQL tables for runt
 JSON files in `storage/data/` are optional one-time import fixtures only:
 
 ```bash
-bapXphp db init     # Create tables from collections.php
-bapXphp db sync     # Push JSON seed data into MySQL
+bapXaura db init     # Create tables from collections.php
+bapXaura db sync     # Push JSON seed data into MySQL
 ```
 
 They are never runtime storage. All runtime reads and writes go through `DatabaseService` to remote MySQL. Blog/document content remains Markdown/YAML by design.

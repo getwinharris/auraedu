@@ -201,7 +201,7 @@
                                         amount: order.amount,
                                         currency: order.currency || 'INR',
                                         order_id: order.order_id,
-                                        name: 'Sri Panchami Spiritual',
+                                        name: 'AuraEdu',
                                         description: 'Product order payment',
                                         theme: {color: '#3A0003'},
                                         prefill: {

@@ -74,14 +74,14 @@
         <table>
             <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
             <tbody>
-                <tr><td><code>bapXphp handoff next &lt;issue&gt;</code></td><td>Read JSON with next role + objective</td></tr>
-                <tr><td><code>bapXphp handoff template &lt;issue&gt;</code></td><td>Generate empty Worker handoff</td></tr>
-                <tr><td><code>bapXphp handoff validate &lt;file&gt;</code></td><td>Validate handoff JSON structure</td></tr>
-                <tr><td><code>bapXphp handoff comment &lt;file&gt; &lt;pr&gt;</code></td><td>Upsert PR handoff comment</td></tr>
-                <tr><td><code>bapXphp handoff execute &lt;issue&gt;</code></td><td>Emit handoff context JSON</td></tr>
-                <tr><td><code>bapXphp handoff score &lt;issue&gt;</code></td><td>Score the work cycle</td></tr>
-                <tr><td><code>bapXphp update</code></td><td>Regenerate both project maps</td></tr>
-                <tr><td><code>bapXphp ci</code></td><td>Full non-mutating validation</td></tr>
+                <tr><td><code>bapXaura handoff next &lt;issue&gt;</code></td><td>Read JSON with next role + objective</td></tr>
+                <tr><td><code>bapXaura handoff template &lt;issue&gt;</code></td><td>Generate empty Worker handoff</td></tr>
+                <tr><td><code>bapXaura handoff validate &lt;file&gt;</code></td><td>Validate handoff JSON structure</td></tr>
+                <tr><td><code>bapXaura handoff comment &lt;file&gt; &lt;pr&gt;</code></td><td>Upsert PR handoff comment</td></tr>
+                <tr><td><code>bapXaura handoff execute &lt;issue&gt;</code></td><td>Emit handoff context JSON</td></tr>
+                <tr><td><code>bapXaura handoff score &lt;issue&gt;</code></td><td>Score the work cycle</td></tr>
+                <tr><td><code>bapXaura update</code></td><td>Regenerate both project maps</td></tr>
+                <tr><td><code>bapXaura ci</code></td><td>Full non-mutating validation</td></tr>
             </tbody>
         </table>
     </div>
@@ -92,7 +92,7 @@
     <pre style="background:var(--color-canvas); padding:var(--space-md); border-radius:var(--radius-sm); overflow-x:auto; font-size:0.8rem; line-height:1.6;">
 flowchart LR
     ISSUE["GitHub Issue"] --> CTO["CTO"]
-    CTO --> HANDOFF["bapXphp handoff next"]
+    CTO --> HANDOFF["bapXaura handoff next"]
     HANDOFF --> WORKER["Worker"]
     WORKER --> EVIDENCE["Handoff Evidence"]
     EVIDENCE --> REVIEWER["Reviewer"]

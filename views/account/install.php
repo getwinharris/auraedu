@@ -4,7 +4,7 @@
         <div class="account-content account-install">
             <header class="account-install__header">
                 <span class="eyebrow">Your account</span>
-                <h1>Install Sri Panchami Spiritual</h1>
+                <h1>Install AuraEdu</h1>
                 <p>Keep the shop, orders, and consultation bookings available from your home screen or desktop app menu.</p>
             </header>
 
@@ -57,7 +57,7 @@
         action.hidden=true;
         if(state==='installed'){
             title.textContent='App installed';
-            copy.textContent='Sri Panchami Spiritual is already running as an installed app on this device.';
+            copy.textContent='AuraEdu is already running as an installed app on this device.';
         }else if(state==='available'){
             title.textContent='Ready to install';
             copy.textContent='This browser can install the app directly. Tap the button below.';

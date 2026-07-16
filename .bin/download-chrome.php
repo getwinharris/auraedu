@@ -58,7 +58,7 @@ curl_setopt_array($ch, [
     CURLOPT_FILE => $fp,
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_TIMEOUT => 300,
-    CURLOPT_USERAGENT => 'bapXphp-chrome-downloader/1.0',
+    CURLOPT_USERAGENT => 'bapXaura-chrome-downloader/1.0',
 ]);
 $result = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

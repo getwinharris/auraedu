@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title><?= e($pageTitle ?? 'Admin') ?> — Sri Panchami Spiritual</title>
+<title><?= e($pageTitle ?? 'Admin') ?> — AuraEdu</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#3a0003">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SPS Admin">
+<meta name="apple-mobile-web-app-title" content="AuraEdu Admin">
 <link rel="apple-touch-icon" href="/assets/images/logo-square.jpeg">
 <link rel="stylesheet" href="/assets/css/band.css">
 <style>
@@ -56,7 +56,7 @@
 <div class="admin-shell">
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="admin-sidebar__brand">
-            <span>Sri Panchami Spiritual</span>
+            <span>AuraEdu</span>
             <small>Admin Panel</small>
         </div>
         <nav class="admin-sidebar__nav" id="admin-nav">

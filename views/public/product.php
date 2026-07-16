@@ -65,7 +65,7 @@
                         <span class="badge badge--success">Save <?= $pct ?>%</span>
                     <?php endif; ?>
                 </div>
-                <p class="product-info__desc"><?= e($product['description'] ?? 'A sacred spiritual product crafted with devotion and care.') ?></p>
+                <p class="product-info__desc"><?= e($product['description'] ?? 'A sacred education product crafted with devotion and care.') ?></p>
                 <?php if(!empty($product['highlights']) && is_array($product['highlights'])): ?>
                     <div class="product-copy-block">
                         <h2>Key Features</h2>

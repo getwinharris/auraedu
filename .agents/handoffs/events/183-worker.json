@@ -19,8 +19,8 @@
   },
   "repository": {
     "owner": "getwinharris",
-    "name": "bapXphpAiBackend",
-    "upstream": "bapxmediahub/bapXphpAiBackend"
+    "name": "bapXauraAiBackend",
+    "upstream": "bapxmediahub/bapXauraAiBackend"
   },
   "objectives": [
     {

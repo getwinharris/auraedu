@@ -1,5 +1,5 @@
 <?php
-    $schemaBase = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'sripanchamispiritual.com');
+    $schemaBase = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'auraedu.co.in');
     $schemaUrl = $schemaBase . '/blog/' . ($slug ?? '');
     $schemaImage = $meta['og_image'] ?? $meta['image'] ?? ($seo['og_image'] ?? '');
     $schema = [
@@ -22,11 +22,11 @@
                 'dateModified' => $meta['updated_at'] ?? $meta['published_at'] ?? '',
                 'author' => [
                     '@type' => 'Person',
-                    'name' => $meta['author'] ?? 'Sri Panchami Spiritual',
+                    'name' => $meta['author'] ?? 'AuraEdu',
                 ],
                 'publisher' => [
                     '@type' => 'Organization',
-                    'name' => 'Sri Panchami Spiritual',
+                    'name' => 'AuraEdu',
                 ],
                 'mainEntityOfPage' => $schemaUrl,
             ],

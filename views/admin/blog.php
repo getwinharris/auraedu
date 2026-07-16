@@ -32,7 +32,7 @@
         <label>Summary <textarea name="summary" id="edit-summary" rows="2" style="width:100%"></textarea></label>
         <label>Display order <input type="number" name="order" id="edit-order" min="0" step="1" style="width:100%"></label>
         <label class="admin-blog-editor__wide">Excerpt <textarea name="excerpt" id="edit-excerpt" rows="2" style="width:100%"></textarea></label>
-        <label class="admin-blog-editor__wide">SEO Keywords <input type="text" name="keywords" id="edit-keywords" placeholder="astrology, spirituality, vedic astrology" style="width:100%"><small>Comma-separated keywords for search engine indexing.</small></label>
+        <label class="admin-blog-editor__wide">SEO Keywords <input type="text" name="keywords" id="edit-keywords" placeholder="astrology, educationity, vedic astrology" style="width:100%"><small>Comma-separated keywords for search engine indexing.</small></label>
         <label>Published At <input type="date" name="published_at" id="edit-date" style="width:100%"></label>
         <label>Author <input type="text" name="author" id="edit-author" value="Admin" style="width:100%"></label>
         <label class="admin-blog-editor__wide">Content (Markdown) <textarea name="content" id="edit-content" rows="16" style="width:100%;font-family:monospace"></textarea></label>

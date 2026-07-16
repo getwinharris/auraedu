@@ -29,7 +29,7 @@
       "evidence": [
         "cli/handoff.php validates issue, role, unique objective IDs, statuses, evidence arrays, commands, risks, and next role",
         ".agents/handoffs/170-worker.json maps issue #170 objectives to evidence and unresolved items",
-        "Issue comment https://github.com/getwinharris/bapXphpAiBackend/issues/170#issuecomment-4979650209 records the stable twelve-ID objective registry"
+        "Issue comment https://github.com/getwinharris/bapXauraAiBackend/issues/170#issuecomment-4979650209 records the stable twelve-ID objective registry"
       ],
       "browser_evidence": [],
       "unresolved": []
@@ -39,7 +39,7 @@
       "status": "pass",
       "evidence": [
         ".github/workflows/ci.yml detects and validates every changed .agents/handoffs/*.json file",
-        "CI invokes bapXphp handoff validate --issue, which compares the exact handoff ID set with the marked GitHub issue registry",
+        "CI invokes bapXaura handoff validate --issue, which compares the exact handoff ID set with the marked GitHub issue registry",
         "tests/run.php proves both missing issue objectives and out-of-scope handoff objectives fail"
       ],
       "browser_evidence": [],
@@ -49,7 +49,7 @@
       "id": "170-single-cto-comment",
       "status": "pass",
       "evidence": [
-        "bapXphp handoff comment renders one <!-- CTO-HANDOFF --> marker and PATCHes the matching PR comment when it exists",
+        "bapXaura handoff comment renders one <!-- CTO-HANDOFF --> marker and PATCHes the matching PR comment when it exists",
         ".github/workflows/ci.yml uses github.token and does not require OpenAI credentials"
       ],
       "browser_evidence": [],
@@ -90,7 +90,7 @@
       "id": "170-merge-control",
       "status": "pass",
       "evidence": [
-        "Existing bapXphp pr and bapXphp merge commands remain unchanged and authoritative",
+        "Existing bapXaura pr and bapXaura merge commands remain unchanged and authoritative",
         "The Worker did not commit, create a PR, merge, deploy, or change issue state"
       ],
       "browser_evidence": [],
@@ -127,25 +127,25 @@
   ],
   "files_changed": [
     "cli/handoff.php",
-    "cli/bapXphp",
+    "cli/bapXaura",
     ".github/workflows/ci.yml",
     "tests/run.php",
     ".agents/handoffs/170-worker.json"
   ],
   "commands_run": [
-    "bapXphp map",
-    "bapXphp schema list",
+    "bapXaura map",
+    "bapXaura schema list",
     "gh issue comment 170 --body-file - (created stable objective registry comment)",
     "php -l cli/handoff.php",
-    "bash -n cli/bapXphp",
+    "bash -n cli/bapXaura",
     "php tests/run.php",
-    "bapXphp handoff validate .agents/handoffs/170-worker.json --issue",
-    "bapXphp ci (lint, tests, docs-map validation, and smoke passed; project-map freshness failed)"
+    "bapXaura handoff validate .agents/handoffs/170-worker.json --issue",
+    "bapXaura ci (lint, tests, docs-map validation, and smoke passed; project-map freshness failed)"
   ],
   "risks": [
     "The PR comment create/update path is statically tested but was not exercised against GitHub because GitHub state changes were forbidden",
     "The dirty worktree contains unrelated product, GST, UI, schema, map, documentation, and workflow changes that this Worker preserved",
-    "Full bapXphp ci reports the existing docs/systematic-map.mmd as stale; map regeneration is outside this Worker's exclusive ownership",
+    "Full bapXaura ci reports the existing docs/systematic-map.mmd as stale; map regeneration is outside this Worker's exclusive ownership",
     "A CTO and independent Reviewer must assess all gap objectives before merge"
   ],
   "next_role": "reviewer"

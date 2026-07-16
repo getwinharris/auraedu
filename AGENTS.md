@@ -11,7 +11,7 @@ alwaysApply: true
 Strict sequential handoff chain. Never dispatch sub-agents in parallel.
 
 ```
-Issue → handoff JSON (GitHub Action) → CTO (bapXphp handoff next)
+Issue → handoff JSON (GitHub Action) → CTO (bapXaura handoff next)
   → Worker (single objective) → evidence
   → Reviewer (verify evidence) → findings
   → CTO (close loop, route next objective or close issue)
@@ -48,7 +48,7 @@ Issue → handoff JSON (GitHub Action) → CTO (bapXphp handoff next)
   - `storage/`: Declare every persisted field in `collections.php`. MySQL is runtime truth; JSON is import-only.
   - `content/`: Blog/help = Markdown with YAML frontmatter in `content/blog/posts/`. Help = `help` category. Shared 16:9 image.
   - `docs/`: Durable behavior documentation + generated `systematic-map.mmd` and `map.mmd`.
-  - `cli/`: Extend `bapXphp` for repeatable operations. Commands must be non-interactive, credential-safe, shared-hosting compatible.
+  - `cli/`: Extend `bapXaura` for repeatable operations. Commands must be non-interactive, credential-safe, shared-hosting compatible.
   - `integrations/`: Keep clients small. Use `SecretService` for secrets. Never hardcode credentials.
   - `tests/`: Assert contracts without production credentials or network dependence.
 
@@ -58,8 +58,8 @@ For meaningful code/schema/UI/doc/workflow changes, reproduce or inspect behavio
 
 ## Work Order
 
-1. Run `bapXphp map` AND `bapXphp schema list` **before any action**.
-2. Run `bapXphp handoff next <issue>` — reads handoff JSON, tells next role + objective.
+1. Run `bapXaura map` AND `bapXaura schema list` **before any action**.
+2. Run `bapXaura handoff next <issue>` — reads handoff JSON, tells next role + objective.
 3. Read this `AGENTS.md`.
 4. Read `docs/systematic-map.mmd` for the route/controller/service wiring.
 5. Search for existing issue, then create evidence-backed issue per Diagnose rule.
@@ -117,7 +117,7 @@ All agents use `.agents/temp/` as the standard inbox for user-provided attachmen
 
 ## CRITICAL RULE: ZERO-CODE INITIATION
 
-Forbidden from writing code or creating files upon receiving a new prompt. Must execute `bapXphp map` AND `bapXphp schema list` before proposing any code change.
+Forbidden from writing code or creating files upon receiving a new prompt. Must execute `bapXaura map` AND `bapXaura schema list` before proposing any code change.
 
 ## Automated Issue & Deployment Workflow
 
@@ -125,7 +125,7 @@ Forbidden from writing code or creating files upon receiving a new prompt. Must 
 
 1. **Investigate & Diagnose:** Trace code footprints. Identify exact file, page context, line numbers.
 2. **File the Issue:** Create the evidence-backed issue in GitHub. GitHub Actions creates and commits the handoff event; Hostinger does not need GitHub CLI.
-3. **Isolate and Execute:** Use plain `git` for branches, commits, fetch, pull, and push. Use `bapXphp` only for project-owned operations. Update durable docs and run `bapXphp update` + `bapXphp ci`.
+3. **Isolate and Execute:** Use plain `git` for branches, commits, fetch, pull, and push. Use `bapXaura` only for project-owned operations. Update durable docs and run `bapXaura update` + `bapXaura ci`.
 4. **PR and Merge:** Push the feature/fix branch with `git push`. GitHub Actions and the GitHub web workflow own PR creation, handoff comments, review, and merge coordination.
 5. **Channel Communication:** All technical updates belong in GitHub issue comments, not terminal output.
 
@@ -134,7 +134,7 @@ Forbidden from writing code or creating files upon receiving a new prompt. Must 
 ## Git and Hosting Boundary
 
 - Hostinger requires `git`, PHP, and the checked-out project. It must not require `gh`.
-- Do not wrap normal Git commands with `bapXphp`.
+- Do not wrap normal Git commands with `bapXaura`.
 - GitHub issue conversations and handoff triggers run in `.github/workflows/`.
-- Repository enforcement hooks live only in `.agents/hooks/`; install them with `bapXphp hooks install`.
+- Repository enforcement hooks live only in `.agents/hooks/`; install them with `bapXaura hooks install`.
 - `.agents/workflows/` and `.agents/handoffs/` are canonical for every coding agent. Do not add `.claude/` or other duplicated role folders.

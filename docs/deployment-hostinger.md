@@ -39,21 +39,21 @@ belong to GitHub Actions and the GitHub web interface.
 One-time Git auto-deploy from `main` is configured — commits to GitHub main deploy automatically. Merge only after local validation passes:
 
 ```bash
-bapXphp update
-bapXphp ci
+bapXaura update
+bapXaura ci
 ```
 
 ## Repository Architecture
 
-This is a **white-label** product. The upstream source of truth is `getwinharris/bapXphpAiBackend`, forked to `bapxmediahub/bapXphpAiBackend` for customer deployment. Each customer gets their own fork with their branding, domain, and configuration. The product is not customer-specific — it's a reusable automation platform rebranded per client.
+This is a **white-label** product. The upstream source of truth is `getwinharris/bapXauraAiBackend`, forked to `bapxmediahub/bapXauraAiBackend` for customer deployment. Each customer gets their own fork with their branding, domain, and configuration. The product is not customer-specific — it's a reusable automation platform rebranded per client.
 
 ### Fork Synchronization
 
-`.github/workflows/sync-upstream.yml` on the deployment fork (`bapxmediahub/bapXphpAiBackend`) runs **hourly** via cron (`0 * * * *`) plus supports `workflow_dispatch` and `repository_dispatch` as fallbacks. It calls GitHub's `merge-upstream` API using `github.token` (no `FORK_SYNC_TOKEN` secret needed). The workflow is guarded by `if: github.repository == 'bapxmediahub/bapXphpAiBackend'` so it only runs on the deployment fork.
+`.github/workflows/sync-upstream.yml` on the deployment fork (`bapxmediahub/bapXauraAiBackend`) runs **hourly** via cron (`0 * * * *`) plus supports `workflow_dispatch` and `repository_dispatch` as fallbacks. It calls GitHub's `merge-upstream` API using `github.token` (no `FORK_SYNC_TOKEN` secret needed). The workflow is guarded by `if: github.repository == 'bapxmediahub/bapXauraAiBackend'` so it only runs on the deployment fork.
 
 ## Production Logs
 
-Production operational history belongs in remote MySQL `audit_events`, visible in Admin -> Audit Log and through `bapXphp logs`. Local `server.log`, `storage/logs/`, and `output/playwright/` are ignored development/runtime artifacts and must never be committed. Use `bapXphp logs --local` only when diagnosing the local PHP server. Do not auto-commit hosted request or error logs: they may contain customer data and each log commit would retrigger deployment.
+Production operational history belongs in remote MySQL `audit_events`, visible in Admin -> Audit Log and through `bapXaura logs`. Local `server.log`, `storage/logs/`, and `output/playwright/` are ignored development/runtime artifacts and must never be committed. Use `bapXaura logs --local` only when diagnosing the local PHP server. Do not auto-commit hosted request or error logs: they may contain customer data and each log commit would retrigger deployment.
 
 ## Vercel
 
@@ -95,8 +95,8 @@ This application is built for normal PHP hosting, not Vercel. Vercel's official 
 ## Troubleshooting
 
 - 500 error: check PHP version, `.htaccess`, and PHP error logs.
-- Data not saving: run `bapXphp db status`, then verify the `BAPX_MYSQL_*` values and hosted database permissions.
+- Data not saving: run `bapXaura db status`, then verify the `BAPX_MYSQL_*` values and hosted database permissions.
 - Admin blocked: verify the admin account in remote MySQL and the current Admin -> Settings configuration.
 - Razorpay disabled: add live key ID and secret in admin integrations.
-- Google login not working: verify the Google Cloud Console has the correct callback URL (`https://sripanchamispiritual.com/auth/google/callback`).
+- Google login not working: verify the Google Cloud Console has the correct callback URL (`https://auraedu.co.in/auth/google/callback`).
 - Emails not sending: configure SMTP secrets and run `cli/process-mail-queue.php` from cron.

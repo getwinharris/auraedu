@@ -2,29 +2,29 @@
     <div class="container">
         <div class="section-header">
             <span class="eyebrow serif-accent">Our Story</span>
-            <h1 class="section-title" style="margin-bottom:var(--space-sm);">About Sri Panchami Spiritual</h1>
-            <p class="lede">A sacred space dedicated to spiritual growth, inner peace, and divine connection. Serving devotees across Chennai and India with authentic spiritual products and expert Vedic astrology guidance.</p>
+            <h1 class="section-title" style="margin-bottom:var(--space-sm);">About AuraEdu</h1>
+            <p class="lede">A sacred space dedicated to education growth, inner peace, and divine connection. Serving devotees across Coimbatore and India with authentic education products and expert Vedic astrology guidance.</p>
         </div>
         <div class="about-story-grid">
             <div class="about-story-card reveal">
                 <h3>Our Mission</h3>
-                <p>To guide individuals on a meaningful spiritual journey through traditional Vedic wisdom, authentic devotional practices, genuine spiritual products, and expert astrological guidance.</p>
+                <p>To guide individuals on a meaningful education journey through traditional Vedic wisdom, authentic devotional practices, genuine education products, and expert astrological guidance.</p>
             </div>
             <div class="about-story-card reveal">
                 <h3>Our Vision</h3>
-                <p>Making sacred products and trusted spiritual guidance accessible to devotees across India, from devotional jewellery and pooja samagri to expert kundli matching and horoscope readings.</p>
+                <p>Making sacred products and trusted education guidance accessible to devotees across India, from devotional jewellery and pooja samagri to expert kundli matching and horoscope readings.</p>
             </div>
         </div>
         <div class="about-feature-grid">
             <article class="about-feature-card reveal">
                 <span class="about-feature-card__icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span>
-                <h3>Spiritual Guidance</h3>
+                <h3>education Guidance</h3>
                 <p>Expert Vedic astrology consultation for your life journey.</p>
             </article>
             <article class="about-feature-card reveal">
                 <span class="about-feature-card__icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><circle cx="12" cy="12" r="3"/><path d="M12 5v2"/><path d="M12 17v2"/><path d="M5 12h2"/><path d="M17 12h2"/></svg></span>
                 <h3>Sacred Products</h3>
-                <p>Authentic rudraksha, devotional items, and spiritual jewellery.</p>
+                <p>Authentic rudraksha, devotional items, and education jewellery.</p>
             </article>
             <article class="about-feature-card reveal">
                 <span class="about-feature-card__icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 7a5 5 0 00-3 9v4h6v-4a5 5 0 00-3-9z"/><path d="M10 18h4"/></svg></span>
@@ -33,9 +33,9 @@
             </article>
         </div>
         <div class="section-header" style="margin-top:var(--space-3xl);">
-            <span class="eyebrow serif-accent">Why Sri Panchami Spiritual</span>
+            <span class="eyebrow serif-accent">Why AuraEdu</span>
             <h2 class="section-title">Faith · Trust · Tradition</h2>
-            <p class="lede">Rooted in devotion, committed to authenticity — every product and service reflects our reverence for India's spiritual heritage.</p>
+            <p class="lede">Rooted in devotion, committed to authenticity — every product and service reflects our reverence for India's education heritage.</p>
         </div>
         <div class="value-strip">
             <article class="value-card reveal">
@@ -43,14 +43,14 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
                 <h3>Authenticity</h3>
-                <p>Every item sourced with devotion — authentic rudraksha, pure pooja essentials, and sacred jewellery verified for spiritual genuineness.</p>
+                <p>Every item sourced with devotion — authentic rudraksha, pure pooja essentials, and sacred jewellery verified for education genuineness.</p>
             </article>
             <article class="value-card reveal">
                 <div class="value-card__icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
-                <h3>Spiritual Growth</h3>
-                <p>Our products are more than offerings — they are symbols of faith that help keep alive the divine traditions connecting every devotee with spirituality.</p>
+                <h3>education Growth</h3>
+                <p>Our products are more than offerings — they are symbols of faith that help keep alive the divine traditions connecting every devotee with educationity.</p>
             </article>
             <article class="value-card reveal">
                 <div class="value-card__icon">
@@ -64,7 +64,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 </div>
                 <h3>Community</h3>
-                <p>Fostering belonging and connection through shared spiritual experiences — bringing temples, traditions, and devotees closer together.</p>
+                <p>Fostering belonging and connection through shared education experiences — bringing temples, traditions, and devotees closer together.</p>
             </article>
         </div>
         <div class="page-cta-card reveal" style="margin-top:var(--space-2xl);">
@@ -82,13 +82,13 @@
 {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About Sri Panchami Spiritual",
-    "description": "Learn about Sri Panchami Spiritual — Chennai's trusted store for authentic rudraksha, pooja items, spiritual jewellery, and expert Vedic astrology consultation.",
-    "url": "https://sripanchamispiritual.com/about",
+    "name": "About AuraEdu",
+    "description": "Learn about AuraEdu — Coimbatore's trusted store for authentic rudraksha, pooja items, education jewellery, and expert Vedic astrology consultation.",
+    "url": "https://auraedu.co.in/about",
     "mainEntity": {
         "@type": "LocalBusiness",
-        "name": "Sri Panchami Spiritual",
-        "email": "sripanchamispiritual@gmail.com"
+        "name": "AuraEdu",
+        "email": "support@auraedu.co.in"
     }
 }
 </script>

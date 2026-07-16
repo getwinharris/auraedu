@@ -14,7 +14,7 @@ This report covers:
 - What has been discussed and built across recent engineering sessions
 - What has been discussed but NOT built
 - What has been implemented but NOT documented
-- Gaps between opencode/Playwright tools and our `bapXphp` CLI
+- Gaps between opencode/Playwright tools and our `bapXaura` CLI
 - Next objectives for the engineering team
 
 ---
@@ -27,7 +27,7 @@ This report covers:
 | Fork sync switch: event→schedule | ✅ Done | `.github/workflows/sync-upstream.yml` |
 | `notify-fork.yml` removal | ✅ Done | Deleted |
 | Fork sync test update | ✅ Done | `tests/run.php` |
-| CI pipeline (lint → test → map val → docs val → codemap:val → smoke) | ✅ Done | `cli/bapXphp` `cmd_ci()` |
+| CI pipeline (lint → test → map val → docs val → codemap:val → smoke) | ✅ Done | `cli/bapXaura` `cmd_ci()` |
 
 ### 2.2 AGENTS.md & Documentation Consolidation
 | Feature | Status | Files |
@@ -52,12 +52,12 @@ This report covers:
 ### 2.4 Handoff System (CLI)
 | Feature | Status | Files |
 |---------|--------|-------|
-| `bapXphp handoff validate` | ✅ Done | `cli/bapXphp`, `cli/handoff.php` |
-| `bapXphp handoff comment` | ✅ Done | `cli/bapXphp` |
-| `bapXphp handoff next` | ✅ Done | `cli/bapXphp`, `cli/handoff.php` |
-| `bapXphp handoff template` | ✅ Done | `cli/bapXphp`, `cli/handoff.php` |
-| `bapXphp handoff execute` | ✅ Done | `cli/bapXphp` |
-| `bapXphp handoff score` | ✅ Done | `cli/bapXphp` |
+| `bapXaura handoff validate` | ✅ Done | `cli/bapXaura`, `cli/handoff.php` |
+| `bapXaura handoff comment` | ✅ Done | `cli/bapXaura` |
+| `bapXaura handoff next` | ✅ Done | `cli/bapXaura`, `cli/handoff.php` |
+| `bapXaura handoff template` | ✅ Done | `cli/bapXaura`, `cli/handoff.php` |
+| `bapXaura handoff execute` | ✅ Done | `cli/bapXaura` |
+| `bapXaura handoff score` | ✅ Done | `cli/bapXaura` |
 | Handoff JSON schema | ✅ Done | `.agents/workflows/handoff.schema.json` |
 | Workflow files (cto, worker, reviewer, browser-tester) | ✅ Done | `.agents/workflows/*.md` |
 | Telemetry tracking | ✅ Done | `.agents/ops/telemetry.json` |
@@ -67,10 +67,10 @@ This report covers:
 | Feature | Status | Files |
 |---------|--------|-------|
 | Two `map.mmd` files: `docs/map.mmd` (content) + `map.mmd` (code) | ✅ Done | `docs/map.mmd`, `map.mmd` |
-| `bapXphp map` regenerates deterministically (not stale cat) | ✅ Done | `cli/bapXphp` |
-| `bapXphp codemap` command | ✅ Done | `cli/bapXphp` |
-| `bapXphp map:val` validates both maps via diff | ✅ Done | `cli/bapXphp` |
-| CI validates root map.mmd freshness | ✅ Done | `cli/bapXphp` `cmd_ci()` |
+| `bapXaura map` regenerates deterministically (not stale cat) | ✅ Done | `cli/bapXaura` |
+| `bapXaura codemap` command | ✅ Done | `cli/bapXaura` |
+| `bapXaura map:val` validates both maps via diff | ✅ Done | `cli/bapXaura` |
+| CI validates root map.mmd freshness | ✅ Done | `cli/bapXaura` `cmd_ci()` |
 | Gap nodes in generated maps (`unwired_services`, `unwired_schema_collections`) | ✅ Done | `ProjectMapService::renderSystematicMermaid()` |
 | `docs/KnowledgeMap.mmd` deleted | ✅ Done | Deleted |
 | `docs/knowledge-graph.mmd` deleted | ✅ Done | Deleted |
@@ -127,7 +127,7 @@ This report covers:
 ## 3. What Was Discussed But NOT Built
 
 ### 3.1 MCP Endpoint (`/api/mcp`)
-- **Discussed but never built.** User explicitly requested MCP endpoint at `https://sripanchamispiritual.com/api/mcp`
+- **Discussed but never built.** User explicitly requested MCP endpoint at `https://auraedu.co.in/api/mcp`
 - Requires: JSON-RPC 2.0 protocol controller, tool definitions, resource access, prompt templates
 - McpController.php was created in session but **deleted** as premature
 - MCP routes were registered then **removed** from project map
@@ -146,7 +146,7 @@ This report covers:
 - **Discussed but never built.** User wants browser-tester enhanced for CLI-based browser control
 - No Playwright server-side dependency
 - Browser-tester workflow exists at `.agents/workflows/browser-tester.md` but no CLI implementation
-- No `bapXphp browser` command exists
+- No `bapXaura browser` command exists
 
 ### 3.5 Roo Code / External Agent MCP Support
 - **Discussed but never built.** User wants external agents (Roo Code, OpenCode, etc.) to connect via MCP
@@ -206,18 +206,18 @@ All 42 services lack dedicated `docs/services/*.md` files.
 
 ---
 
-## 5. CLI Tool Gaps (OpenCode vs bapXphp)
+## 5. CLI Tool Gaps (OpenCode vs bapXaura)
 
-### 5.1 OpenCode Has — bapXphp CLI Missing
+### 5.1 OpenCode Has — bapXaura CLI Missing
 
-| OpenCode Tool | bapXphp Equivalent | Status |
+| OpenCode Tool | bapXaura Equivalent | Status |
 |--------------|-------------------|--------|
-| `read` file | `bapXphp read file <path>` | ✅ Exists |
-| `write` file | `bapXphp write file <path>` | ✅ Exists |
-| `edit` file | `bapXphp edit <path> <search> <replace>` | ✅ Exists |
-| `grep` | `bapXphp grep <pattern> [path]` | ✅ Exists |
-| `glob` | `bapXphp find <glob>` | ✅ Partial |
-| `bash` | `bapXphp run <command>` | ✅ Exists |
+| `read` file | `bapXaura read file <path>` | ✅ Exists |
+| `write` file | `bapXaura write file <path>` | ✅ Exists |
+| `edit` file | `bapXaura edit <path> <search> <replace>` | ✅ Exists |
+| `grep` | `bapXaura grep <pattern> [path]` | ✅ Exists |
+| `glob` | `bapXaura find <glob>` | ✅ Partial |
+| `bash` | `bapXaura run <command>` | ✅ Exists |
 | `websearch` | ❌ **Not implemented** | 🚫 Missing |
 | `webfetch` | ❌ **Not implemented** | 🚫 Missing |
 | `task` (sub-agent dispatch) | ❌ **Not implemented** | 🚫 Missing |
@@ -225,7 +225,7 @@ All 42 services lack dedicated `docs/services/*.md` files.
 | `todowrite` (task tracking) | ❌ **Not implemented** | 🚫 Missing |
 | `question` (ask user) | ❌ **Not implemented** | 🚫 Missing |
 
-### 5.2 Playwright MCP Tools — bapXphp CLI Missing
+### 5.2 Playwright MCP Tools — bapXaura CLI Missing
 
 All 17+ Playwright tools (navigate, click, snapshot, screenshot, fill, evaluate, network, type, press_key, wait_for, console, hover, select_option, file_upload, resize, drag/drop, tabs) — ❌ **None implemented**.
 
@@ -283,7 +283,7 @@ All 18+ DevTools tools (click, fill, snapshot, screenshot, evaluate, network, co
 6. Convert undocumented controllers/services into OKF doc concepts (`type: controller`, `type: service`)
 7. Add `type: route` frontmatter to route documentation
 8. Index all `.php` code files as OKF concepts (functions, classes, methods)
-9. Build `bapXphp index` command for deterministic codebase re-indexing
+9. Build `bapXaura index` command for deterministic codebase re-indexing
 
 ### Phase D: MCP Endpoint
 10. Build MCP controller at `POST /api/mcp` (JSON-RPC 2.0)
@@ -291,10 +291,10 @@ All 18+ DevTools tools (click, fill, snapshot, screenshot, evaluate, network, co
 12. Wire `.okf/` bundle as MCP resource root
 
 ### Phase E: CLI Gaps
-13. Add `bapXphp websearch <query>` CLI command
-14. Add `bapXphp webfetch <url>` CLI command
-15. Add `bapXphp browser` subcommand (navigate, click, snapshot, screenshot)
-16. Add `bapXphp task` subcommand for sub-agent dispatch
+13. Add `bapXaura websearch <query>` CLI command
+14. Add `bapXaura webfetch <url>` CLI command
+15. Add `bapXaura browser` subcommand (navigate, click, snapshot, screenshot)
+16. Add `bapXaura task` subcommand for sub-agent dispatch
 
 ### Phase F: Structural Code Graph
 17. Evaluate tree-sitter PHP grammar for AST-level function/service call resolution
@@ -303,9 +303,9 @@ All 18+ DevTools tools (click, fill, snapshot, screenshot, evaluate, network, co
 20. Add `trace_path` — call chain between two symbols
 
 ### Phase G: Browser Tester
-21. Implement `bapXphp browser navigate <url>` — Playwright-style CLI browser control
-22. Implement `bapXphp browser click <selector>`
-23. Implement `bapXphp browser snapshot [file]`
+21. Implement `bapXaura browser navigate <url>` — Playwright-style CLI browser control
+22. Implement `bapXaura browser click <selector>`
+23. Implement `bapXaura browser snapshot [file]`
 
 ---
 

@@ -80,7 +80,7 @@ final class BrowserSession {
         if ($cfg["tracing"] ?? false) {
             $rid = bin2hex(random_bytes(8));
             $hdrs[] = "X-Request-Id: ba-{$rid}";
-            $hdrs[] = "X-Browser-Agent: bapXphp/1.0";
+            $hdrs[] = "X-Browser-Agent: bapXaura/1.0";
         }
         return [$ua, $hdrs];
     }
@@ -184,7 +184,7 @@ final class BrowserSession {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HEADER => true,
-            CURLOPT_USERAGENT => "bapXphp-browser-agent/1.0",
+            CURLOPT_USERAGENT => "bapXaura-browser-agent/1.0",
         ]);
         $resp = curl_exec($ch);
         $info = curl_getinfo($ch);

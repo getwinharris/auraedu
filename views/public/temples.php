@@ -2,8 +2,8 @@
     <div class="container" style="margin-bottom:var(--space-2xl);">
         <div style="text-align:center;">
             <span class="eyebrow serif-accent">Sacred Spaces · Divine Energy</span>
-            <h1 class="section-title" style="margin-bottom:var(--space-sm);">Our Temples in Chennai</h1>
-            <p class="lede">Visit our sacred spaces for divine blessings, traditional pooja ceremonies, and spiritual awakening in Chennai, Tamil Nadu.</p>
+            <h1 class="section-title" style="margin-bottom:var(--space-sm);">Our Temples in Coimbatore</h1>
+            <p class="lede">Visit our sacred spaces for divine blessings, traditional pooja ceremonies, and education awakening in Coimbatore, Tamil Nadu.</p>
         </div>
     </div>
     <?php if(empty($items)): ?>

@@ -126,8 +126,8 @@
             Configure default SEO metadata used across all pages. These can be overridden per page automatically by the SEO service.
         </p>
         <div class="admin-form__row">
-            <label>Site Name<input name="seo_site_name" value="<?= e($secrets['seo_site_name']??'') ?>" placeholder="Sri Panchami Spiritual"></label>
-            <label>Twitter Handle<input name="seo_twitter_handle" value="<?= e($secrets['seo_twitter_handle']??'') ?>" placeholder="@sps"></label>
+            <label>Site Name<input name="seo_site_name" value="<?= e($secrets['seo_site_name']??'') ?>" placeholder="AuraEdu"></label>
+            <label>Twitter Handle<input name="seo_twitter_handle" value="<?= e($secrets['seo_twitter_handle']??'') ?>" placeholder="@auraedu"></label>
         </div>
         <div class="admin-form__row">
             <label>Default OG Image URL<input name="seo_default_og_image" value="<?= e($secrets['seo_default_og_image']??'') ?>" placeholder="https://example.com/og-image.jpg"></label>
@@ -156,7 +156,7 @@
             <label>From Email<input name="mail_from_email" value="<?= e($secrets['mail_from_email']??'') ?>" placeholder="support@your-domain.com"></label>
         </div>
         <div class="admin-form__row">
-            <label>From Name<input name="mail_from_name" value="<?= e($secrets['mail_from_name']??'Sri Panchami Spiritual') ?>" placeholder="Sri Panchami Spiritual"></label>
+            <label>From Name<input name="mail_from_name" value="<?= e($secrets['mail_from_name']??'AuraEdu') ?>" placeholder="AuraEdu"></label>
             <label>Admin Notification Email<input name="admin_notification_email" value="<?= e($secrets['admin_notification_email']??'') ?>" placeholder="admin@your-domain.com"></label>
         </div>
         <p style="margin:var(--space-xs) 0 0; color:var(--color-text-muted); font-size:0.8rem;">Use the mailbox created in your hosting control panel (for example Hostinger: <code>smtp.hostinger.com</code>, ports 465 SSL or 587 TLS, authentication required). The cron job <code>cli/process-mail-queue.php</code> reads these settings from the secret store.</p>

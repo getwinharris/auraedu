@@ -100,15 +100,15 @@ Goal: score ≥ 90 per cycle. If score < 70, the workflow needs optimization.
 ## Implementation Guide
 
 ### CTO Agent (Orchestrator)
-- Runs `bapXphp map` + `bapXphp schema list` before any action
-- Runs `bapXphp handoff next <issue>` to load objectives
+- Runs `bapXaura map` + `bapXaura schema list` before any action
+- Runs `bapXaura handoff next <issue>` to load objectives
 - Routes single objective to Worker via Task tool with structured JSON prompt
 - Waits for Worker evidence, passes to Reviewer, then closes loop or routes next
 - Can create blog posts, read user/order data, answer questions about the site
 
 ### Worker Agent
 - Receives one objective, investigates, implements, produces evidence
-- Every file operation goes through `bapXphp` CLI
+- Every file operation goes through `bapXaura` CLI
 - No parallel dispatch — focus on single objective
 - Returns: files changed, commands run, evidence links
 
@@ -142,7 +142,7 @@ This standardizes attachment handling across all coding agent types.
 The site is hosted on Hostinger shared hosting with Git auto-deploy:
 - **Host**: Hostinger VPS / shared hosting
 - **Auto-deploy**: Git push → production webhook
-- **CI**: GitHub Actions (`bapXphp ci`)
+- **CI**: GitHub Actions (`bapXaura ci`)
 - **DB**: Remote MySQL (production)
 - **Agent sub-delegation**: Sub-agents can trigger `workflow_dispatch` on GitHub Actions for long-running tasks
 - **Hosted runtime**: plain Git and PHP only; no GitHub CLI dependency
@@ -157,7 +157,7 @@ The site is hosted on Hostinger shared hosting with Git auto-deploy:
 - ❌ Giving every sub-agent every tool — deny by default, allow per role
 - ❌ Ignoring 17.2x error amplification of independent multi-agent systems
 - ❌ Hardcoding model/API keys — always read from MySQL `secrets` table
-- ❌ Writing files directly instead of using `bapXphp write file`
+- ❌ Writing files directly instead of using `bapXaura write file`
 
 ## References
 

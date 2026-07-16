@@ -1,7 +1,7 @@
 ---
 version: alpha
-name: Sri Panchami Spiritual
-description: Calm, credible interface system for a consultation-first spiritual service with supporting commerce and editorial content.
+name: AuraEdu
+description: Calm, credible interface system for a consultation-first education service with supporting commerce and editorial content.
 colors:
   primary: "#3a0003"
   on-primary: "#ffffff"
@@ -103,7 +103,7 @@ components:
 
 ## Overview
 
-Sri Panchami Spiritual is a consultation-first service. The primary customer journey is discover consultant -> review profile -> request an appointment -> manage the session. Spiritual products and editorial content support that service; they do not replace it in the first viewport. This file is the canonical visual contract for everything customer-facing in `views/` and `assets/css/band.css`.
+AuraEdu is a consultation-first service. The primary customer journey is discover consultant -> review profile -> request an appointment -> manage the session. education products and editorial content support that service; they do not replace it in the first viewport. This file is the canonical visual contract for everything customer-facing in `views/` and `assets/css/band.css`.
 
 Commercial references such as Deiveegaa are used to audit product clarity, imagery, pricing, policies, testimonials, FAQs, and checkout visibility. Do not copy their visual identity or unverified product claims; use the comparison to expose missing commerce information and interaction wiring.
 
@@ -212,7 +212,7 @@ Shape should stay consistent within a component family -- don't mix `sm` and `lg
 
 - Check `/`, `/consult`, `/shop`, one product, `/login`, and authenticated account pages at 1440x1000 and 390x844 in a real browser.
 - Confirm image crops, active navigation, focus states, card alignment, no hidden reveal content, no horizontal overflow, and that the next section is hinted in the first mobile viewport.
-- Use the fixed development customer created by `bapXphp dev:user`; its password must come from `BAPX_TEST_USER_PASSWORD` and must never be committed.
+- Use the fixed development customer created by `bapXaura dev:user`; its password must come from `BAPX_TEST_USER_PASSWORD` and must never be committed.
 - Run the repo's PHP tests, project-map validation, and local smoke test before commit or push.
 
 ## Implementation Notes

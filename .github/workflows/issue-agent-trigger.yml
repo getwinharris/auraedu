@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   dispatch:
-    if: github.event.action != 'closed' && github.actor != 'trigger-ai-bot' && endsWith(github.repository, 'bapXphpAiBackend')
+    if: github.event.action != 'closed' && github.actor != 'trigger-ai-bot' && endsWith(github.repository, 'bapXauraAiBackend')
     runs-on: ubuntu-latest
     env:
       ISSUE: ${{ github.event.issue.number || inputs.issue_number }}
@@ -85,7 +85,7 @@ jobs:
       - name: Commit handoff event
         run: |
           git config user.name "trigger-ai-bot"
-          git config user.email "trigger-ai-bot@bapXphp.action"
+          git config user.email "trigger-ai-bot@bapXaura.action"
           git add .agents/handoffs/ .agents/ops/
           git diff --cached --quiet || git commit -m "auto: handoff event for issue #${ISSUE}"
           git pull --rebase origin "$GITHUB_REF_NAME"
@@ -113,13 +113,13 @@ jobs:
             | Chain | CTO -> Worker -> Reviewer -> CTO |
             | Handoff | \`.agents/handoffs/events/${issue}.json\` |
 
-            CTO: run \`bapXphp map && bapXphp schema list\`, then \`bapXphp handoff next ${issue}\`.
+            CTO: run \`bapXaura map && bapXaura schema list\`, then \`bapXaura handoff next ${issue}\`.
 
             Comment \`/handoff worker\` only after the CTO records a bounded objective.`
             });
 
   cleanup:
-    if: github.event.action == 'closed' && endsWith(github.repository, 'bapXphpAiBackend')
+    if: github.event.action == 'closed' && endsWith(github.repository, 'bapXauraAiBackend')
     runs-on: ubuntu-latest
     env:
       ISSUE: ${{ github.event.issue.number }}
@@ -136,7 +136,7 @@ jobs:
       - name: Commit cleanup
         run: |
           git config user.name "trigger-ai-bot"
-          git config user.email "trigger-ai-bot@bapXphp.action"
+          git config user.email "trigger-ai-bot@bapXaura.action"
           git diff --cached --quiet || git commit -m "auto: clear closed issue #${ISSUE} handoff"
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:$GITHUB_REF_NAME"

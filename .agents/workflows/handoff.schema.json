@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "bapXphp CTO handoff",
+  "title": "bapXaura CTO handoff",
   "type": "object",
   "required": ["issue", "role", "objectives", "commands_run", "risks", "next_role"],
   "properties": {

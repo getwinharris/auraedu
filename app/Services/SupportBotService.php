@@ -53,7 +53,7 @@ final class SupportBotService {
         $key = trim((string)(getenv('AGENT_API_KEY') ?: getenv('SUPPORT_BOT_GOOGLE_API_KEY') ?: ($secrets['agent_api_key'] ?? $secrets['support_bot_google_api_key'] ?? '')));
         $model = trim((string)(getenv('AGENT_MODEL') ?: getenv('SUPPORT_BOT_MODEL') ?: ($secrets['agent_model'] ?? $secrets['support_bot_model'] ?? 'gemma-4-31b-it'))) ?: 'gemma-4-31b-it';
         if ($key === '' || !function_exists('curl_init')) return null;
-        $prompt = "You are Sri Panchami Spiritual support bot.\n"
+        $prompt = "You are AuraEdu support bot.\n"
             . "Return only the final customer-facing answer. Do not include reasoning, analysis, markdown bullets, code, tool calls, or hidden thoughts.\n"
             . "Use only this JSON context for the signed-in customer and public site links. Never mention, infer, or access other users' data. If data is missing, ask the customer to use the contact form.\n"
             . "Allowed help: product, cart, checkout, delivery address, order, consultant booking, and navigation details from the JSON.\n"
@@ -128,15 +128,15 @@ final class SupportBotService {
         $pages = $site['pages'] ?? [];
         $products = array_slice($site['products'] ?? [], 0, 5);
         if (preg_match('/\b(hi|hello|hey|vanakkam|namaste)\b/i', $message)) {
-            return 'Hello. I can help you browse spiritual products, place an order, manage delivery addresses, or request a consultant appointment.';
+            return 'Hello. I can help you browse education products, place an order, manage delivery addresses, or request a consultant appointment.';
         }
         if (preg_match('/\b(product|available|shop|buy|item|pendant|jewelry|jewellery)\b/i', $message)) {
             $names = array_filter(array_map(fn($p) => trim((string)($p['name'] ?? '')), $products));
-            $list = $names ? implode(', ', $names) : 'sacred emblems and spiritual jewelry';
+            $list = $names ? implode(', ', $names) : 'sacred emblems and education jewelry';
             return 'Available products include ' . $list . '. Open ' . ($pages['shop'] ?? '/shop') . ' to browse all products, or add an item to cart from its product page.';
         }
         if (preg_match('/\b(service|consult|booking|book|astrology|call|message|temple)\b/i', $message)) {
-            return 'Available services include spiritual product sales, scheduled consultant appointments, and temple guidance. Open ' . ($pages['consult'] ?? '/consult') . ' to request an appointment.';
+            return 'Available services include education product sales, scheduled consultant appointments, and temple guidance. Open ' . ($pages['consult'] ?? '/consult') . ' to request an appointment.';
         }
         if (preg_match('/\b(recharge|wallet|credit|payment)\b/i', $message)) {
             return 'Product payments are completed securely during checkout. Sign in to reuse saved delivery addresses and view confirmed orders.';

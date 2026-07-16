@@ -28,37 +28,37 @@ Each role advances the chain by commenting `/handoff <role>` on the GitHub issue
 
 ### Essential
 ```bash
-bapXphp map && bapXphp schema list    # Mandatory pre-flight before changes
-bapXphp ci                             # Full validation (lint → test → maps → smoke)
-bapXphp update                         # Regenerate and validate maps
+bapXaura map && bapXaura schema list    # Mandatory pre-flight before changes
+bapXaura ci                             # Full validation (lint → test → maps → smoke)
+bapXaura update                         # Regenerate and validate maps
 ```
 
 ### Handoff
 ```bash
-bapXphp handoff next <issue>           # Show next role + objective
-bapXphp handoff template <issue>       # Generate empty handoff template
-bapXphp handoff validate <file>        # Validate handoff JSON
-bapXphp handoff comment <file> <pr>    # Post handoff on PR
-bapXphp handoff execute <issue>        # Emit handoff context
-bapXphp handoff score <issue>          # Score the cycle
+bapXaura handoff next <issue>           # Show next role + objective
+bapXaura handoff template <issue>       # Generate empty handoff template
+bapXaura handoff validate <file>        # Validate handoff JSON
+bapXaura handoff comment <file> <pr>    # Post handoff on PR
+bapXaura handoff execute <issue>        # Emit handoff context
+bapXaura handoff score <issue>          # Score the cycle
 ```
 
 ### File Operations (use these instead of raw shell)
 ```bash
-bapXphp read file <path>
-bapXphp write file <path>              # Reads stdin
-bapXphp edit <path> <search> <replace>
-bapXphp grep <pattern> [path]
-bapXphp find <glob>
-bapXphp run <command...>
+bapXaura read file <path>
+bapXaura write file <path>              # Reads stdin
+bapXaura edit <path> <search> <replace>
+bapXaura grep <pattern> [path]
+bapXaura find <glob>
+bapXaura run <command...>
 ```
 
 ### Database
 ```bash
-bapXphp db query <collection> [--where 'f=v'] [--limit N]
-bapXphp db upsert <collection> '<json>'
-bapXphp db delete <collection> <id>
-bapXphp db init                        # Create tables from schema
+bapXaura db query <collection> [--where 'f=v'] [--limit N]
+bapXaura db upsert <collection> '<json>'
+bapXaura db delete <collection> <id>
+bapXaura db init                        # Create tables from schema
 ```
 
 ## Documentation Standards
@@ -71,7 +71,7 @@ bapXphp db init                        # Create tables from schema
 
 ## Pre-Flight Checklist (Worker)
 
-1. ✅ Run `bapXphp map` AND `bapXphp schema list`
+1. ✅ Run `bapXaura map` AND `bapXaura schema list`
 2. ✅ Read `AGENTS.md`
 3. ✅ Read `docs/systematic-map.mmd` for route/controller/service wiring
 4. ✅ Search existing issues
@@ -82,7 +82,7 @@ bapXphp db init                        # Create tables from schema
 ## Pre-Merge Checklist (CTO)
 
 1. ✅ All objectives have evidence (handoff validated)
-2. ✅ `bapXphp ci` passes (lint → test → map val → docs val → smoke)
+2. ✅ `bapXaura ci` passes (lint → test → map val → docs val → smoke)
 3. ✅ Both maps regenerated and validated
 4. ✅ Affected docs updated
 5. ✅ No stale generated maps
@@ -94,9 +94,9 @@ bapXphp db init                        # Create tables from schema
 ```bash
 git checkout -b <scope>/<description>   # Branch from main
 # ... make changes ...
-bapXphp update                           # Regenerate maps
-bapXphp ci                               # Validate everything
-bapXphp pr                               # Create PR (runs CI first)
+bapXaura update                           # Regenerate maps
+bapXaura ci                               # Validate everything
+bapXaura pr                               # Create PR (runs CI first)
 # After CTO review:
-bapXphp merge                            # Merge to main
+bapXaura merge                            # Merge to main
 ```

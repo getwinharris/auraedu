@@ -1,12 +1,12 @@
 ---
 type: doc
 title: Documentation Index
-description: Connected documentation for developers, maintainers, and coding agents building on Sri Panchami Spiritual.
+description: Connected documentation for developers, maintainers, and coding agents building on AuraEdu.
 category: docs
 ---
 # Documentation Index
 
-This folder contains connected documentation for developers, maintainers, and coding agents building on Sri Panchami Spiritual.
+This folder contains connected documentation for developers, maintainers, and coding agents building on AuraEdu.
 
 ## Start Here
 
@@ -53,6 +53,6 @@ This folder contains connected documentation for developers, maintainers, and co
 - Regenerate it after route, service, view, schema, storage, tool, or integration changes:
 
 ```bash
-bapXphp update
-bapXphp ci
+bapXaura update
+bapXaura ci
 ```

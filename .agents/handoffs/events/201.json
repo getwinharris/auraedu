@@ -8,13 +8,13 @@
     "sequence": ["cto", "worker", "reviewer", "cto"]
   },
   "payload": {
-    "title": "cli/bapXphp parse error when invoked via php directly\n",
-    "body": "## Problem\n`php cli/bapXphp map` and `php -l cli/bapXphp` fail with:\n\n\n## Root cause\n`cli/bapXphp` is a bash script (shebang `#!/usr/bin/env bash`) with embedded PHP `-r` strings. Running it through `php` tries to parse the entire bash file as PHP, which fails on line 497 in `cmd_remove_field`.\n\n## Workaround\nUse `bash cli/bapXphp` or `./cli/bapXphp` instead of `php cli/bapXphp`.\n\n## Suggested fix\nAdd a tiny PHP shim at the top (after the shebang) that detects direct PHP invocation and re-execs via bash, or document the correct invocation in AGENTS.md.\n\n",
+    "title": "cli/bapXaura parse error when invoked via php directly\n",
+    "body": "## Problem\n`php cli/bapXaura map` and `php -l cli/bapXaura` fail with:\n\n\n## Root cause\n`cli/bapXaura` is a bash script (shebang `#!/usr/bin/env bash`) with embedded PHP `-r` strings. Running it through `php` tries to parse the entire bash file as PHP, which fails on line 497 in `cmd_remove_field`.\n\n## Workaround\nUse `bash cli/bapXaura` or `./cli/bapXaura` instead of `php cli/bapXaura`.\n\n## Suggested fix\nAdd a tiny PHP shim at the top (after the shebang) that detects direct PHP invocation and re-execs via bash, or document the correct invocation in AGENTS.md.\n\n",
     "labels": []
   },
   "repository": {
     "owner": "getwinharris",
-    "name": "bapXphpAiBackend"
+    "name": "bapXauraAiBackend"
   },
   "objectives": [{
     "id": "OBJ-201-1",

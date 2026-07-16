@@ -14,8 +14,8 @@ final class ProjectMapService {
         $routes = [
             ['method'=>'GET','path'=>'/','name'=>'home','page'=>'public/home','controller'=>'PublicController@home','services'=>['ProductService','AstrologerService','TempleService','CategoryService']],
             ['method'=>'GET','path'=>'/about','name'=>'about','page'=>'public/about','controller'=>'PublicController@about','services'=>[]],
-            ['method'=>'GET','path'=>'/sri-panchami-spiritual','name'=>'spiritual','page'=>'public/spiritual','controller'=>'PublicController@spiritual','services'=>[]],
-            ['method'=>'GET','path'=>'/spiritual','name'=>'spiritual.short','page'=>'public/spiritual','controller'=>'PublicController@spiritual','services'=>[]],
+            ['method'=>'GET','path'=>'/sri-panchami-education','name'=>'education','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
+            ['method'=>'GET','path'=>'/education','name'=>'education.short','page'=>'public/education','controller'=>'PublicController@education','services'=>[]],
             ['method'=>'GET','path'=>'/terms','name'=>'terms','page'=>'public/terms','controller'=>'PublicController@terms','services'=>[]],
             ['method'=>'GET','path'=>'/privacy','name'=>'privacy','page'=>'public/privacy','controller'=>'PublicController@privacy','services'=>[]],
 
@@ -170,7 +170,7 @@ final class ProjectMapService {
         $views = self::viewNames(app_path('views'));
         $integrations = self::phpBasenames(app_path('integrations'));
         $tools = self::phpBasenames(app_path('cli'));
-        if (is_file(app_path('cli/bapXphp'))) $tools[] = 'bapXphp';
+        if (is_file(app_path('cli/bapXaura'))) $tools[] = 'bapXaura';
         $storageFiles = self::jsonBasenames(app_path('storage/data'));
 
         $routeControllers = array_values(array_unique(array_map(
@@ -240,9 +240,9 @@ final class ProjectMapService {
             '/blog/{slug}'    => 'Blog post — rendered from GitHub-sourced markdown',
             '/blog/category/{slug}' => 'Blog listing filtered by category',
             '/'                => 'Home page — hero, categories, featured products, astrologers',
-            '/about'           => 'About SPS — story, values, CTA',
-            '/sri-panchami-spiritual' => 'Sri Panchami Spiritual landing page',
-            '/spiritual'        => 'Short spiritual landing redirect-equivalent page',
+            '/about'           => 'About AuraEdu — story, values, CTA',
+            '/sri-panchami-education' => 'AuraEdu landing page',
+            '/education'        => 'Short education landing redirect-equivalent page',
             '/terms'           => 'Terms of Service — 15 sections, legal',
             '/privacy'         => 'Privacy Policy — 14 sections, data handling',
             '/consult'         => 'Astrologer marketplace — browse and book',

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   review:
-    if: github.actor != 'review-ai-bot' && endsWith(github.repository, 'bapXphpAiBackend')
+    if: github.actor != 'review-ai-bot' && endsWith(github.repository, 'bapXauraAiBackend')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

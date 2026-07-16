@@ -24,10 +24,10 @@ final class PublicController extends BaseController {
         $this->render('public/about'); 
     }
 
-    public function spiritual(): void {
+    public function education(): void {
         $this->detectApiRequest();
-        $this->seoKey = 'spiritual';
-        $this->render('public/spiritual');
+        $this->seoKey = 'education';
+        $this->render('public/education');
     }
     
     public function terms(): void { 
@@ -55,7 +55,7 @@ final class PublicController extends BaseController {
         $this->seoKey = 'astrologer';
         $exp = !empty($astrologer['experience_years']) ? ' with ' . $astrologer['experience_years'] . ' years of experience' : '';
         $this->seoOverrides = [
-            'title' => ($astrologer['name'] ?? 'Astrologer') . ' – Vedic Astrologer Online Consultation at Sri Panchami Spiritual',
+            'title' => ($astrologer['name'] ?? 'Astrologer') . ' – Vedic Astrologer Online Consultation at AuraEdu',
             'description' => 'Request a scheduled appointment with ' . ($astrologer['name'] ?? 'an experienced consultant') . '.' . (!empty($astrologer['speciality']) ? ' ' . $astrologer['speciality'] . '.' : '') . $exp,
             'og_image' => $astrologer['photo_url'] ?? '',
         ];
@@ -74,7 +74,7 @@ final class PublicController extends BaseController {
         $temple = (new TempleService())->findBySlug($slug);
         $this->seoKey = 'temple';
         $this->seoOverrides = [
-            'title' => ($temple['name'] ?? 'Temple') . ' – Temple Timings, Address, Pooja & Darshan at Sri Panchami Spiritual',
+            'title' => ($temple['name'] ?? 'Temple') . ' – Temple Timings, Address, Pooja & Darshan at AuraEdu',
             'description' => 'Explore ' . ($temple['name'] ?? 'this temple') . ' with detailed guide including timings, address, location map, and available pooja services. ' . ($temple['description'] ?? ''),
             'og_image' => $temple['image_url'] ?? '',
         ];
@@ -105,8 +105,8 @@ final class PublicController extends BaseController {
             }
             if ($catName) {
                 $this->seoOverrides = [
-                    'title' => 'Buy ' . $catName . ' Online – Spiritual Products at Sri Panchami Spiritual',
-                    'description' => 'Shop authentic ' . $catName . ' online at Sri Panchami Spiritual. Browse our collection of sacred items for your spiritual practice. Fast shipping across India.',
+                    'title' => 'Buy ' . $catName . ' Online – education Products at AuraEdu',
+                    'description' => 'Shop authentic ' . $catName . ' online at AuraEdu. Browse our collection of sacred items for your education practice. Fast shipping across India.',
                 ];
             }
         }
@@ -135,8 +135,8 @@ final class PublicController extends BaseController {
             $price = $product['offer_price'] ?? $product['price'] ?? 0;
             $schema = (new SeoService((new SecretService())->all()))->productSchema($product);
             $this->seoOverrides = [
-                'title' => ($product['name'] ?? 'Product') . ' – Buy Online at Sri Panchami Spiritual',
-                'description' => 'Buy ' . ($product['name'] ?? 'this product') . ' online at Sri Panchami Spiritual. ' . ($product['description'] ?? '') . ' Price: ₹' . $price . '. Authentic spiritual product with fast shipping.',
+                'title' => ($product['name'] ?? 'Product') . ' – Buy Online at AuraEdu',
+                'description' => 'Buy ' . ($product['name'] ?? 'this product') . ' online at AuraEdu. ' . ($product['description'] ?? '') . ' Price: ₹' . $price . '. Authentic education product with fast shipping.',
                 'og_image' => $product['image_url'] ?? '',
                 'json_ld' => '<script type="application/ld+json">' . json_encode($schema) . '</script>',
             ];
@@ -166,13 +166,13 @@ final class PublicController extends BaseController {
     
     public function sitemap(): void {
         header('Content-Type: application/xml; charset=utf-8');
-        $host = $_SERVER['HTTP_HOST'] ?? 'sripanchamispiritual.com';
+        $host = $_SERVER['HTTP_HOST'] ?? 'auraedu.co.in';
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $base = $scheme . '://' . $host;
 
         $pages = [
             '/', '/about', '/consult', '/temples', '/shop', '/contact', '/blog',
-            '/terms', '/privacy', '/spiritual',
+            '/terms', '/privacy', '/education',
         ];
         $products = [];
         try { $products = (new ProductService())->all(); } catch (\Throwable) {}

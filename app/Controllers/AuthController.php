@@ -40,7 +40,7 @@ final class AuthController extends BaseController {
  }
  private function redirectUri(): string {
    $configured = trim((string)($_ENV['APP_URL'] ?? getenv('APP_URL') ?? ''));
-   $base = $configured !== '' ? $configured : 'https://sripanchamispiritual.com';
+   $base = $configured !== '' ? $configured : 'https://auraedu.co.in';
    return rtrim($base, '/') . '/auth/google/callback';
  }
  private function post(string $url,array $data): array { $ch=curl_init($url); curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>http_build_query($data),CURLOPT_TIMEOUT=>10]); $body=curl_exec($ch); curl_close($ch); return json_decode($body,true)?:[]; }

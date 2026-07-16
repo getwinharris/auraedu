@@ -6,7 +6,7 @@ final class GitHubDocService
     private string $cacheDir;
     private int $cacheTtl;
 
-    private const DEFAULT_BASE_URL = 'https://raw.githubusercontent.com/sripanchami-spiritual/blog/main';
+    private const DEFAULT_BASE_URL = 'https://raw.githubusercontent.com/auraedu/blog/main';
     private const BLOG_INDEX_PATH = '/index.json';
     private const CATEGORIES_PATH = '/categories.json';
     private const POSTS_DIR = '/posts';
@@ -119,7 +119,7 @@ final class GitHubDocService
             'http' => [
                 'method' => 'GET',
                 'timeout' => 10,
-                'header' => "User-Agent: bapXphp-blog-fetcher/1.0\r\n",
+                'header' => "User-Agent: bapXaura-blog-fetcher/1.0\r\n",
                 'ignore_errors' => true,
             ],
         ]);

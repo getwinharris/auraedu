@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PHP polyglot guard — Issue #201. Allows `php cli/bapXphp <cmd>` to work.
+# PHP polyglot guard — Issue #201. Allows `php cli/bapXaura <cmd>` to work.
 : <<'BAP_PHP_GUARD'
 <?php
 if (PHP_SAPI === 'cli') {
@@ -15,92 +15,92 @@ BAP_PHP_GUARD
 set -euo pipefail
 
 # ═══════════════════════════════════════════════════════════════
-# bapXphp — Project management CLI for the PHP/JSON monorepo
+# bapXaura — Project management CLI for the PHP/JSON monorepo
 # ═══════════════════════════════════════════════════════════════
-# Usage: bapXphp <command> [args...]
+# Usage: bapXaura <command> [args...]
 #
 # ── Orientation ─────────────────────────────────────────────────
-#   bapXphp help                    — this message
-#   bapXphp understand              — full project overview (schema, commits, issues, PRs, skills, AGENTS.md)
-#   bapXphp context                 — quick session orientation (branch, status, last test result)
+#   bapXaura help                    — this message
+#   bapXaura understand              — full project overview (schema, commits, issues, PRs, skills, AGENTS.md)
+#   bapXaura context                 — quick session orientation (branch, status, last test result)
 #
 # ── Development ─────────────────────────────────────────────────
-#   bapXphp test                    — run test suite (php tests/run.php)
-#   bapXphp lint [path]             — PHP syntax check (php -l)
-#   bapXphp ci                      — non-mutating validation: lint → test → maps → smoke
-#   bapXphp check                   — alias for bapXphp ci
-#   bapXphp update                  — regenerate and validate both project maps
-#   bapXphp serve                   — start dev server on 127.0.0.1:6020
-#   bapXphp smoke                   — run local smoke tests
-#   bapXphp dev:user [--dry-run]   — create/update the fixed remote-DB customer used for browser testing
+#   bapXaura test                    — run test suite (php tests/run.php)
+#   bapXaura lint [path]             — PHP syntax check (php -l)
+#   bapXaura ci                      — non-mutating validation: lint → test → maps → smoke
+#   bapXaura check                   — alias for bapXaura ci
+#   bapXaura update                  — regenerate and validate both project maps
+#   bapXaura serve                   — start dev server on 127.0.0.1:6020
+#   bapXaura smoke                   — run local smoke tests
+#   bapXaura dev:user [--dry-run]   — create/update the fixed remote-DB customer used for browser testing
 #
 # ── Project Map ─────────────────────────────────────────────────
-#   bapXphp map                     — regenerate + view map.mmd (deterministic code graph with edges + gaps)
-#   bapXphp map:gen                 — regenerate systematic-map.mmd + map.mmd from source (AST/regex parsed)
-#   bapXphp map:val                 — validate both maps are up-to-date
+#   bapXaura map                     — regenerate + view map.mmd (deterministic code graph with edges + gaps)
+#   bapXaura map:gen                 — regenerate systematic-map.mmd + map.mmd from source (AST/regex parsed)
+#   bapXaura map:val                 — validate both maps are up-to-date
 #
 # ── Schema (collections.php) ───────────────────────────────────
-#   bapXphp schema list             — list all collections with field counts
-#   bapXphp schema show <col>       — show full collection schema (fields, types, constraints)
-#   bapXphp add <field>:<type> [opts] under <collection>
+#   bapXaura schema list             — list all collections with field counts
+#   bapXaura schema show <col>       — show full collection schema (fields, types, constraints)
+#   bapXaura add <field>:<type> [opts] under <collection>
 #                                   — add a field to collection schema
 #                                     opts: required:true values:a,b,c items:string
-#   bapXphp remove <field> under <collection>
+#   bapXaura remove <field> under <collection>
 #                                   — remove a field from collection schema
 #
 # ── Tool Management ─────────────────────────────────────────────
-#   bapXphp tool list               — list all PHP tools in cli/
-#   bapXphp tool add <file>         — create a new PHP tool with nano editor
+#   bapXaura tool list               — list all PHP tools in cli/
+#   bapXaura tool add <file>         — create a new PHP tool with nano editor
 #
 # ── Skills & Routes ─────────────────────────────────────────────
-#   bapXphp skills                  — list available agent skills with descriptions
-#   bapXphp route:list              — list all registered routes with controllers
+#   bapXaura skills                  — list available agent skills with descriptions
+#   bapXaura route:list              — list all registered routes with controllers
 #
 # ── Repository Support ──────────────────────────────────────────
-#   bapXphp status                  — repository status + recent commits
-#   bapXphp logs [--limit N]        — read recent live audit events from remote MySQL
-#   bapXphp logs --local            — tail ignored local development logs
-#   bapXphp artifacts:clean [--dry-run]
+#   bapXaura status                  — repository status + recent commits
+#   bapXaura logs [--limit N]        — read recent live audit events from remote MySQL
+#   bapXaura logs --local            — tail ignored local development logs
+#   bapXaura artifacts:clean [--dry-run]
 #                                   — untrack and ignore runtime/test artifacts
-#   bapXphp hooks install           — install .agents/hooks as this checkout's Git hooks
-#   bapXphp hooks status            — show configured Git hooks path
-#   bapXphp tui                     — open the interactive project terminal UI
-#   bapXphp handoff validate <file> [--issue]
+#   bapXaura hooks install           — install .agents/hooks as this checkout's Git hooks
+#   bapXaura hooks status            — show configured Git hooks path
+#   bapXaura tui                     — open the interactive project terminal UI
+#   bapXaura handoff validate <file> [--issue]
 #                                   — validate structure and local Action event objective coverage
-#   bapXphp handoff active          — show the current GitHub Actions handoff
-#   bapXphp handoff next <issue>    — show event-based handoff with role + workflow
-#   bapXphp handoff template <issue> — generate empty handoff template from issue
-#   bapXphp handoff execute <issue> [--next role]
+#   bapXaura handoff active          — show the current GitHub Actions handoff
+#   bapXaura handoff next <issue>    — show event-based handoff with role + workflow
+#   bapXaura handoff template <issue> — generate empty handoff template from issue
+#   bapXaura handoff execute <issue> [--next role]
 #                                   — emit handoff context JSON (includes score + event + workflow)
-#   bapXphp handoff score <issue>   — validate work and assign 0-100 score to handoff event
+#   bapXaura handoff score <issue>   — validate work and assign 0-100 score to handoff event
 #
 # ── Mail & Images ───────────────────────────────────────────────
-#   bapXphp mail:process            — process pending mail queue
-#   bapXphp images:optimize         — convert/resize images to WebP
-#   bapXphp product:images <source> [--dry-run|--assets-only|--database-only]
+#   bapXaura mail:process            — process pending mail queue
+#   bapXaura images:optimize         — convert/resize images to WebP
+#   bapXaura product:images <source> [--dry-run|--assets-only|--database-only]
 #                                   — import ordered product galleries from a ZIP/folder
-#   bapXphp blog:image <slug> <image> [--source-url /path] [--alt text] [--dry-run]
+#   bapXaura blog:image <slug> <image> [--source-url /path] [--alt text] [--dry-run]
 #                                   — crop a screenshot/image and attach it to a blog post
 #
 # ── Database (MySQL direct) ──────────────────────────────────────
-#   bapXphp db tables               — list all MySQL tables
-#   bapXphp db describe <table>     — describe MySQL table columns
-#   bapXphp db list                 — list all schema collections (from collections.php)
-#   bapXphp db show <collection>    — show schema collection fields & types
-#   bapXphp db query <collection> [--where "field=value"] [--limit N] [--id id] [--owner email]
+#   bapXaura db tables               — list all MySQL tables
+#   bapXaura db describe <table>     — describe MySQL table columns
+#   bapXaura db list                 — list all schema collections (from collections.php)
+#   bapXaura db show <collection>    — show schema collection fields & types
+#   bapXaura db query <collection> [--where "field=value"] [--limit N] [--id id] [--owner email]
 #                                   — query records from MySQL
-#   bapXphp db find <collection> <id>
+#   bapXaura db find <collection> <id>
 #                                   — shorthand: find record by ID
-#   bapXphp db status               — verify DB paths and integration readiness
-#   bapXphp db raw <sql>            — execute raw SQL on MySQL
-#   bapXphp db init                 — create MySQL tables from collections.php schema
-#   bapXphp db sync                 — pull MySQL data → seed YAML files (currently: db init only)
+#   bapXaura db status               — verify DB paths and integration readiness
+#   bapXaura db raw <sql>            — execute raw SQL on MySQL
+#   bapXaura db init                 — create MySQL tables from collections.php schema
+#   bapXaura db sync                 — pull MySQL data → seed YAML files (currently: db init only)
 #
 # ── AI / Agent ───────────────────────────────────────────────────
-#   bapXphp agent <message>          — chat with the site AI agent
-#   bapXphp ai:config               — show AI model config from MySQL secrets
-#   bapXphp ai:probe                — safely verify the configured model endpoint
-#   bapXphp handoff execute <issue> [--next role]
+#   bapXaura agent <message>          — chat with the site AI agent
+#   bapXaura ai:config               — show AI model config from MySQL secrets
+#   bapXaura ai:probe                — safely verify the configured model endpoint
+#   bapXaura handoff execute <issue> [--next role]
 #                                   — load handoff context for next role
 #
 # ── Workflows (.agents/workflows/) ───────────────────────────────
@@ -114,89 +114,89 @@ set -euo pipefail
 #   .agents/ops/telemetry.json      — cycle tracking + scoring
 #
 # ── Blog & Docs ──────────────────────────────────────────────────
-#       bapXphp docsmap                 — regenerate docs/map.mmd (content: skills, docs, blog, admin, agents)
-#       bapXphp codemap                 — regenerate map.mmd (root, code dependency graph with edges + gaps)
-#   bapXphp bloggen                 — regenerate blog cache from GitHub markdown sources
-#       bapXphp okfgen                  — generate .okf/ knowledge bundle (OKF v0.1, concept nodes + edges)
+#       bapXaura docsmap                 — regenerate docs/map.mmd (content: skills, docs, blog, admin, agents)
+#       bapXaura codemap                 — regenerate map.mmd (root, code dependency graph with edges + gaps)
+#   bapXaura bloggen                 — regenerate blog cache from GitHub markdown sources
+#       bapXaura okfgen                  — generate .okf/ knowledge bundle (OKF v0.1, concept nodes + edges)
 #
 # ── Browser Agent (PHP-native, no Node.js needed) ──────────────
-#   bapXphp browser-agent open <url>      — fetch page, return YAML snapshot
-#   bapXphp browser-agent search <query>  — Google search, parse organic results
-#   bapXphp browser-agent goto <url>      — navigate to URL
-#   bapXphp browser-agent snapshot        — print current page as YAML snapshot
-#   bapXphp browser-agent click <sel>     — follow link by CSS selector
-#   bapXphp browser-agent fill <sel> <t>  — store form field value
-#   bapXphp browser-agent submit          — submit form with stored values
-#   bapXphp browser-agent smoke <url>     — run smoke tests (status, links, images)
-#   bapXphp browser-agent links           — extract all links from current page
-#   bapXphp browser-agent forms           — list all forms with fields
-#   bapXphp browser-agent captcha         — detect captcha on current page
-#   bapXphp browser-agent console <url>   — show page HTTP metadata
-#   bapXphp browser-agent html            — print raw HTML of current page
-#   bapXphp browser-agent help            — detailed help with all options
+#   bapXaura browser-agent open <url>      — fetch page, return YAML snapshot
+#   bapXaura browser-agent search <query>  — Google search, parse organic results
+#   bapXaura browser-agent goto <url>      — navigate to URL
+#   bapXaura browser-agent snapshot        — print current page as YAML snapshot
+#   bapXaura browser-agent click <sel>     — follow link by CSS selector
+#   bapXaura browser-agent fill <sel> <t>  — store form field value
+#   bapXaura browser-agent submit          — submit form with stored values
+#   bapXaura browser-agent smoke <url>     — run smoke tests (status, links, images)
+#   bapXaura browser-agent links           — extract all links from current page
+#   bapXaura browser-agent forms           — list all forms with fields
+#   bapXaura browser-agent captcha         — detect captcha on current page
+#   bapXaura browser-agent console <url>   — show page HTTP metadata
+#   bapXaura browser-agent html            — print raw HTML of current page
+#   bapXaura browser-agent help            — detailed help with all options
 #   (Use --pw prefix for Playwright mode when Node.js is available.)
 #
 # ── Task Management (todowrite) ──────────────────────────────────
-#   bapXphp todo                   — list tasks
-#   bapXphp todo add <description> — add a task
-#   bapXphp todo update <id> <status> — update task status (pending/in_progress/completed/cancelled)
-#   bapXphp todo done <id>         — mark task completed
+#   bapXaura todo                   — list tasks
+#   bapXaura todo add <description> — add a task
+#   bapXaura todo update <id> <status> — update task status (pending/in_progress/completed/cancelled)
+#   bapXaura todo done <id>         — mark task completed
 #
 # ── Objectives ───────────────────────────────────────────────────
-#   bapXphp objective read         — show current objectives from OBJECTIVE.md
-#   bapXphp objective update <text> — update objective entry (pipe or pass text)
+#   bapXaura objective read         — show current objectives from OBJECTIVE.md
+#   bapXaura objective update <text> — update objective entry (pipe or pass text)
 #
 # ── Task Dispatch ────────────────────────────────────────────────
-#   bapXphp task run <description> — dispatch a sub-agent task
-#   bapXphp task list              — list running/pending tasks
+#   bapXaura task run <description> — dispatch a sub-agent task
+#   bapXaura task list              — list running/pending tasks
 #
 # ── Question ─────────────────────────────────────────────────────
-#   bapXphp question <text>        — ask the user a question
+#   bapXaura question <text>        — ask the user a question
 #
 # ── Session Memory ───────────────────────────────────────────────
-#   bapXphp memory init            — initialize session.json in .tmp/
+#   bapXaura memory init            — initialize session.json in .tmp/
 #
 # ── Context (extract + search) ────────────────────────────────────
-#   bapXphp context-extract        — extract last 48h conversation + commits to .tmp/context-extract.xml
-#   bapXphp context-extract --hours 72
+#   bapXaura context-extract        — extract last 48h conversation + commits to .tmp/context-extract.xml
+#   bapXaura context-extract --hours 72
 #                                  — custom window (e.g., 72 hours)
-#   bapXphp context-extract --output /path/file.xml
+#   bapXaura context-extract --output /path/file.xml
 #                                  — custom output path (default: .tmp/context-extract.xml)
-#   bapXphp context <query>        — search extracted context for matching messages
-#   bapXphp context "bapXphp opencode compact"
+#   bapXaura context <query>        — search extracted context for matching messages
+#   bapXaura context "bapXaura opencode compact"
 #                                  — find marker commands in conversation history
-#   bapXphp memory add <role> <content> — append entry
-#   bapXphp memory list            — show all entries
-#   bapXphp memory search <text>   — search by content
-#   bapXphp memory last [n]        — show last n entries
-#   bapXphp memory export          — dump full JSON
-#   bapXphp memory info            — session stats
-#   bapXphp memory clear           — erase session memory
+#   bapXaura memory add <role> <content> — append entry
+#   bapXaura memory list            — show all entries
+#   bapXaura memory search <text>   — search by content
+#   bapXaura memory last [n]        — show last n entries
+#   bapXaura memory export          — dump full JSON
+#   bapXaura memory info            — session stats
+#   bapXaura memory clear           — erase session memory
 #
 # ── Skill ────────────────────────────────────────────────────────
-#   bapXphp skill <name>           — load a skill SKILL.md
-#   bapXphp skills                 — list available skills
+#   bapXaura skill <name>           — load a skill SKILL.md
+#   bapXaura skills                 — list available skills
 #
 # ── Read / Write Content ────────────────────────────────────────
-#   bapXphp read blog [slug]        — read blog post (list all if no slug)
-#   bapXphp write blog [slug]       — create/edit blog post with auto-slug/date/URL
-#   bapXphp read docs [slug]        — read customer guide (list all if no slug)
-#   bapXphp write docs [slug]       — create/edit customer guide
-#   bapXphp read product [slug]     — read product (list all if no slug)
-#   bapXphp write product [slug]    — create/edit product interactively
+#   bapXaura read blog [slug]        — read blog post (list all if no slug)
+#   bapXaura write blog [slug]       — create/edit blog post with auto-slug/date/URL
+#   bapXaura read docs [slug]        — read customer guide (list all if no slug)
+#   bapXaura write docs [slug]       — create/edit customer guide
+#   bapXaura read product [slug]     — read product (list all if no slug)
+#   bapXaura write product [slug]    — create/edit product interactively
 #
 # ── Generic File Operations (no direct shell/edit/write) ─────────
-#   bapXphp read file <path>        — read arbitrary file with line numbers
-#   bapXphp write file <path>       — write/create arbitrary file (reads stdin)
-#   bapXphp edit <path> <search> <replace>
+#   bapXaura read file <path>        — read arbitrary file with line numbers
+#   bapXaura write file <path>       — write/create arbitrary file (reads stdin)
+#   bapXaura edit <path> <search> <replace>
 #                                   — search/replace in file (dry-run with --preview)
-#   bapXphp grep <pattern> [path]   — search file contents (ripgrep style)
-#   bapXphp find <glob>             — find files by glob pattern
-#   bapXphp run <command...>        — execute any shell command through the CLI
+#   bapXaura grep <pattern> [path]   — search file contents (ripgrep style)
+#   bapXaura find <glob>             — find files by glob pattern
+#   bapXaura run <command...>        — execute any shell command through the CLI
 #
 # ── Backward compatibility aliases ──────────────────────────────
-#   bapXphp mysql:query   → bapXphp db raw
-#   bapXphp mysql:import  → bapXphp db sync
+#   bapXaura mysql:query   → bapXaura db raw
+#   bapXaura mysql:import  → bapXaura db sync
 # ═══════════════════════════════════════════════════════════════
 
 BAPX_SRC="${BASH_SOURCE[0]}"
@@ -264,7 +264,7 @@ cmd_dev_user() {
     umask 077
     printf 'BAPX_TEST_USER_PASSWORD=%s\n' "$password" > "$ROOT/.env.test-user"
   fi
-  [ -n "$password" ] || die "Set BAPX_TEST_USER_PASSWORD in ignored operator config, or run bapXphp dev:user --generate."
+  [ -n "$password" ] || die "Set BAPX_TEST_USER_PASSWORD in ignored operator config, or run bapXaura dev:user --generate."
 
   local record
   record=$(php -r '
@@ -290,7 +290,7 @@ cmd_help() {
     capturing { sub(/^# ?/, ""); print }
   ' "${BASH_SOURCE[0]}"
   echo ""
-  echo "Run 'bapXphp <command>' for command-specific help."
+  echo "Run 'bapXaura <command>' for command-specific help."
 }
 
 # ── understand ─────────────────────────────────────────────────
@@ -305,7 +305,7 @@ cmd_understand() {
 
   echo ""
   printf "${B}${C}%s${N}${B}%s${N}\n" "╔══════════════════════════════════════════╗" ""
-  printf "${B}${C}%s${N}${B}%s${N}\n" "║" "          bapXphp understand" ""
+  printf "${B}${C}%s${N}${B}%s${N}\n" "║" "          bapXaura understand" ""
   printf "${B}${C}%s${N}${B}%s${N}\n" "╚══════════════════════════════════════════╝" ""
   echo ""
 
@@ -372,16 +372,16 @@ cmd_understand() {
 
   # ── Quick Reference ──
   printf "${B}── Quick Reference ─────────────────────────${N}\n"
-  printf "  ${C}bapXphp test${N}        php tests/run.php\n"
-  printf "  ${C}bapXphp serve${N}       php -S 127.0.0.1:6020 index.php\n"
-  printf "  ${C}bapXphp ci${N}          lint → test → map validation → docs-map validation → smoke\n"
-  printf "  ${C}bapXphp check${N}       alias for ci\n"
-  printf "  ${C}bapXphp update${N}      regenerate and validate both repository maps\n"
-  printf "  ${C}bapXphp db query <col>${N}  --where 'field=val' --limit 10\n"
-  printf "  ${C}bapXphp db init${N}     create MySQL tables from schema\n"
-  printf "  ${C}bapXphp db sync${N}     push JSON → MySQL\n"
-  printf "  ${C}bapXphp understand${N}  Full project overview\n"
-  printf "  ${C}bapXphp help${N}        All commands\n"
+  printf "  ${C}bapXaura test${N}        php tests/run.php\n"
+  printf "  ${C}bapXaura serve${N}       php -S 127.0.0.1:6020 index.php\n"
+  printf "  ${C}bapXaura ci${N}          lint → test → map validation → docs-map validation → smoke\n"
+  printf "  ${C}bapXaura check${N}       alias for ci\n"
+  printf "  ${C}bapXaura update${N}      regenerate and validate both repository maps\n"
+  printf "  ${C}bapXaura db query <col>${N}  --where 'field=val' --limit 10\n"
+  printf "  ${C}bapXaura db init${N}     create MySQL tables from schema\n"
+  printf "  ${C}bapXaura db sync${N}     push JSON → MySQL\n"
+  printf "  ${C}bapXaura understand${N}  Full project overview\n"
+  printf "  ${C}bapXaura help${N}        All commands\n"
   echo ""
 }
 
@@ -391,12 +391,12 @@ cmd_context() {
   echo ""
   local branch
   branch=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')
-  printf "${B}${C}── bapXphp context ══ ${branch} ──${N}\n"
+  printf "${B}${C}── bapXaura context ══ ${branch} ──${N}\n"
   git -C "$ROOT" log --oneline -3 2>/dev/null | sed 's/^/  /' || true
   local dirty
   dirty=$(git -C "$ROOT" status --short 2>/dev/null | wc -l | tr -d ' ') || true
   echo "  Status: ${dirty:-0} pending"
-  echo "  bapXphp understand for full overview | bapXphp check for full validation"
+  echo "  bapXaura understand for full overview | bapXaura check for full validation"
   echo ""
 }
 
@@ -425,7 +425,7 @@ cmd_schema_list() {
 
 cmd_schema_show() {
   local collection="$1"
-  [ -z "$collection" ] && die "Usage: bapXphp schema show <collection>"
+  [ -z "$collection" ] && die "Usage: bapXaura schema show <collection>"
   [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
   php -r "
     \$s = require '$SCHEMA_FILE';
@@ -452,7 +452,7 @@ cmd_add() {
   local field_spec="" collection=""
   local args=()
 
-  # Parse: bapXphp add <field>:<type> [opts] under <collection>
+  # Parse: bapXaura add <field>:<type> [opts] under <collection>
   while [ $# -gt 0 ]; do
     case "$1" in
       under) shift; collection="$1" ;;
@@ -461,8 +461,8 @@ cmd_add() {
     shift
   done
 
-  [ -z "$collection" ] && die "Usage: bapXphp add <field>:<type> [modifiers] under <collection>"
-  [ ${#args[@]} -eq 0 ] && die "Missing field spec. Usage: bapXphp add <field>:<type> under <collection>"
+  [ -z "$collection" ] && die "Usage: bapXaura add <field>:<type> [modifiers] under <collection>"
+  [ ${#args[@]} -eq 0 ] && die "Missing field spec. Usage: bapXaura add <field>:<type> under <collection>"
 
   field_spec="${args[0]}"
   local field_name="${field_spec%%:*}"
@@ -516,8 +516,8 @@ cmd_remove() {
     shift
   done
 
-  [ -z "$collection" ] && die "Usage: bapXphp remove <field> under <collection>"
-  [ ${#args[@]} -eq 0 ] && die "Missing field name. Usage: bapXphp remove <field> under <collection>"
+  [ -z "$collection" ] && die "Usage: bapXaura remove <field> under <collection>"
+  [ ${#args[@]} -eq 0 ] && die "Missing field name. Usage: bapXaura remove <field> under <collection>"
 
   field_name="${args[0]}"
   [ -f "$SCHEMA_FILE" ] || die "Schema file not found: $SCHEMA_FILE"
@@ -570,12 +570,12 @@ cmd_tool_list() {
     desc=$(head -3 "$f" | sed -n 's/.*\* *//p' | head -1) || true
     printf "  %s  %s\n" "$name" "$desc"
   done
-  [ -x "$ROOT/bapXphp" ] && printf "  %s  %s\n" "bapXphp" "Project management CLI"
+  [ -x "$ROOT/bapXaura" ] && printf "  %s  %s\n" "bapXaura" "Project management CLI"
 }
 
 cmd_tool_add() {
   local filename="$1"
-  [ -z "$filename" ] && die "Usage: bapXphp tool add <filename.php>"
+  [ -z "$filename" ] && die "Usage: bapXaura tool add <filename.php>"
 
   # Ensure .php extension
   [[ "$filename" == *.php ]] || filename="${filename}.php"
@@ -656,13 +656,13 @@ cmd_ci() {
   php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/.map.mmd.tmp"
   if [ -f "$ROOT/map.mmd" ]; then
     if ! diff -q "$ROOT/map.mmd" "$ROOT/.map.mmd.tmp" >/dev/null 2>&1; then
-      warn "CODE MAP STALE. Run bapXphp codemap and commit map.mmd."
+      warn "CODE MAP STALE. Run bapXaura codemap and commit map.mmd."
       failed=1
     else
       ok "Code map is current"
     fi
   else
-    warn "map.mmd missing. Run bapXphp codemap."
+    warn "map.mmd missing. Run bapXaura codemap."
     failed=1
   fi
   rm -f "$ROOT/.map.mmd.tmp"
@@ -724,13 +724,13 @@ cmd_map_val() {
   php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/.map.mmd.tmp" 2>&1
   if [ -f "$ROOT/map.mmd" ]; then
     if ! diff -q "$ROOT/map.mmd" "$ROOT/.map.mmd.tmp" >/dev/null 2>&1; then
-      warn "map.mmd STALE. Run bapXphp map:gen / codemap."
+      warn "map.mmd STALE. Run bapXaura map:gen / codemap."
       rm -f "$ROOT/.map.mmd.tmp"
       return 1
     fi
     ok "map.mmd is current"
   else
-    warn "map.mmd MISSING. Run bapXphp codemap."
+    warn "map.mmd MISSING. Run bapXaura codemap."
     rm -f "$ROOT/.map.mmd.tmp"
     return 1
   fi
@@ -794,7 +794,7 @@ cmd_logs() {
     case "$1" in
       --local) mode="local" ;;
       --limit) shift; limit="${1:-20}" ;;
-      *) die "Usage: bapXphp logs [--limit N|--local]" ;;
+      *) die "Usage: bapXaura logs [--limit N|--local]" ;;
     esac
     shift
   done
@@ -824,7 +824,7 @@ cmd_logs() {
 cmd_artifacts_clean() {
   local dry_run=false
   [ "${1:-}" = "--dry-run" ] && dry_run=true
-  [ $# -gt 1 ] && die "Usage: bapXphp artifacts:clean [--dry-run]"
+  [ $# -gt 1 ] && die "Usage: bapXaura artifacts:clean [--dry-run]"
 
   local tracked
   tracked=$(git -C "$ROOT" ls-files 'server.log' 'output/playwright/**' 'storage/logs/**')
@@ -845,17 +845,17 @@ cmd_handoff() {
   local action="${1:-}" file="${2:-}" argument="${3:-}"
   case "$action" in
     active)
-      [ $# -eq 1 ] || die "Usage: bapXphp handoff active"
+      [ $# -eq 1 ] || die "Usage: bapXaura handoff active"
       local active_file="$ROOT/.agents/handoffs/active/current.json"
       [ -f "$active_file" ] || die "No active GitHub Actions handoff"
       jq . "$active_file"
       ;;
     validate)
-      [ $# -ge 2 ] && [ $# -le 3 ] && [ -n "$file" ] || die "Usage: bapXphp handoff validate <file> [--issue]"
+      [ $# -ge 2 ] && [ $# -le 3 ] && [ -n "$file" ] || die "Usage: bapXaura handoff validate <file> [--issue]"
       require_php
       php "$ROOT/cli/handoff.php" validate "$file"
       if [ -n "$argument" ]; then
-        [ "$argument" = "--issue" ] || die "Usage: bapXphp handoff validate <file> [--issue]"
+        [ "$argument" = "--issue" ] || die "Usage: bapXaura handoff validate <file> [--issue]"
         local issue_number event_file
         issue_number=$(php -r '$data=json_decode(file_get_contents($argv[1]), true); echo $data["issue"] ?? "";' "$file")
         [[ "$issue_number" =~ ^[1-9][0-9]*$ ]] || die "Handoff issue number is invalid"
@@ -865,7 +865,7 @@ cmd_handoff() {
       fi
       ;;
     next)
-      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff next <issue>"
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXaura handoff next <issue>"
       require_php
       local event_file="$ROOT/.agents/handoffs/events/${file}.json"
       [ ! -f "$event_file" ] && event_file=$(ls "$ROOT/.agents/handoffs/events/${file}"-*.json 2>/dev/null | head -1)
@@ -891,7 +891,7 @@ cmd_handoff() {
       fi
       ;;
     template)
-      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff template <issue>"
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXaura handoff template <issue>"
       require_php
       local event_file_3="$ROOT/.agents/handoffs/events/${file}.json"
       [ -f "$event_file_3" ] || die "No GitHub Actions handoff event for issue #${file}"
@@ -906,7 +906,7 @@ cmd_handoff() {
       ' "$event_file_3"
       ;;
     execute)
-      [ $# -ge 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff execute <issue> [--next role]"
+      [ $# -ge 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXaura handoff execute <issue> [--next role]"
       local nextFlag=""
       [ "$argument" = "--next" ] && nextFlag="${4:-}"
       local event_file="$ROOT/.agents/handoffs/events/${file}.json"
@@ -934,7 +934,7 @@ cmd_handoff() {
       echo "}"
       ;;
     score)
-      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXphp handoff score <issue>"
+      [ $# -eq 2 ] && [[ "$file" =~ ^[1-9][0-9]*$ ]] || die "Usage: bapXaura handoff score <issue>"
       local event_file="$ROOT/.agents/handoffs/events/${file}.json"
       if [ ! -f "$event_file" ]; then
         local found
@@ -950,7 +950,7 @@ cmd_handoff() {
 
       # 1) CI validation (30 points)
       echo -n "CI check (30pts) ... "
-      if bapXphp ci >/dev/null 2>&1; then
+      if bapXaura ci >/dev/null 2>&1; then
         score=$((score + 30))
         breakdown="${breakdown}ci:30 "
         echo "PASS"
@@ -1041,7 +1041,7 @@ cmd_handoff() {
 
       echo "Score written to handoff event"
       ;;
-    *) die "Usage: bapXphp handoff <active|validate|next|template|execute|score> <file> [--next role]" ;;
+    *) die "Usage: bapXaura handoff <active|validate|next|template|execute|score> <file> [--next role]" ;;
   esac
 }
 
@@ -1058,7 +1058,7 @@ cmd_hooks() {
       configured=$(git -C "$ROOT" config --get core.hooksPath || true)
       echo "Git hooks path: ${configured:-not installed}"
       ;;
-    *) die "Usage: bapXphp hooks <install|status>" ;;
+    *) die "Usage: bapXaura hooks <install|status>" ;;
   esac
 }
 
@@ -1081,14 +1081,14 @@ cmd_images_optimize() {
 cmd_agent() {
   local message="$*"
   if [ -z "$message" ]; then
-    echo "Usage: bapXphp agent <message>"
+    echo "Usage: bapXaura agent <message>"
     echo ""
     echo "Chat with the site AI agent."
     echo ""
     echo "Examples:"
-    echo "  bapXphp agent how many users do we have"
-    echo "  bapXphp agent what's the revenue this month"
-    echo "  bapXphp agent create a blog post about Diwali offers"
+    echo "  bapXaura agent how many users do we have"
+    echo "  bapXaura agent what's the revenue this month"
+    echo "  bapXaura agent create a blog post about Diwali offers"
     return 0
   fi
   local endpoint="${BAPX_AGENT_URL:-https://sripanchamispiritual.com/api/agent}"
@@ -1133,7 +1133,7 @@ cmd_agent() {
 # ═══════════════════════════════════════════════════════════════
 
 # ── db <command> ───────────────────────────────────────────────
-# Entry point: bapXphp db <subcommand> [args]
+# Entry point: bapXaura db <subcommand> [args]
 # Subcommands: tables, describe, list, show, query, find, raw, init, sync
 cmd_db() {
   local action="${1:-help}"
@@ -1159,20 +1159,20 @@ cmd_db() {
 cmd_db_help() {
   echo "Database commands — query MySQL directly, or via /remoteDB web proxy when local MySQL is unavailable."
   echo ""
-  echo "  bapXphp db tables              — list MySQL tables"
-  echo "  bapXphp db describe <table>    — describe MySQL table columns"
-  echo "  bapXphp db list                — list all collections from schema"
-  echo "  bapXphp db show <collection>   — show schema collection fields"
-  echo "  bapXphp db query <collection> [--where 'f=v'] [--limit N] [--id id]"
-  echo "  bapXphp db find <collection> <id>  — find record by ID"
-  echo "  bapXphp db raw <sql>           — execute raw SQL via remote endpoint"
-  echo "  bapXphp db upsert <collection> <json> — upsert record via remote endpoint"
-  echo "  bapXphp db delete <collection> <id>   — delete record via remote endpoint"
-  echo "  bapXphp db status              — verify DB paths and integration readiness"
-  echo "  bapXphp db pma <sql>           — execute SQL via phpMyAdmin web proxy"
-  echo "  bapXphp db hosted <sql>        — execute SQL on hosted MySQL through SSH"
-  echo "  bapXphp db init                — create MySQL tables from collections.php"
-  echo "  bapXphp db sync                — push JSON data files → MySQL tables"
+  echo "  bapXaura db tables              — list MySQL tables"
+  echo "  bapXaura db describe <table>    — describe MySQL table columns"
+  echo "  bapXaura db list                — list all collections from schema"
+  echo "  bapXaura db show <collection>   — show schema collection fields"
+  echo "  bapXaura db query <collection> [--where 'f=v'] [--limit N] [--id id]"
+  echo "  bapXaura db find <collection> <id>  — find record by ID"
+  echo "  bapXaura db raw <sql>           — execute raw SQL via remote endpoint"
+  echo "  bapXaura db upsert <collection> <json> — upsert record via remote endpoint"
+  echo "  bapXaura db delete <collection> <id>   — delete record via remote endpoint"
+  echo "  bapXaura db status              — verify DB paths and integration readiness"
+  echo "  bapXaura db pma <sql>           — execute SQL via phpMyAdmin web proxy"
+  echo "  bapXaura db hosted <sql>        — execute SQL on hosted MySQL through SSH"
+  echo "  bapXaura db init                — create MySQL tables from collections.php"
+  echo "  bapXaura db sync                — push JSON data files → MySQL tables"
   echo ""
   echo "Config env vars: BAPX_MYSQL_HOST, BAPX_MYSQL_DB, BAPX_MYSQL_USER, BAPX_MYSQL_PASS"
   echo "Remote endpoint: $REMOTE_DB_URL"
@@ -1205,7 +1205,7 @@ cmd_db_remote_status() {
 
 cmd_db_upsert() {
   local collection="$1" record="$2"
-  [ -n "$collection" ] && [ -n "$record" ] || die "Usage: bapXphp db upsert <collection> '<json record>'"
+  [ -n "$collection" ] && [ -n "$record" ] || die "Usage: bapXaura db upsert <collection> '<json record>'"
   php -r 'json_decode($argv[1], true, 512, JSON_THROW_ON_ERROR);' "$record" >/dev/null 2>&1 || die "Record must be valid JSON."
   local payload
   payload=$(php -r 'echo json_encode(["action"=>"upsert","collection"=>$argv[1],"record"=>json_decode($argv[2],true,512,JSON_THROW_ON_ERROR)]);' "$collection" "$record") || die "Unable to encode record."
@@ -1221,7 +1221,7 @@ cmd_db_upsert() {
 
 cmd_db_delete() {
   local collection="$1" id="$2"
-  [ -n "$collection" ] && [ -n "$id" ] || die "Usage: bapXphp db delete <collection> <id>"
+  [ -n "$collection" ] && [ -n "$id" ] || die "Usage: bapXaura db delete <collection> <id>"
   local payload
   payload=$(php -r 'echo json_encode(["action"=>"delete","collection"=>$argv[1],"id"=>$argv[2]]);' "$collection" "$id")
   curl -sS --max-time 15 -X POST "$REMOTE_DB_URL" \
@@ -1251,7 +1251,7 @@ cmd_db_tables() {
 # Shows column names, types, nullability for a given table.
 cmd_db_describe() {
   local table="$1"
-  [ -z "$table" ] && die "Usage: bapXphp db describe <table>"
+  [ -z "$table" ] && die "Usage: bapXaura db describe <table>"
   cmd_db_raw "DESCRIBE \`$table\`" 2>/dev/null || {
     warn "MySQL not reachable — showing schema instead:"
     cmd_schema_show "$table"
@@ -1297,7 +1297,7 @@ cmd_db_query() {
   done
 
   collection="${args[0]:-}"
-  [ -z "$collection" ] && die "Usage: bapXphp db query <collection> [--where 'f=v'] [--id id] [--owner email] [--limit N]"
+  [ -z "$collection" ] && die "Usage: bapXaura db query <collection> [--where 'f=v'] [--id id] [--owner email] [--limit N]"
 
   # ── Query via remote DB endpoint ──
   local sql="SELECT * FROM $collection"
@@ -1334,11 +1334,11 @@ cmd_db_query() {
 }
 
 # ── db find <collection> <id> ───────────────────────────────────
-# Shorthand for bapXphp db query <collection> --id <id>
+# Shorthand for bapXaura db query <collection> --id <id>
 cmd_db_find() {
   local collection="$1" id="$2"
-  [ -z "$collection" ] && die "Usage: bapXphp db find <collection> <id>"
-  [ -z "$id" ] && die "Usage: bapXphp db find <collection> <id>"
+  [ -z "$collection" ] && die "Usage: bapXaura db find <collection> <id>"
+  [ -z "$id" ] && die "Usage: bapXaura db find <collection> <id>"
   cmd_db_query "$collection" --id "$id"
 }
 
@@ -1346,7 +1346,7 @@ cmd_db_find() {
 # POSTs the SQL to the remote DB endpoint and outputs JSON lines.
 cmd_db_raw() {
   local sql="$*"
-  [ -z "$sql" ] && die "Usage: bapXphp db raw \"SELECT ...\""
+  [ -z "$sql" ] && die "Usage: bapXaura db raw \"SELECT ...\""
 
   curl -s --max-time 15 -X POST "$REMOTE_DB_URL" \
     -H "Content-Type: application/json" \
@@ -1368,14 +1368,14 @@ cmd_db_raw() {
 # Always uses the phpMyAdmin web interface, bypassing direct MySQL limits.
 cmd_db_pma() {
   local sql="$*"
-  [ -z "$sql" ] && die "Usage: bapXphp db pma \"SELECT ...\" (or --table-stats, --export)"
+  [ -z "$sql" ] && die "Usage: bapXaura db pma \"SELECT ...\" (or --table-stats, --export)"
   php "$ROOT/cli/pma-client.php" "$sql"
 }
 
 # ── db hosted <sql> — Execute SQL on hosting through SSH ───────
 cmd_db_hosted_sql() {
   local sql="$*"
-  [ -n "$sql" ] || die "Usage: bapXphp db hosted \"SELECT ...\""
+  [ -n "$sql" ] || die "Usage: bapXaura db hosted \"SELECT ...\""
   for name in BAPX_SSH_HOST BAPX_SSH_USER BAPX_SSH_PASS BAPX_MYSQL_DB BAPX_MYSQL_USER BAPX_MYSQL_PASS; do
     [ -n "${!name:-}" ] || die "$name is required in .env.mysql"
   done
@@ -1508,7 +1508,7 @@ cmd_bloggen() {
 cmd_product_images() {
   require_php
   local source="${1:-}"
-  [ -z "$source" ] && die "Usage: bapXphp product:images <archive.zip|folder> [--dry-run|--assets-only|--database-only]"
+  [ -z "$source" ] && die "Usage: bapXaura product:images <archive.zip|folder> [--dry-run|--assets-only|--database-only]"
   shift
   php "$ROOT/cli/import-product-images.php" "$ROOT" "$source" "$@"
 }
@@ -1546,16 +1546,16 @@ cmd_read() {
     product|products)
       php "$ROOT/cli/product-read.php" "$ROOT" "$slug" ;;
     file)
-      [ -z "$slug" ] && die "Usage: bapXphp read file <path>"
+      [ -z "$slug" ] && die "Usage: bapXaura read file <path>"
       [ -f "$slug" ] || die "File not found: $slug"
       echo "── $slug ──"
       awk '{ printf "%d: %s\n", NR, $0 }' "$slug"
       ;;
     *)
-      echo "Usage: bapXphp read blog <slug>"
-      echo "       bapXphp read docs <slug>"
-      echo "       bapXphp read product <slug>"
-      echo "       bapXphp read file <path>"
+      echo "Usage: bapXaura read blog <slug>"
+      echo "       bapXaura read docs <slug>"
+      echo "       bapXaura read product <slug>"
+      echo "       bapXaura read file <path>"
       exit 1 ;;
   esac
 }
@@ -1573,7 +1573,7 @@ cmd_write() {
     product|products)
       php "$ROOT/cli/product-write.php" "$ROOT" "$slug" ;;
     file)
-      [ -z "$slug" ] && die "Usage: bapXphp write file <path>  (provide content via stdin)"
+      [ -z "$slug" ] && die "Usage: bapXaura write file <path>  (provide content via stdin)"
       local tmpdir dir
       tmpdir=$(dirname "$slug")
       [ -d "$tmpdir" ] || mkdir -p "$tmpdir"
@@ -1583,10 +1583,10 @@ cmd_write() {
       ok "Wrote $lines lines to $slug"
       ;;
     *)
-      echo "Usage: bapXphp write blog [slug]     (create new or edit existing)"
-      echo "       bapXphp write docs [slug]     (create new or edit existing)"
-      echo "       bapXphp write product [slug]  (create new or edit existing)"
-      echo "       bapXphp write file <path>     (write file, pipe content via stdin)"
+      echo "Usage: bapXaura write blog [slug]     (create new or edit existing)"
+      echo "       bapXaura write docs [slug]     (create new or edit existing)"
+      echo "       bapXaura write product [slug]  (create new or edit existing)"
+      echo "       bapXaura write file <path>     (write file, pipe content via stdin)"
       exit 1 ;;
   esac
 }
@@ -1604,9 +1604,9 @@ cmd_edit() {
   done
 
   local path="${1:-}" search="${2:-}" replace="${3:-}"
-  [ -z "$path" ] && die "Usage: bapXphp edit <path> <search> <replace>"
+  [ -z "$path" ] && die "Usage: bapXaura edit <path> <search> <replace>"
   [ -f "$path" ] || die "File not found: $path"
-  [ -z "$search" ] && die "Usage: bapXphp edit <path> <search> <replace>"
+  [ -z "$search" ] && die "Usage: bapXaura edit <path> <search> <replace>"
 
   if [ "$preview" = true ]; then
     php -r "
@@ -1644,7 +1644,7 @@ cmd_edit() {
 # ── grep <pattern> [path] — Search file contents ───────────────
 cmd_grep() {
   local pattern="${1:-}" path="${2:-.}"
-  [ -z "$pattern" ] && die "Usage: bapXphp grep <pattern> [path]"
+  [ -z "$pattern" ] && die "Usage: bapXaura grep <pattern> [path]"
 
   if command -v rg >/dev/null 2>&1; then
     rg --line-number --color=auto "$pattern" "$path"
@@ -1658,7 +1658,7 @@ cmd_grep() {
 # ── find <glob> — Find files by glob pattern ───────────────────
 cmd_find() {
   local pattern="${1:-}"
-  [ -z "$pattern" ] && die "Usage: bapXphp find <glob-pattern>"
+  [ -z "$pattern" ] && die "Usage: bapXaura find <glob-pattern>"
 
   # Use php glob for cross-platform consistency
   php -r "
@@ -1682,7 +1682,7 @@ cmd_find() {
 
 # ── run <command...> — Execute any shell command through the CLI ─
 cmd_run() {
-  [ $# -eq 0 ] && die "Usage: bapXphp run <command...>"
+  [ $# -eq 0 ] && die "Usage: bapXaura run <command...>"
   eval "$@"
 }
 
@@ -1708,10 +1708,10 @@ cmd_todo() {
           }
         ' "$file"
       else
-        echo "No tasks. Use: bapXphp todo add \"<description>\""
+        echo "No tasks. Use: bapXaura todo add \"<description>\""
       fi ;;
     add|new)
-      [ -z "$arg" ] && die "Usage: bapXphp todo add \"<description>\""
+      [ -z "$arg" ] && die "Usage: bapXaura todo add \"<description>\""
       php -r '
         $file = $argv[1]; $content = $argv[2];
         $tasks = is_file($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
@@ -1721,7 +1721,7 @@ cmd_todo() {
       ' "$file" "$arg" ;;
     update|mod)
       local id="${2:-}" status="${3:-}"
-      [ -z "$id" ] && die "Usage: bapXphp todo update <id> <status>"
+      [ -z "$id" ] && die "Usage: bapXaura todo update <id> <status>"
       [ -z "$status" ] && die "Status required: pending, in_progress, completed, cancelled"
       php -r '
         $file = $argv[1]; $id = (int)$argv[2]; $status = $argv[3];
@@ -1733,7 +1733,7 @@ cmd_todo() {
         echo "Task #$id → $status\n";
       ' "$file" "$id" "$status" ;;
     done|complete|finish)
-      [ -z "$arg" ] && die "Usage: bapXphp todo done <id>"
+      [ -z "$arg" ] && die "Usage: bapXaura todo done <id>"
       php -r '
         $file = $argv[1]; $id = (int)$argv[2];
         $tasks = is_file($file) ? (json_decode(file_get_contents($file), true) ?: []) : [];
@@ -1744,7 +1744,7 @@ cmd_todo() {
         echo "Task #$id completed: " . $tasks[$id]["content"] . "\n";
       ' "$file" "$arg" ;;
     *)
-      echo "Usage: bapXphp todo [list|add|update|done]"
+      echo "Usage: bapXaura todo [list|add|update|done]"
       echo "  todo               — list all tasks"
       echo "  todo add <desc>    — add a new task"
       echo "  todo update <id> <status> — update task status"
@@ -1772,7 +1772,7 @@ cmd_objective() {
       ' "$objFile"
       echo ""
       echo "── Full path: $objFile ──"
-      echo "Use: bapXphp objective update to modify" ;;
+      echo "Use: bapXaura objective update to modify" ;;
     update|write|edit)
       if [ -n "$arg" ] && [ "$arg" != "-" ]; then
         echo "$arg" >> "$objFile"
@@ -1783,9 +1783,9 @@ cmd_objective() {
         echo "Appended to OBJECTIVE.md"
       fi ;;
     *)
-      echo "Usage: bapXphp objective read"
-      echo "       bapXphp objective update <text>"
-      echo "       bapXphp objective update (paste with Ctrl+D)"
+      echo "Usage: bapXaura objective read"
+      echo "       bapXaura objective update <text>"
+      echo "       bapXaura objective update (paste with Ctrl+D)"
       exit 1 ;;
   esac
 }
@@ -1809,7 +1809,7 @@ cmd_task() {
       done
       [ "$count" -eq 0 ] && echo "No tasks." ;;
     run|dispatch|create)
-      [ -z "$arg" ] && die "Usage: bapXphp task run \"<description>\""
+      [ -z "$arg" ] && die "Usage: bapXaura task run \"<description>\""
       local id; id=$(date +%s | md5 | head -8) || id="task_$(date +%s)"
       php -r '
         $task = [
@@ -1825,7 +1825,7 @@ cmd_task() {
         echo "  File: " . $argv[3] . "/" . $argv[1] . ".json\n";
       ' "$id" "$arg" "$dir" ;;
     status)
-      [ -z "$arg" ] && die "Usage: bapXphp task status <id>"
+      [ -z "$arg" ] && die "Usage: bapXaura task status <id>"
       local f="$dir/$arg.json"
       [ -f "$f" ] || die "Task not found: $arg"
       php -r '
@@ -1834,9 +1834,9 @@ cmd_task() {
           $t["id"] ?? "?", $t["description"] ?? "?", $t["status"] ?? "?", $t["created_at"] ?? "?");
       ' "$f" ;;
     *)
-      echo "Usage: bapXphp task run \"<description>\""
-      echo "       bapXphp task list"
-      echo "       bapXphp task status <id>"
+      echo "Usage: bapXaura task run \"<description>\""
+      echo "       bapXaura task list"
+      echo "       bapXaura task status <id>"
       exit 1 ;;
   esac
 }
@@ -1844,7 +1844,7 @@ cmd_task() {
 # ── question — Ask the user a question ───────────────────────────────
 cmd_question() {
   local text="${*:-}"
-  [ -z "$text" ] && die "Usage: bapXphp question <text>"
+  [ -z "$text" ] && die "Usage: bapXaura question <text>"
 
   echo ""
   echo "╔══════════════════════════════════════════╗"
@@ -1914,10 +1914,10 @@ cmd_memory() {
       echo "Session memory initialized at $f" ;;
     add|append)
       local role="${2:-user}" text="${3:-}"
-      shift 2; [ $# -eq 0 ] && die "Usage: bapXphp memory add <role> <content>"
+      shift 2; [ $# -eq 0 ] && die "Usage: bapXaura memory add <role> <content>"
       memory_append "$role" "$*" "" ;;
     list|ls|all)
-      [ -f "$f" ] || die "No session memory. Start with: bapXphp memory init"
+      [ -f "$f" ] || die "No session memory. Start with: bapXaura memory init"
       php -r '
         $data = json_decode(file_get_contents($argv[1]), true);
         $entries = $data["entries"] ?? [];
@@ -1934,7 +1934,7 @@ cmd_memory() {
         }
       ' "$f" ;;
     search|grep)
-      [ -z "$arg" ] && die "Usage: bapXphp memory search <text>"
+      [ -z "$arg" ] && die "Usage: bapXaura memory search <text>"
       [ -f "$f" ] || die "No session memory."
       php -r '
         $q = $argv[1]; $data = json_decode(file_get_contents($argv[2]), true);
@@ -1983,7 +1983,7 @@ cmd_memory() {
       rm -f "$f"
       echo "Session memory cleared." ;;
     *)
-      echo "Usage: bapXphp memory <action> [args]"
+      echo "Usage: bapXaura memory <action> [args]"
       echo ""
       echo "Actions:"
       echo "  init                      Initialize new session memory"
@@ -2032,7 +2032,7 @@ cmd_context_extract() {
     // Detect marker commands that the user types as conversation section dividers
     function isMarker($text) {
       $t = trim(mb_strtolower($text));
-      return $t === "bapxphp opencode compact" || $t === "bapxphp codex compact";
+      return $t === "bapxaura opencode compact" || $t === "bapxaura codex compact";
     }
 
     $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -2290,16 +2290,16 @@ cmd_context_extract() {
 }
 
 # ── context — Search extracted conversation context ──────────────
-# Usage: bapXphp context <query>
+# Usage: bapXaura context <query>
 # Searches .tmp/context-extract.xml for messages matching <query>
 # and shows surrounding context.
 cmd_context() {
-  [ $# -lt 1 ] && err "Usage: bapXphp context <query>" && return 1
+  [ $# -lt 1 ] && err "Usage: bapXaura context <query>" && return 1
 
   local query="$1"
   local file="$ROOT/.tmp/context-extract.xml"
 
-  [ ! -f "$file" ] && err "No context file found. Run 'bapXphp context-extract' first." && return 1
+  [ ! -f "$file" ] && err "No context file found. Run 'bapXaura context-extract' first." && return 1
 
   require_php
 
@@ -2506,10 +2506,10 @@ main() {
       shift; cmd_db "$@" ;;
     # Backward compatibility: mysql:* aliases
     mysql:query|mysql-query)
-      warn "[DEPRECATED] Use 'bapXphp db raw' instead"
+      warn "[DEPRECATED] Use 'bapXaura db raw' instead"
       shift; cmd_db_raw "$@" ;;
     mysql:import|mysql-import)
-      warn "[DEPRECATED] Use 'bapXphp db sync' instead"
+      warn "[DEPRECATED] Use 'bapXaura db sync' instead"
       cmd_db_sync ;;
     docsmap)
       cmd_docsmap ;;

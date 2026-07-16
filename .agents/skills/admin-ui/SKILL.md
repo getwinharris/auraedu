@@ -17,7 +17,7 @@ description: Use when editing owner/admin pages, CRUD forms, media library, envi
 The admin panel has an agent interface at `/admin/agent` that:
 
 1. **Answers questions** about the site: user count, orders, revenue, products, consultations
-2. **Creates/edits blog posts** via natural language prompts (delegates to `bapXphp write blog`)
+2. **Creates/edits blog posts** via natural language prompts (delegates to `bapXaura write blog`)
 3. **Reads MySQL data** through `DatabaseService` to answer queries
 4. **Calls AI model** configured in Admin → Integrations (Google Gemini endpoint by default)
 5. **Reads attachments** from `.agents/temp/` (screenshots, documents provided by the user)
