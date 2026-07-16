@@ -3028,10 +3028,8 @@ h1, h2, h3, h4, h5, h6,
 
 .section { padding: 64px 24px; }
 .section--full { padding-left: 0; padding-right: 0; }
-.section-title { font-size: 1.75rem; font-weight: 700; }
 .section-title::before,
 .section-title::after { display: none; }
-.eyebrow { color: var(--color-text-muted); letter-spacing: 0; }
 
 .astro-search-toolbar {
     align-items: stretch;
