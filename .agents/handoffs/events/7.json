@@ -5,12 +5,17 @@
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
-    "sequence": ["cto", "worker", "reviewer", "cto"]
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
   },
   "payload": {
-    "title": "fix: rename /temples route to /hospitals across entire codebase",
-    "body": "The /temples public route still uses the old temple naming. Rename to /hospitals to match the Aura Medical Institute repositioning. Includes controller methods, view files, nav links, API endpoint, route descriptions, and a 301 redirect from /temples to /hospitals for backward compatibility.",
-    "labels": ["enhancement", "routes"]
+    "title": "bug: ai-pr-review.yml returns 'No diff to review' / 'Skip: empty AI response' on every PR",
+    "body": "## Bug Report\n\n### Description\nThe AI PR review workflow () consistently returns empty or skipped review comments. It posts either \"No diff to review\" or \"Skip: empty AI response\" on every PR.\n\n### Evidence from PR #4\nhttps://github.com/getwinharris/auraedu/pull/4\n\nMultiple comments from `github-actions[bot]`:\n> 🤖 AI Code Review\n> No diff to review.\n\nAnd also:\n> Skip: empty AI response\n\n### Root causes\n\n**1. Diff collection fails (\"No diff to review\")**  \nThe workflow does `git diff origin/${{ github.base_ref }}...HEAD` but only fetches with `--depth=1`. The base branch commit isn't available for comparison, so the diff is empty.\n\n**2. No AI endpoint configured (\"Skip: empty AI response\")**  \nThe inline PHP script checks for `AGENT_ENDPOINT` + `BAPX_AI_API_KEY` secrets, then falls back to `APP_URL`. None are set in the repository's GitHub Secrets, so it always falls through to \"Skip\".\n\n### Steps to reproduce\n1. Open any PR against `main`\n2. Wait for the `ai-pr-review` workflow to complete\n3. Observe the \"No diff to review\" or \"Skip: empty AI response\" comment\n\n### Required fixes\n1. Set up GitHub Secrets: `AGENT_ENDPOINT`, `BAPX_AI_API_KEY`, `BAPX_AI_MODEL` in the repository settings\n2. Or set `APP_URL` to point to the production server so the workflow can call `/api/chat/completions`\n3. Fix diff collection: use `git fetch origin ${{ github.base_ref }} --depth=1` before diffing\n\n### Workflow file\n`.github/workflows/ai-pr-review.yml`",
+    "labels": []
   },
   "repository": {
     "owner": "getwinharris",
@@ -18,25 +23,17 @@
   },
   "objectives": [
     {
-      "id": "OBJ-ROUTE-1",
-      "status": "pass",
-      "evidence": [
-        "index.php: whitelist /temples→/hospitals, added 301 redirect",
-        "PublicController: temples()→hospitals(), temple()→hospital()",
-        "Copied views: temples.php→hospitals.php, temple.php→hospital.php with internal links updated",
-        "ApiController: temples()→hospitals(), /api/temples→/api/hospitals",
-        "SupportBotService: regex whitelist + friendly name updated",
-        "ProjectMapService: all 6 route entries + descriptions updated",
-        "app.php: all nav links /temples→/hospitals (4 occurrences)",
-        "smoke-local.php: expected routes updated",
-        "support.php: link updated"
-      ],
+      "id": "OBJ-7-1",
+      "status": "gap",
+      "evidence": [],
       "browser_evidence": [],
-      "unresolved": []
+      "unresolved": [
+        "Handoff created - awaiting CTO"
+      ]
     }
   ],
   "telemetry": {
-    "started_at": "2026-07-17T00:00:00Z",
+    "started_at": "2026-07-16T22:14:47.582Z",
     "handoffs_completed": 0
   }
 }
