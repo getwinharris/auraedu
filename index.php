@@ -93,6 +93,12 @@ if ($uri !== null && $uri !== '/' && str_ends_with($uri, '/')) {
     exit;
 }
 
+// Legacy rebrand redirects (institute repositioning)
+if ($uri === '/sri-panchami-education') {
+    header('Location: /education', response_code: 301);
+    exit;
+}
+
 // PHP routes (admin + public pages)
 $phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/temples','/consult','/consultation','/astrologer','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
 $isPhpRoute = false;

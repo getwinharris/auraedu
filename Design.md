@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: AuraEdu
-description: Calm, credible interface system for a consultation-first education service with supporting commerce and editorial content.
+description: Calm, credible interface system for Aura Medical Institute of Electropathy and Hospital — an institute/hospital with B.E.M.S. education, hospital care, and supporting therapy-product commerce.
 colors:
   primary: "#08A900"
   on-primary: "#ffffff"
@@ -96,7 +96,7 @@ components:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.sm}"
     padding: 16px
-  card-astrologer:
+  card-therapist:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.sm}"
   input:
@@ -140,7 +140,7 @@ Keep the existing PHP templates, routes, forms, and JSON-backed behavior. Design
 - Responsive breakpoints: mobile below `744px` (one column, compact header, bottom nav), tablet `744-1128px` (reduced grid columns, same card geometry), desktop above `1128px` (centered container, `64px` section spacing).
 - Text, buttons, images, and fixed controls must not overlap or reflow awkwardly as content length changes.
 - Do not scale typography with viewport width. Use explicit breakpoint sizes so headings remain predictable and do not dominate short mobile screens.
-- The first viewport must show the product's primary action and a hint of the next section. Home leads to consultation; shop leads to products; account pages lead to the user's current task.
+- The first viewport must lead with the institute: B.E.M.S. programme, admissions, and hospital care. Therapy-product commerce is a supporting function, not the primary narrative. Account pages lead to the user's current task.
 - Page sections are unframed full-width bands. Cards are reserved for repeated entities, forms, summaries, and genuinely bounded tools. Never place a card inside another decorative card.
 - Desktop operational screens use compact density and stable columns. Mobile screens use one clear column with 16px page gutters and no horizontal scrolling.
 
@@ -154,7 +154,7 @@ Four shadow steps exist (`--shadow-sm/md/lg/xl` in `band.css`), each with exactl
 |---|---|
 | `sm` | Resting state for cards and inputs |
 | `md` | Raised buttons; hovered product cards |
-| `lg` | Hovered astrologer cards and feature/value cards |
+| `lg` | Hovered therapist/feature cards and value cards |
 | `xl` | Modals, drawers, popovers only |
 
 Rules:
@@ -187,15 +187,15 @@ Shape should stay consistent within a component family -- don't mix `sm` and `lg
 - **Forms:** white fields (`on-primary`), `8px` radius, `48px` height, clear labels, a single-value focus ring (`--shadow-focus`) -- no glow.
 - **Search/filter:** one rounded (`pill`) search control, or a quiet grouped filter row. No nested cards for filters.
 - **Product cards (`card-product`):** white, `8px` radius, 1px quiet border, stable 1:1 media, concise title and price, then the `- 0 +` quantity control. Do not add a second cart button.
-- **Consultant cards (`card-astrologer`):** white, `8px` radius, face-forward portrait, name, speciality, language/experience metadata, review summary when present, and one clear profile/booking action. Every card uses equal media and content tracks so rows align.
-- **Hero:** consultation-first offer over actual devotional imagery. The primary action is `Book a consultation`; shopping is secondary. Desktop text is left aligned. Mobile uses one column, a compact image, and must reveal the next content band without requiring a full-screen scroll.
+- **Therapist / faculty cards (`card-therapist`):** white, `8px` radius, face-forward portrait, name, speciality, language/experience metadata, and one clear profile/booking action. Every card uses equal media and content tracks so rows align.
+- **Hero:** institute-led offer — B.E.M.S., admissions, and hospital care over actual campus/hospital imagery. The primary action is `Explore B.E.M.S. Admissions`; therapy shop is secondary. Desktop text is left aligned. Mobile uses one column, a compact image, and must reveal the next content band without requiring a full-screen scroll.
 - **Authentication:** login and registration are task pages, not marketing pages. Use a centered form surface, suppress the public footer, and keep the complete form visible on common mobile heights.
 - **Consultation discovery:** search and language controls form one quiet toolbar. Results render immediately without reveal animations or low-opacity loading states. Empty and filtered states explain the next action.
 - **Account:** use a persistent internal menu and one unframed content region. Orders, sessions, addresses, and installation are tasks, not promotional cards.
 - **Admin:** optimize for scanning and repeated action: compact sidebar, clear tables, consistent forms, explicit save state, and no marketing-style hero composition.
 - **Value-proposition cards:** 4-column desktop / 2 tablet / 1 mobile, white card, warm icon circle, `accent-italic` heading, muted body, `4px` hover lift into `shadow-lg`.
 - **Footer:** white background, soft border, warm-brown headings, muted body, bottom bar with copyright + credit.
-- **Documents and guides:** Markdown-backed pages use the same warm canvas and a constrained reading column. The page header is centered and quiet; the content surface is white with a single soft border, 14px-20px radius, and `shadow-sm`. Use maroon `h2` headings, muted body text at 1.6-1.7 line-height, generous section spacing, and gold only for eyebrows, links, and small metadata. Documentation indexes use a two-column desktop grid and one-column mobile layout with clear titles, summaries, and a visible `Read guide` action. Do not render legal or customer documentation as long unstructured text or nested cards.
+- **Documents and guides:** Markdown-backed pages use the same light canvas and a constrained reading column. The page header is centered and quiet; the content surface is white with a single soft border, 14px-20px radius, and `shadow-sm`. Use green `h2` headings, muted body text at 1.6-1.7 line-height, generous section spacing, and orange only for CTAs/eyebrows. Documentation indexes use a two-column desktop grid and one-column mobile layout with clear titles, summaries, and a visible `Read guide` action. Do not render legal or customer documentation as long unstructured text or nested cards.
 
 ## Do's and Don'ts
 

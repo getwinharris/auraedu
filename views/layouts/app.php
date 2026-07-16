@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <title><?= e($pageTitle ?? 'AuraEdu') ?></title>
-<meta name="description" content="<?= e($metaDescription ?? 'Book a private consultant appointment and shop education products, rudraksha, pooja items, and sacred jewellery.') ?>">
+<meta name="description" content="<?= e($metaDescription ?? 'Aura Medical Institute of Electropathy and Hospital — B.E.M.S. admissions, hospital care, acupuncture and allied-health therapies in Coimbatore.') ?>">
 <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
 <?php $__seoKeywords = $seo['keywords'] ?? ''; if ($__seoKeywords !== ''): ?><meta name="keywords" content="<?= e($__seoKeywords) ?>"><?php endif; ?>
 <?php
@@ -307,9 +307,10 @@ gtag('js', new Date());
     </button>
 <?php try { $__blogCats = (new \App\Services\BlogService())->categories(); } catch (\Throwable $e) { $__blogCats = []; } ?>
     <nav id="primary-nav">
+        <a href="/education"<?= str_starts_with($currentPath, '/education') ? ' aria-current="page"' : '' ?>>B.E.M.S.</a>
         <a href="/shop"<?= str_starts_with($currentPath, '/shop') ? ' aria-current="page"' : '' ?>>Shop</a>
-        <a href="/consult"<?= str_starts_with($currentPath, '/consult') ? ' aria-current="page"' : '' ?>>Consult</a>
-        <a href="/temples"<?= str_starts_with($currentPath, '/temples') ? ' aria-current="page"' : '' ?>>Temples</a>
+        <a href="/consult"<?= str_starts_with($currentPath, '/consult') ? ' aria-current="page"' : '' ?>>Therapies</a>
+        <a href="/temples"<?= str_starts_with($currentPath, '/temples') ? ' aria-current="page"' : '' ?>>Hospital</a>
         <div class="nav-dropdown">
             <a href="/blog" class="nav-dropdown__trigger"<?= str_starts_with($currentPath, '/blog') ? ' aria-current="page"' : '' ?>>Blog <span class="nav-dropdown__arrow">▾</span></a>
             <div class="nav-dropdown__menu">
@@ -319,7 +320,7 @@ gtag('js', new Date());
                 <?php endforeach; ?>
             </div>
         </div>
-        <a href="/about"<?= str_starts_with($currentPath, '/about') ? ' aria-current="page"' : '' ?>>About AuraEdu</a>
+        <a href="/about"<?= str_starts_with($currentPath, '/about') ? ' aria-current="page"' : '' ?>>About</a>
         <a href="/contact"<?= str_starts_with($currentPath, '/contact') ? ' aria-current="page"' : '' ?>>Contact</a>
         <?php if(!empty($_SESSION['user'])): ?>
             <a href="/account/dashboard"<?= str_starts_with($currentPath, '/account/dashboard') ? ' aria-current="page"' : '' ?>>Dashboard</a>
@@ -351,17 +352,21 @@ if ($__flash):
 <?php if (!in_array($currentPath, ['/login', '/register'])): ?>
 <nav class="bottom-nav" id="bottom-nav">
     <div class="nav-grid">
+        <a href="/education" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/education') === 0 ? 'active' : '') ?>">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <span>B.E.M.S.</span>
+        </a>
         <a href="/shop" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/shop') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             <span>Shop</span>
         </a>
         <a href="/consult" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/consult') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 000 20 14.5 14.5 0 000-20"/><path d="M2 12h20"/></svg>
-            <span>Consult</span>
+            <span>Therapies</span>
         </a>
         <a href="/temples" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/temples') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4 8 4v14"/><path d="M9 21v-4a2 2 0 012-2h2a2 2 0 012 2v4"/></svg>
-            <span>Temples</span>
+            <span>Hospital</span>
         </a>
         <a href="/blog" class="nav-item <?= (strpos($_SERVER['REQUEST_URI'], '/blog') === 0 ? 'active' : '') ?>">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -409,15 +414,16 @@ if ($__flash):
         <div class="footer-grid">
             <div>
                 <span class="footer-brand">AuraEdu</span>
-                <p class="footer-desc">Scheduled astrology consultations, authentic education products, sacred jewellery, rudraksha, pooja items, and temple guidance.</p>
+                <p class="footer-desc">Aura Medical Institute of Electropathy and Hospital — B.E.M.S. medical education, hospital care, acupuncture, and allied-health therapies in Coimbatore.</p>
             </div>
             <div>
-                <h4 class="footer-heading">Shop</h4>
+                <h4 class="footer-heading">Institute</h4>
                 <ul class="footer-links">
-                    <li><a href="/shop">All Products</a></li>
-                    <li><a href="/consult">Consult</a></li>
-                    <li><a href="/temples">Temples</a></li>
-                    <li><a href="/about">About AuraEdu</a></li>
+                    <li><a href="/education">B.E.M.S. Admissions</a></li>
+                    <li><a href="/shop">Therapy Products</a></li>
+                    <li><a href="/consult">Therapies</a></li>
+                    <li><a href="/temples">Hospital</a></li>
+                    <li><a href="/about">About</a></li>
                     <li><a href="/blog">Blog</a></li>
                     <li><a href="/contact">Contact</a></li>
                     <li><a href="/terms">Terms</a></li>
@@ -425,15 +431,15 @@ if ($__flash):
                 </ul>
             </div>
             <div>
-                <h4 class="footer-heading">Services</h4>
+                <h4 class="footer-heading">Care &amp; Training</h4>
             <ul class="footer-links">
-                <li><a href="/consult">Consult</a></li>
-                <li><a href="/temples">Temples</a></li>
+                <li><a href="/consult">Therapies</a></li>
+                <li><a href="/temples">Hospital</a></li>
+                <li><a href="/education">Admissions</a></li>
                 <li><a href="/blog">Blog</a></li>
                 <?php foreach ($__blogCats as $__cat): ?>
                 <li><a href="/blog/category/<?= e($__cat['slug'] ?? '') ?>"><?= e($__cat['name'] ?? '') ?></a></li>
                 <?php endforeach; ?>
-                <li><a href="/about">About AuraEdu</a></li>
                 <li><a href="/contact">Contact</a></li>
             </ul>
             </div>

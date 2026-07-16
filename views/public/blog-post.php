@@ -57,7 +57,7 @@
         </div>
       </header>
 
-      <?php $articleImage = $meta['image'] ?? $meta['og_image'] ?? '/assets/images/hero-temple-bg.webp'; ?>
+      <?php $articleImage = $meta['image'] ?? $meta['og_image'] ?? '/assets/images/og-image.jpg'; ?>
       <figure class="blog-post__featured"><img src="<?= e($articleImage) ?>" alt="<?= e($meta['image_alt'] ?? '') ?>" loading="eager"></figure>
 
       <div class="blog-post__content">
