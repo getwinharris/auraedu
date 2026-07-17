@@ -5,7 +5,12 @@
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
-    "sequence": ["cto", "worker", "reviewer", "cto"]
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
   },
   "payload": {
     "title": "cleanup: remove remaining astrologer/spiritual references from production code",
@@ -16,30 +21,23 @@
       "name": "auraedu"
     }
   },
+  "repository": {
+    "owner": "bapXai",
+    "name": "auraedu"
+  },
   "objectives": [
     {
-      "id": "OBJ-CLEAN-ASTRO-1",
-      "status": "pass",
-      "evidence": [
-        "robots.txt: removed /astrologer/ disallow",
-        "AuthService: requireAstrologer()→requirePractitioner(), role check astrologer→practitioner",
-        "AuthController: removed astrologer_slug from Google OAuth + login sessions, removed astrologer role block",
-        "ApiController consult(): $astrologers→$products, response key astrologers→products",
-        "MediaService: removed 'astrologers' from all 3 context arrays",
-        "Admin dashboard: removed Astrologers card, updated text to 'Manage sessions, hospital facilities'",
-        "Admin media: removed 'Astrologers' option from context dropdown",
-        "Admin resource: removed astrologers from collection check + data-field ternary",
-        "SupportBotService: removed astrologer keyword trigger + response text",
-        "AgentController: removed astrologerCount from AI context",
-        "PublicController: 'sacred items'→'therapy and wellness products' in SEO",
-        "Consult view: 'Vedic Astrology'→'Therapy & Wellness', review summary key 'astrologer'→'product'"
-      ],
+      "id": "OBJ-8-1",
+      "status": "gap",
+      "evidence": [],
       "browser_evidence": [],
-      "unresolved": []
+      "unresolved": [
+        "Handoff created - awaiting CTO"
+      ]
     }
   ],
   "telemetry": {
-    "started_at": "2026-07-17T00:00:00Z",
+    "started_at": "2026-07-16T22:15:24.319Z",
     "handoffs_completed": 0
   }
 }
