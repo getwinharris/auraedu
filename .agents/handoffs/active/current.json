@@ -3,8 +3,8 @@
   "issue": 8,
   "actor": "getwinharris",
   "workflow": {
-    "current_role": "cto",
-    "next_role": "worker",
+    "current_role": "merge_bot",
+    "next_role": "deployment",
     "sequence": [
       "cto",
       "worker",
