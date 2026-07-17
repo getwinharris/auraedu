@@ -64,7 +64,7 @@ set -euo pipefail
 #                                   — untrack and ignore runtime/test artifacts
 #   bapXaura hooks install           — install .agents/hooks as this checkout's Git hooks
 #   bapXaura hooks status            — show configured Git hooks path
-#   bapXaura tui                     — open the interactive project terminal UI
+#   bapXaura repl                    — interactive bidirectional CLI session
 #   bapXaura handoff validate <file> [--issue]
 #                                   — validate structure and local Action event objective coverage
 #   bapXaura handoff active          — show the current GitHub Actions handoff
@@ -98,6 +98,9 @@ set -euo pipefail
 #
 # ── AI / Agent ───────────────────────────────────────────────────
 #   bapXaura agent <message>          — chat with the site AI agent
+#   bapXaura agent:listen             — start cloud agent runtime listener (long-running)
+#   bapXaura agent:prompt <role> <issue> <msg>
+#                                   — prompt a cloud agent role (cto/worker/reviewer/...)
 #   bapXaura ai:config               — show AI model config from MySQL secrets
 #   bapXaura ai:probe                — safely verify the configured model endpoint
 #   bapXaura handoff execute <issue> [--next role]
@@ -1062,9 +1065,59 @@ cmd_hooks() {
   esac
 }
 
-cmd_tui() {
-  require_php
-  php "$ROOT/cli/tui.php"
+cmd_repl() {
+  local histfile="$ROOT/.tmp/repl_history.txt"
+  mkdir -p "$ROOT/.tmp"
+  touch "$histfile"
+  printf "${B}${C}╔══════════════════════════════════════════════╗${N}\n"
+  printf "${B}${C}║${N}  bapXaura REPL — bidirectional CLI shell   ${B}${C}║${N}\n"
+  printf "${B}${C}╚══════════════════════════════════════════════╝${N}\n"
+  echo "  Type any bapXaura command or enter AI prompts."
+  echo "  Prefix with 'ai: ' to chat with the agent."
+  echo "  Type 'help', 'exit', or Ctrl+D to quit."
+  echo ""
+  local branch
+  branch=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')
+  while true; do
+    if ! read -r -e -p "bapX(${branch})> " line; then
+      echo ""
+      break
+    fi
+    history -s "$line"
+    echo "$line" >> "$histfile"
+    case "$line" in
+      exit|quit|q)
+        break ;;
+      help)
+        cmd_help ;;
+      ai:*)
+        local msg="${line#ai: }"
+        local endpoint="${BAPX_AGENT_URL:-${APP_URL%/}/api/agent}"
+        echo ""
+        echo "  ⏳ thinking..."
+        local resp
+        resp=$(curl -s -X POST "$endpoint" \
+          -H 'Content-Type: application/json' \
+          -d "$(printf '{"message":"%s","source":"cli"}' "$(echo "$msg" | sed 's/"/\\"/g')")" \
+          --connect-timeout 10 --max-time 60 2>&1) || true
+        local answer
+        answer=$(echo "$resp" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('answer','') or d.get('error','No response'))" 2>/dev/null)
+        if [ -n "$answer" ]; then
+          echo ""
+          echo "$answer" | sed 's/^/  /'
+        else
+          echo "  Error: $resp"
+        fi
+        echo "" ;;
+      "")
+        continue ;;
+      npm\ *)
+        cd "$ROOT" && eval "${line}" 2>&1 | sed 's/^/  /' ;;
+      *)
+        cd "$ROOT" && eval "php cli/bapXaura ${line} 2>&1" | sed 's/^/  /' ;;
+    esac
+  done
+  echo "bye!"
 }
 
 # ── Mail & Images ──────────────────────────────────────────────
@@ -1076,6 +1129,79 @@ cmd_mail_process() {
 cmd_images_optimize() {
   require_php
   php "$ROOT/cli/optimize-images.php" 2>&1
+}
+
+cmd_agent_listen() {
+  require_php
+  echo "Agent runtime listening for handoff events..."
+  echo "PID: $$"
+  local events_dir="$ROOT/.agents/handoffs/events"
+  local processed_file="$ROOT/.tmp/agent-processed.log"
+  mkdir -p "$ROOT/.tmp"
+  touch "$processed_file"
+  while true; do
+    for event_file in "$events_dir"/*.json; do
+      [ -f "$event_file" ] || continue
+      local event_name
+      event_name=$(basename "$event_file")
+      if grep -q "$event_name" "$processed_file" 2>/dev/null; then
+        continue
+      fi
+      echo "[$(date '+%H:%M:%S')] Processing: $event_name"
+      php -r '
+        require "'"$ROOT"'/app/bootstrap.php";
+        $file = "'"$event_file"'";
+        $data = json_decode(file_get_contents($file), true);
+        if (!$data) { echo "  Invalid JSON\n"; exit(1); }
+        $runtime = new App\Services\AgentRuntimeService();
+        $result = $runtime->executeHandoff($data, []);
+        echo "  Role: " . ($data["to_role"] ?? "?") . "\n";
+        echo "  Issue: #" . ($data["issue"] ?? "?") . "\n";
+        echo "  Status: " . ($result["handled"] ? "processed" : "failed") . "\n";
+      ' 2>&1
+      echo "$event_name" >> "$processed_file"
+    done
+    sleep 10
+  done
+}
+
+cmd_agent_prompt() {
+  local message="$*"
+  if [ -z "$message" ]; then
+    echo "Usage: bapXaura agent:prompt <role> <issue> <message>"
+    echo ""
+    echo "Prompt a cloud agent role directly."
+    echo ""
+    echo "Examples:"
+    echo '  bapXaura agent:prompt cto 42 "Implement hospital listing feature"'
+    echo '  bapXaura agent:prompt worker 43 "Add search to hospitals page"'
+    return 0
+  fi
+  local role="${1:-cto}"
+  local issue="${2:-0}"
+  shift 2 2>/dev/null || true
+  local text="$*"
+  if [ -z "$text" ]; then
+    echo "Error: message text required"
+    return 1
+  fi
+  local endpoint="${BAPX_AGENT_URL:-${APP_URL%/}/api/agent/prompt}"
+  echo "Prompting $role agent for issue #$issue..."
+  local response
+  response=$(curl -s -X POST "$endpoint" \
+    -H 'Content-Type: application/json' \
+    -d "$(printf '{"role":"%s","issue":%d,"title":"Agent Prompt","message":"%s"}' "$role" "$issue" "$(echo "$text" | sed 's/"/\\"/g')")" \
+    --connect-timeout 10 --max-time 120 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "Error: Could not reach agent at $endpoint"
+    return 1
+  fi
+  echo "$response" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+resp = d.get('response', d.get('error', 'Unknown'))
+print(resp)
+" 2>/dev/null || echo "$response"
 }
 
 cmd_agent() {
@@ -2493,8 +2619,8 @@ main() {
       shift; cmd_artifacts_clean "$@" ;;
     hooks)
       shift; cmd_hooks "$@" ;;
-    tui)
-      cmd_tui ;;
+    repl|interactive|shell)
+      cmd_repl ;;
     handoff)
       shift; cmd_handoff "$@" ;;
     ai:config|ai-config|model-config)
@@ -2505,6 +2631,10 @@ main() {
       cmd_mail_process ;;
     agent)
       shift; cmd_agent "$@" ;;
+    agent:listen|agent-listen)
+      cmd_agent_listen ;;
+    agent:prompt|agent-prompt)
+      shift; cmd_agent_prompt "$@" ;;
     images:optimize|images-optimize|imgopt)
       cmd_images_optimize ;;
     product:images|product-images)

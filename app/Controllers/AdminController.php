@@ -49,7 +49,9 @@ final class AdminController extends BaseController {
     public function agent(): void{
         $secrets = new SecretService();
         $modelConfig = $secrets->getModelConfig();
-        $this->render('admin/agent',['pageTitle'=>'AI Agent','modelConfig'=>$modelConfig]);
+        $allSecrets = $secrets->all();
+        $agentName = $allSecrets['agent_name'] ?? $modelConfig['model'] ?? 'bapXcli';
+        $this->render('admin/agent',['pageTitle'=>'AI Agent','modelConfig'=>$modelConfig,'agentName'=>$agentName]);
     }
     public function agentAsk(): void{
         $message = trim((string)($_POST['message'] ?? ''));
@@ -197,7 +199,23 @@ final class AdminController extends BaseController {
     public function emailOutbox(): void{$this->render('admin/mailbox',['pageTitle'=>'Email Outbox','title'=>'Email Outbox','box'=>'outbox','items'=>(new MailStorageService())->outbox()]);}
     public function media(): void{$this->render('admin/media',['pageTitle'=>'Media Library','items'=>(new MediaService())->all()]);}
     public function uploadMedia(): void{$uploaded=(new MediaService())->upload($_FILES['media_files'] ?? [], $_POST['context'] ?? 'shared', $_POST['description'] ?? null); (new AuditLogService())->record('upload','media','',['count'=>count($uploaded),'context'=>$_POST['context'] ?? 'shared']); $this->flash(count($uploaded).' media file'.(count($uploaded) === 1 ? '' : 's').' uploaded.','success'); $this->redirect('/admin/media');}
-    public function fixPermissions(): void{(new StoragePermissionService())->fix(); (new AuditLogService())->record('fix','permissions','storage'); $this->flash('Storage permissions checked and updated where PHP is allowed.','success'); $this->redirect('/admin/settings');}
+    public function environment(): void{
+        $envService = new EnvService();
+        $permService = new StoragePermissionService();
+        $this->render('admin/environment', [
+            'pageTitle' => 'Environment',
+            'envRaw' => $envService->raw(),
+            'permissions' => $permService->status(),
+        ]);
+    }
+    public function saveEnvironment(): void{
+        $raw = (string)($_POST['env_raw'] ?? '');
+        (new EnvService())->saveRaw($raw);
+        (new AuditLogService())->record('edit', 'environment', '.env');
+        $this->flash('Environment saved. Changes take effect on next request.','success');
+        $this->redirect('/admin/environment');
+    }
+    public function fixPermissions(): void{(new StoragePermissionService())->fix(); (new AuditLogService())->record('fix','permissions','storage'); $this->flash('Storage permissions checked and updated where PHP is allowed.','success'); $this->redirect('/admin/environment');}
     public function projectMap(): void{$map = \App\Services\ProjectMapService::scan(); $this->render('admin/project-map',['pageTitle' => 'Project Map', 'map'=>$map,'validation'=>\App\Services\ProjectMapService::validate($map)]);}
     public function workflow(): void{
         $agentRoot = app_path('.agents');
@@ -367,5 +385,200 @@ final class AdminController extends BaseController {
         $vals = [];
         foreach ($rgb as $c) { $s = $c / 255; $vals[] = $s <= 0.03928 ? $s / 12.92 : (($s + 0.055) / 1.055) ** 2.4; }
         return 0.2126 * $vals[0] + 0.7152 * $vals[1] + 0.0722 * $vals[2];
+    }
+
+    public function workspace(): void {
+        $tab = $_GET['tab'] ?? 'build';
+
+        $objPath = app_path('OBJECTIVE.md');
+        $objectives = [];
+        if (is_file($objPath)) {
+            $content = file_get_contents($objPath);
+            preg_match_all('/^###?\s+(.+)$/m', $content, $matches);
+            foreach ($matches[1] ?? [] as $i => $obj) {
+                $objectives[] = ['id' => 'OBJ-' . str_pad((string)($i + 1), 3, '0', STR_PAD_LEFT), 'title' => trim($obj), 'status' => 'in_progress'];
+            }
+        }
+
+        $eventsDir = app_path('.agents/handoffs/events');
+        $handoffFiles = glob($eventsDir . '/*.json') ?: [];
+        $agentEvents = [];
+        $agentActivity = [];
+        $recentHandoffs = [];
+        foreach (array_slice($handoffFiles, -30) as $f) {
+            $data = json_decode((string)file_get_contents($f), true);
+            if ($data) {
+                $wf = $data['workflow'] ?? [];
+                $from = $wf['current_role'] ?? $data['from_role'] ?? ($wf['sequence'][0] ?? '?');
+                $to = $wf['next_role'] ?? $data['to_role'] ?? ($wf['sequence'][1] ?? '?');
+                $status = $data['status'] ?? $wf['status'] ?? 'pending';
+                $issue = $data['issue'] ?? '?';
+                $time = date('H:i', filemtime($f));
+                $agentEvents[] = [
+                    'id' => 'EVT-' . ($data['event_id'] ?? basename($f, '.json')),
+                    'title' => "{$from} → {$to} (#{$issue})",
+                    'status' => $status, 'type' => 'bot',
+                    'labels' => [['text' => $status, 'class' => 'handoff']],
+                    'time' => $time, 'actor' => $from . '→' . $to, 'actor_type' => 'bot', 'text' => $status,
+                ];
+                $agentActivity[] = ['time' => $time, 'actor' => $from . '→' . $to, 'text' => $status, 'detail' => "Issue #{$issue}"];
+                $recentHandoffs[] = ['issue' => $issue, 'from' => $from, 'to' => $to, 'status' => $status, 'time' => $time];
+            }
+        }
+
+        $todoPath = app_path('.tmp/todos.json');
+        $todos = [];
+        if (is_file($todoPath)) {
+            $todoData = json_decode(file_get_contents($todoPath), true);
+            foreach ($todoData as $t) {
+                $todos[] = [
+                    'id' => 'TODO-' . ($t['id'] ?? bin2hex(random_bytes(2))),
+                    'title' => $t['content'] ?? $t['text'] ?? '',
+                    'status' => $t['status'] ?? 'pending',
+                    'type' => 'human',
+                    'labels' => [['text' => 'todo', 'class' => 'todo']],
+                ];
+            }
+        }
+
+        $columns = ['backlog' => [], 'todo' => [], 'in_progress' => [], 'review' => [], 'done' => []];
+        $activity = [];
+        $statusMap = ['pending' => 'backlog', 'todo' => 'todo', 'in_progress' => 'in_progress', 'review' => 'review', 'done' => 'done', 'completed' => 'done', 'approved' => 'done', 'changes_required' => 'review', 'planned' => 'in_progress'];
+
+        $openObjectives = [];
+        foreach ($objectives as $obj) {
+            $s = $statusMap[$obj['status']] ?? 'backlog';
+            $obj['type'] = 'human';
+            $obj['labels'] = [['text' => 'objective', 'class' => 'objective']];
+            $columns[$s][] = $obj;
+            if ($s !== 'done') $openObjectives[] = $obj;
+            $activity[] = ['time' => 'now', 'actor' => 'System', 'actor_type' => 'human', 'text' => "Objective: {$obj['title']}"];
+        }
+
+        foreach ($todos as $t) {
+            $s = $statusMap[$t['status']] ?? 'todo';
+            $t['type'] = 'human';
+            $columns[$s][] = $t;
+            $activity[] = ['time' => 'now', 'actor' => 'You', 'actor_type' => 'human', 'text' => "Todo: {$t['title']}"];
+        }
+
+        foreach ($agentEvents as $e) {
+            $s = $statusMap[$e['status']] ?? 'backlog';
+            $e['type'] = 'bot';
+            $columns[$s][] = $e;
+            $activity[] = ['time' => $e['time'] ?? '', 'actor' => $e['actor'] ?? 'Agent', 'actor_type' => 'bot', 'text' => $e['text'] ?? ''];
+        }
+
+        usort($activity, fn($a, $b) => ($b['time'] ?? '') <=> ($a['time'] ?? ''));
+        $activity = array_slice($activity, 0, 30);
+
+        $doneCount = count($columns['done']);
+        $inProgressCount = count($columns['in_progress']);
+        $totalCount = count($columns['backlog']) + count($columns['todo']) + $inProgressCount + count($columns['review']) + $doneCount;
+        $triageItems = array_slice($agentEvents, 0, 10);
+        $initiativesFile = app_path('.agents/workflows/initiatives.json');
+        $initiatives = [];
+        if (is_file($initiativesFile)) {
+            $decoded = json_decode((string)file_get_contents($initiativesFile), true);
+            if (is_array($decoded)) $initiatives = $decoded;
+        }
+        if (empty($initiatives)) {
+            $initiatives = [
+                ['title' => 'Cloud Agent Runtime', 'category' => 'Infrastructure', 'status' => 'on_track', 'count' => 4],
+                ['title' => 'Admin UI Overhaul', 'category' => 'Frontend', 'status' => 'in_progress', 'count' => 3],
+                ['title' => 'MCP Tool Integration', 'category' => 'Platform', 'status' => 'on_track', 'count' => 8],
+                ['title' => 'Testing & QA', 'category' => 'Quality', 'status' => 'at_risk', 'count' => 2],
+            ];
+        }
+
+        $pulseItems = array_merge(
+            array_map(fn($a) => $a + ['detail' => ''], array_slice($activity, 0, 15)),
+            []
+        );
+        usort($pulseItems, fn($a, $b) => ($b['time'] ?? '') <=> ($a['time'] ?? ''));
+
+        $insights = [
+            'total_objectives' => count($objectives),
+            'agent_events' => count($agentEvents),
+            'handoffs' => count($handoffFiles),
+            'completion_rate' => $totalCount > 0 ? round(($doneCount / $totalCount) * 100) : 0,
+            'open_todos' => count(array_filter($todos, fn($t) => ($t['status'] ?? '') !== 'done')),
+        ];
+
+        $stats = [
+            'objectives' => count($objectives), 'todos' => count($todos),
+            'agent_events' => count($agentEvents), 'done' => $doneCount,
+            'total_issues' => $totalCount, 'in_progress' => $inProgressCount,
+            'pending' => $totalCount - $doneCount, 'completion_pct' => $insights['completion_rate'],
+            'tab' => $tab,
+        ];
+
+        $counts = [
+            'intake' => count($triageItems),
+            'build' => $totalCount - $doneCount,
+        ];
+
+        $owner = getenv('OWNER_GITHUB') ?: 'getwinharris';
+        $secrets = new SecretService();
+        $modelConfig = $secrets->getModelConfig();
+
+        $this->render('admin/workspace', compact(
+            'tab', 'counts', 'columns', 'activity', 'stats', 'objectives',
+            'todos', 'agentEvents', 'triageItems', 'agentActivity', 'openObjectives',
+            'initiatives', 'recentHandoffs', 'pulseItems', 'insights', 'owner', 'modelConfig'
+        ));
+    }
+
+    public function workspaceCreate(): void {
+        $title = trim((string)($_POST['title'] ?? ''));
+        if ($title === '') {$this->jsonResponse(['error' => 'Title required'], 400); return;}
+        $todoPath = app_path('.tmp/todos.json');
+        $todos = is_file($todoPath) ? (json_decode(file_get_contents($todoPath), true) ?: []) : [];
+        $todos[] = ['id' => (string)(count($todos) + 1), 'content' => $title, 'status' => 'pending', 'created' => date('Y-m-d')];
+        file_put_contents($todoPath, json_encode($todos, JSON_PRETTY_PRINT));
+        $this->flash('Issue created.', 'success');
+        $this->redirect('/admin/workspace?tab=intake');
+    }
+
+    public function terminal(): void {
+        $modelConfig = (new SecretService())->getModelConfig();
+        $this->render('admin/terminal', ['pageTitle' => 'Terminal', 'modelConfig' => $modelConfig]);
+    }
+
+    public function terminalRun(): void {
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $cmd = trim((string)($input['command'] ?? ''));
+        if ($cmd === '') {$this->jsonResponse(['error' => 'Command is required'], 400); return;}
+        $safe = false;
+        $allowed = ['map','schema','test','ci','check','update','serve','smoke','status','logs','handoff','ai:config','ai:probe','agent','db','route:list','routes','skills','skill','read','write','edit','grep','search','find','glob','context','memory','objective','todo','task','repl','npm'];
+        foreach ($allowed as $prefix) {
+            if (str_starts_with($cmd, $prefix)) {$safe = true; break;}
+        }
+        if (!$safe) {$this->jsonResponse(['error' => 'Command not allowed. Allowed: ' . implode(', ', $allowed)], 403); return;}
+        $root = app_path();
+        $descriptors = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+        if (str_starts_with($cmd, 'npm ')) {
+            $fullCmd = $cmd;
+        } else {
+            $fullCmd = escapeshellcmd('php ' . $root . '/cli/bapXaura ' . $cmd);
+        }
+        $process = proc_open($fullCmd, $descriptors, $pipes, $root);
+        if (!is_resource($process)) {$this->jsonResponse(['error' => 'Failed to start process'], 500); return;}
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[1]); fclose($pipes[2]);
+        $start = time();
+        while (true) {
+            $status = proc_get_status($process);
+            if (!$status['running']) break;
+            if (time() - $start > 30) {proc_terminate($process, 9); $stderr .= "\n[timeout after 30s]"; break;}
+            usleep(100000);
+        }
+        $exitCode = $status['exitcode'] ?? -1;
+        proc_close($process);
+        $output = $stdout;
+        if ($stderr !== '') $output .= "\n" . $stderr;
+        $this->jsonResponse(['exit_code' => $exitCode, 'output' => trim($output)]);
     }
 }

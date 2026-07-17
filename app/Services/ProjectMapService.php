@@ -7,7 +7,7 @@ final class ProjectMapService {
 
     public const SHARED_CONTROLLERS = ['BaseController'];
     public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter', 'KnowledgeGraphService', 'BrowserSession'];
-    public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'admin/environment'];
+    public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'admin/environment', 'admin/workspace/_nav', 'admin/workspace/intake', 'admin/workspace/plan', 'admin/workspace/build', 'admin/workspace/monitor'];
     public const KNOWN_UNWIRED_COLLECTIONS = ['wallet_transactions', 'media_files'];
 
     public static function registry(): array {
@@ -62,6 +62,8 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/account/orders','name'=>'account.orders.legacy','page'=>'account/orders','controller'=>'AccountController@legacyOrders','services'=>['AuthService']],
             ['method'=>'GET','path'=>'/account/orders/{orderId}/invoice','name'=>'account.invoice','page'=>'account/invoice','controller'=>'AccountController@invoice','services'=>['AuthService','OrderService','SettingsService','TaxService']],
             ['method'=>'GET','path'=>'/account/bookings','name'=>'account.bookings.legacy','page'=>'account/bookings','controller'=>'AccountController@legacyBookings','services'=>['AuthService']],
+            ['method'=>'GET','path'=>'/admin/workspace','name'=>'admin.workspace','page'=>'admin/workspace','controller'=>'AdminController@workspace','services'=>[]],
+            ['method'=>'POST','path'=>'/admin/workspace/create','name'=>'admin.workspace.create','page'=>'admin/workspace','controller'=>'AdminController@workspaceCreate','services'=>[]],
             ['method'=>'GET','path'=>'/admin','name'=>'admin.dashboard','page'=>'admin/dashboard','controller'=>'AdminController@dashboard','services'=>['OrderService','AppointmentService']],
             ['method'=>'GET','path'=>'/admin/products','name'=>'admin.products','page'=>'admin/product-form','controller'=>'AdminController@products','services'=>['ProductService','SchemaService']],
             ['method'=>'GET','path'=>'/admin/categories','name'=>'admin.categories','page'=>'admin/resource','controller'=>'AdminController@categories','services'=>['CategoryService']],
@@ -79,6 +81,8 @@ final class ProjectMapService {
             ['method'=>'GET','path'=>'/admin/integrations','name'=>'admin.integrations','page'=>'admin/integrations','controller'=>'AdminController@integrations','services'=>['SettingsService','PaymentService','SecretService']],
             ['method'=>'GET','path'=>'/admin/agent','name'=>'admin.agent','page'=>'admin/agent','controller'=>'AdminController@agent','services'=>['SecretService','DatabaseService']],
             ['method'=>'POST','path'=>'/admin/agent/ask','name'=>'admin.agent.ask','page'=>'admin/agent','controller'=>'AdminController@agentAsk','services'=>['SecretService','DatabaseService']],
+            ['method'=>'GET','path'=>'/admin/terminal','name'=>'admin.terminal','page'=>'admin/terminal','controller'=>'AdminController@terminal','services'=>['SecretService']],
+            ['method'=>'POST','path'=>'/admin/terminal/run','name'=>'admin.terminal.run','page'=>'admin/terminal','controller'=>'AdminController@terminalRun','services'=>[]],
             ['method'=>'GET','path'=>'/admin/backups','name'=>'admin.backups','page'=>'admin/list','controller'=>'AdminController@backups','services'=>['DatabaseService']],
             ['method'=>'GET','path'=>'/admin/audit-log','name'=>'admin.audit','page'=>'admin/list','controller'=>'AdminController@audit','services'=>['AuditLogService']],
             ['method'=>'GET','path'=>'/admin/contact-submissions','name'=>'admin.contact-submissions','page'=>'admin/resource','controller'=>'AdminController@contactSubmissions','services'=>['ContactService']],
@@ -92,7 +96,9 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/admin/appearance/save','name'=>'admin.appearance.save','page'=>'admin/appearance','controller'=>'AdminController@saveAppearance','services'=>['SettingsService','AuditLogService']],
             ['method'=>'GET','path'=>'/admin/media','name'=>'admin.media','page'=>'admin/media','controller'=>'AdminController@media','services'=>['MediaService']],
             ['method'=>'POST','path'=>'/admin/media/upload','name'=>'admin.media.upload','page'=>'admin/media','controller'=>'AdminController@uploadMedia','services'=>['MediaService','AuditLogService']],
-            ['method'=>'POST','path'=>'/admin/environment/fix-permissions','name'=>'admin.environment.fix-permissions','page'=>'admin/settings','controller'=>'AdminController@fixPermissions','services'=>['StoragePermissionService','AuditLogService']],
+            ['method'=>'GET','path'=>'/admin/environment','name'=>'admin.environment','page'=>'admin/environment','controller'=>'AdminController@environment','services'=>['StoragePermissionService']],
+            ['method'=>'POST','path'=>'/admin/environment/save','name'=>'admin.environment.save','page'=>'admin/environment','controller'=>'AdminController@saveEnvironment','services'=>['EnvService','AuditLogService']],
+            ['method'=>'POST','path'=>'/admin/environment/fix-permissions','name'=>'admin.environment.fix-permissions','page'=>'admin/environment','controller'=>'AdminController@fixPermissions','services'=>['StoragePermissionService','AuditLogService']],
             ['method'=>'GET','path'=>'/admin/developer/project-map','name'=>'admin.project-map','page'=>'admin/project-map','controller'=>'AdminController@projectMap','services'=>['ProjectMapService']],
             ['method'=>'GET','path'=>'/admin/developer/workflow','name'=>'admin.workflow','page'=>'admin/workflow','controller'=>'AdminController@workflow','services'=>[]],
             ['method'=>'POST','path'=>'/admin/products/save','name'=>'admin.products.save','page'=>'admin/product-form','controller'=>'AdminController@saveProduct','services'=>['ResourceService','AuditLogService']],
@@ -128,6 +134,12 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/admin/blog/ai-draft','name'=>'admin.blog.ai-draft','page'=>'admin/blog','controller'=>'AdminController@aiDraftBlog','services'=>['BlogService','BlogDraftService']],
             ['method'=>'POST','path'=>'/api/agent','name'=>'api.agent','page'=>'public/404','controller'=>'AgentController@ask','services'=>['SecretService','DatabaseService']],
             ['method'=>'POST','path'=>'/api/tts/tokenize','name'=>'api.tts.tokenize','page'=>'public/404','controller'=>'TtsController@tokenize','services'=>[]],
+            ['method'=>'POST','path'=>'/chat/completions','name'=>'api.chat.completions','page'=>'public/404','controller'=>'AiChatController@chat','services'=>['SecretService']],
+            ['method'=>'GET','path'=>'/chat/tools','name'=>'api.chat.tools','page'=>'public/404','controller'=>'AiChatController@tools','services'=>[]],
+            ['method'=>'POST','path'=>'/agent/webhook','name'=>'api.agent.webhook','page'=>'public/404','controller'=>'CloudAgentController@webhook','services'=>['AgentRuntimeService']],
+            ['method'=>'GET','path'=>'/agent/status','name'=>'api.agent.status','page'=>'public/404','controller'=>'CloudAgentController@status','services'=>[]],
+            ['method'=>'GET','path'=>'/agent/handoffs','name'=>'api.agent.handoffs','page'=>'public/404','controller'=>'CloudAgentController@handoffs','services'=>[]],
+            ['method'=>'POST','path'=>'/agent/prompt','name'=>'api.agent.prompt','page'=>'public/404','controller'=>'CloudAgentController@prompt','services'=>['AgentRuntimeService']],
             ['method'=>'POST','path'=>'/api/browser/search','name'=>'api.browser.search','page'=>'public/404','controller'=>'BrowserAgentController@search','services'=>[]],
             ['method'=>'POST','path'=>'/api/browser/open','name'=>'api.browser.open','page'=>'public/404','controller'=>'BrowserAgentController@open','services'=>[]],
             ['method'=>'POST','path'=>'/api/browser/click','name'=>'api.browser.click','page'=>'public/404','controller'=>'BrowserAgentController@click','services'=>[]],
@@ -308,6 +320,8 @@ final class ProjectMapService {
             '/admin/appearance/save|POST' => 'Admin — save logo/favicon',
             '/admin/media'      => 'Admin — media library',
             '/admin/media/upload|POST' => 'Admin — upload media',
+            '/admin/environment' => 'Admin — environment editor',
+            '/admin/environment/save|POST' => 'Admin — save environment',
             '/admin/environment/fix-permissions|POST' => 'Admin — fix storage permissions',
             '/admin/developer/project-map' => 'Admin — project map viewer',
             '/admin/developer/workflow' => 'Admin — agent workflow viewer',

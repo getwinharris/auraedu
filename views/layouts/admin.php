@@ -34,9 +34,8 @@
 .admin-submenu a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-lg) var(--space-xs) calc(var(--space-lg) + 24px); color: rgba(255,255,255,0.4); font-size: 0.82rem; transition: all var(--transition-base); border-left: 3px solid transparent; }
 .admin-submenu a:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.75); }
 .admin-submenu a.active { background: rgba(212,175,55,0.06); color: var(--color-gold); border-left-color: var(--color-gold); }
-.admin-sidebar__footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: var(--space-xs); }
-.admin-sidebar__footer a { display: flex; align-items: center; gap: var(--space-sm); font-size: 0.8rem; color: rgba(255,255,255,0.4); transition: color var(--transition-base); }
-.admin-sidebar__footer a:hover { color: var(--color-error); }
+.admin-sidebar__section-label { padding: var(--space-xs) var(--space-lg); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); margin-top: var(--space-2xs); }
+.admin-sidebar__divider { height: 1px; background: rgba(255,255,255,0.08); margin: var(--space-xs) var(--space-lg); }
 .admin-main { background: var(--color-bg-alt); min-height: 100vh; }
 .admin-topbar { background: var(--color-white); border-bottom: 1px solid var(--color-border); padding: var(--space-md) var(--space-xl); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
 .admin-topbar h1 { font-family: var(--font-serif); font-size: 1.25rem; margin: 0; color: var(--color-ink); }
@@ -60,6 +59,7 @@
             <small>Admin Panel</small>
         </div>
         <nav class="admin-sidebar__nav" id="admin-nav">
+            <div class="admin-sidebar__section-label">PRODUCT &amp; BUILD</div>
             <a href="/admin" class="admin-nav-top <?= ($_SERVER['REQUEST_URI'] === '/admin' ? 'active' : '') ?>">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 Dashboard
@@ -114,11 +114,24 @@
             <div class="admin-submenu" id="menu-settings">
                 <a href="/admin/environment" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/environment') === 0 ? 'active' : '') ?>">Environment</a>
                 <a href="/admin/integrations" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/integrations') === 0 ? 'active' : '') ?>">Integrations</a>
-                <a href="/admin/agent" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/agent') === 0 ? 'active' : '') ?>">AI Agent</a>
                 <a href="/admin/settings" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/settings') === 0 ? 'active' : '') ?>">Site Settings</a>
                 <a href="/admin/backups" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/backups') === 0 ? 'active' : '') ?>">Backups</a>
                 <a href="/admin/audit-log" class="<?= (strpos($_SERVER['REQUEST_URI'], '/admin/audit-log') === 0 ? 'active' : '') ?>">Audit Log</a>
             </div>
+            <div class="admin-sidebar__divider"></div>
+            <div class="admin-sidebar__section-label" style="color:var(--color-gold);">AGENTS &amp; WORKSPACE</div>
+            <a href="/admin/workspace" class="admin-nav-top <?= (strpos($_SERVER['REQUEST_URI'], '/admin/workspace') === 0 ? 'active' : '') ?>">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                Workspace
+            </a>
+            <a href="/admin/agent" class="admin-nav-top <?= (strpos($_SERVER['REQUEST_URI'], '/admin/agent') === 0 ? 'active' : '') ?>">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 000 20 14.5 14.5 0 000-20"/><path d="M2 12h20"/></svg>
+                AI Agent
+            </a>
+            <a href="/admin/terminal" class="admin-nav-top <?= (strpos($_SERVER['REQUEST_URI'], '/admin/terminal') === 0 ? 'active' : '') ?>">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                Terminal
+            </a>
             <a href="/admin/developer/project-map" class="admin-nav-top <?= (strpos($_SERVER['REQUEST_URI'], '/admin/developer/project-map') === 0 ? 'active' : '') ?>">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM9 15h6v6H9z"/><path d="M6 9v3h6v3M18 9v3h-6"/></svg>
                 Project Map
@@ -127,17 +140,16 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 Workflow
             </a>
-        </nav>
-        <div class="admin-sidebar__footer">
-            <a href="/">
+            <div style="flex:1; min-height:8px;"></div>
+            <a href="/" class="admin-nav-top" style="border-left-color:transparent; margin-top:auto;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 View Site
             </a>
-            <a href="/logout">
+            <a href="/logout" class="admin-nav-top" style="border-left-color:transparent;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 17"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </a>
-        </div>
+        </nav>
     </aside>
     <main class="admin-main">
         <div class="admin-topbar">
