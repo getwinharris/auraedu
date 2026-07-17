@@ -29,7 +29,7 @@
       "evidence": [
         "cli/handoff.php validates issue, role, unique objective IDs, statuses, evidence arrays, commands, risks, and next role",
         ".agents/handoffs/170-worker.json maps issue #170 objectives to evidence and unresolved items",
-        "Issue comment https://github.com/getwinharris/bapXauraAiBackend/issues/170#issuecomment-4979650209 records the stable twelve-ID objective registry"
+        "Issue comment https://github.com/bapXai/bapXauraAiBackend/issues/170#issuecomment-4979650209 records the stable twelve-ID objective registry"
       ],
       "browser_evidence": [],
       "unresolved": []

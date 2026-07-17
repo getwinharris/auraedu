@@ -90,15 +90,26 @@ jobs:
           TARGET: ${{ steps.parse.outputs.target }}
         with:
           script: |
+            const role = process.env.TARGET;
+            const hdr = "<!-- bapx-handoff\n" + JSON.stringify({
+              schema_version: "1.0",
+              event_id: "EVT-HO-" + context.issue.number,
+              workflow_id: "WF-ISSUE-" + context.issue.number,
+              issue: context.issue.number,
+              from_role: role === "worker" ? "cto" : role === "reviewer" ? "worker" : "previous",
+              to_role: role,
+              head_sha: "${{ github.sha }}",
+              status: "routed",
+              owner: { github: "bapXai", notify: false, reason: null }
+            }, null, 2) + "\n-->";
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: context.issue.number,
-              body: `## Handoff routed to **${process.env.TARGET}**
+              body: hdr + `\n## Handoff routed to **${role}**
 
             | Role | Status |
             |------|--------|
-            | Previous | completed |
-            | Current | ${process.env.TARGET} |
+            | Current | ${role} |
             | Next | awaiting completion |
 
             Active handoff: \`.agents/handoffs/active/current.json\``

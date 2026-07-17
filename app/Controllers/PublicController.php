@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-use App\Services\{BlogService,ProductService,CategoryService,SecretService,SeoService,ContactService,ReviewService,MarkdownRenderer};
+use App\Services\{BlogService,ProductService,CategoryService,SecretService,SeoService,ContactService,ReviewService,MarkdownRenderer,TempleService};
 final class PublicController extends BaseController {
     
     public function home(): void {

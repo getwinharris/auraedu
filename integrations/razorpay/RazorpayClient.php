@@ -13,7 +13,6 @@ final class RazorpayClient {
         $body = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-        curl_close($ch);
         if ($status === 401) throw new \RuntimeException('Razorpay authentication failed', 401);
         $decoded = is_string($body) && $body !== '' ? json_decode($body, true) : null;
         if ($status >= 300 || !is_array($decoded)) {

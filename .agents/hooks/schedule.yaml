@@ -1,0 +1,54 @@
+# Schedule / Event Hooks Configuration
+# Defines recurring tasks and event-driven triggers
+
+schedules:
+  - name: daily_report
+    cron: "0 9 * * *"
+    role: cto
+    prompt: "Generate daily site report: user count, orders, revenue, new support tickets"
+    channel: internal
+
+  - name: health_check
+    cron: "*/30 * * * *"
+    role: support
+    prompt: "Check site health — run bapXaura_ci silently, report only on failure"
+    channel: internal
+    silent: true
+
+  - name: mail_queue_process
+    cron: "* * * * *"
+    role: deployment
+    prompt: "Run cli/process-mail-queue.php to send pending emails"
+    channel: internal
+    silent: true
+
+events:
+  - name: issue_created
+    trigger: "issues.opened"
+    role: cto
+    action: analyze_and_plan
+
+  - name: issue_edited
+    trigger: "issues.edited"
+    role: cto
+    action: reanalyze
+
+  - name: pr_opened
+    trigger: "pull_request.opened"
+    role: reviewer
+    action: verify_diff
+
+  - name: pr_sync
+    trigger: "pull_request.synchronize"
+    role: reviewer
+    action: verify_diff
+
+  - name: push_main
+    trigger: "push.main"
+    role: deployment
+    action: deploy_and_verify
+
+  - name: handoff_received
+    trigger: "handoff.*"
+    role: dynamic
+    action: execute_handoff_role

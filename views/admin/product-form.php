@@ -181,7 +181,7 @@ function renderGallery() {
             + '<button type="button" class="gallery-remove-btn" title="Remove" style="width:22px;height:22px;border:0;border-radius:4px;background:rgba(214,64,69,0.85);color:#fff;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;">✕</button>'
             + '</div>';
         div.addEventListener('dragstart', (e) => { dragIndex = i; e.dataTransfer.effectAllowed = 'move'; div.style.opacity = '0.4'; });
-        div.addEventListener('dragenter', (e) => { e.preventDefault(); div.style.borderColor = 'var(--color-gold)'; });
+        div.addEventListener('dragenter', (e) => { e.preventDefault(); div.style.borderColor = 'var(--color-primary)'; });
         div.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
         div.addEventListener('dragleave', () => { div.style.borderColor = ''; });
         div.addEventListener('drop', (e) => { e.preventDefault(); div.style.borderColor = ''; if (dragIndex !== null && dragIndex !== i) { const [moved] = galleryImages.splice(dragIndex, 1); galleryImages.splice(i, 0, moved); renderGallery(); if (dragIndex === 0 || i === 0) updateFeatured(); } dragIndex = null; });
@@ -229,8 +229,8 @@ function selectCategoryChip(el) {
     const slug = el.dataset.slug || el.textContent.trim().toLowerCase().replace(/\s+/g, '-');
     document.getElementById('field-category').value = slug;
     document.querySelectorAll('#category-chips .cat-chip').forEach(c => { c.style.borderColor = 'var(--color-border)'; c.style.background = 'var(--color-bg-alt)'; c.style.color = ''; });
-    el.style.borderColor = 'var(--color-gold)';
-    el.style.background = 'var(--color-gold)';
+    el.style.borderColor = 'var(--color-primary)';
+    el.style.background = 'var(--color-primary)';
     el.style.color = '#fff';
 }
 document.querySelectorAll('#category-chips .cat-chip').forEach(chip => {
@@ -248,8 +248,8 @@ function setCategoryChips(val) {
     document.getElementById('field-category').value = val;
     document.querySelectorAll('#category-chips .cat-chip').forEach(c => {
         if ((c.dataset.slug || '').toLowerCase() === val.toLowerCase() || c.textContent.trim().toLowerCase() === val.toLowerCase()) {
-            c.style.borderColor = 'var(--color-gold)';
-            c.style.background = 'var(--color-gold)';
+            c.style.borderColor = 'var(--color-primary)';
+            c.style.background = 'var(--color-primary)';
             c.style.color = '#fff';
         }
     });
@@ -306,7 +306,7 @@ document.getElementById('gallery-file-input').addEventListener('change', () => {
     [...document.getElementById('gallery-file-input').files].forEach(file => {
         const url = URL.createObjectURL(file);
         const div = document.createElement('div');
-        div.style.cssText = 'position:relative; aspect-ratio:1; border-radius:var(--radius-sm); overflow:hidden; border:2px solid var(--color-gold); opacity:0.6;';
+        div.style.cssText = 'position:relative; aspect-ratio:1; border-radius:var(--radius-sm); overflow:hidden; border:2px solid var(--color-primary); opacity:0.6;';
         div.innerHTML = '<img src="' + url + '" alt="' + file.name + '" style="width:100%;height:100%;object-fit:cover;display:block;">'
             + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);color:#fff;font-size:0.65rem;font-weight:600;text-transform:uppercase;">New</div>';
         preview.appendChild(div);

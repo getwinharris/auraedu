@@ -1,53 +1,58 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* bapXaura design system — adapted for Aura Medical Institute
-       Black primary | Mint accent #00D4A4 | White canvas | Grey surface #F6F6F6 */
+    /* ElevenLabs editorial design — off-white canvas, warm near-black ink, serif display, Inter body, pastel gradient orbs */
 
     /* Base palette */
-    --color-ink: #000000;
-    --color-ink-light: #333333;
-    --color-primary: #000000;
-    --color-primary-hover: #333333;
-    --color-accent: #00D4A4;
-    --color-accent-hover: #00B88E;
-    --color-accent-soft: #E6F9F4;
-    --color-canvas: #FFFFFF;
-    --color-canvas-dark: #0D0D0D;
-    --color-surface: #F6F6F6;
-    --color-surface-soft: #FBFBFB;
-    --color-border: #E5E5E5;
-    --color-border-light: #EEEEEE;
-    --color-border-dark: #333333;
-    --color-text-muted: #666666;
-    --color-text-light: #888888;
-    --color-text-soft: #999999;
-    --color-text-disabled: #B0B0B0;
-    --color-white: #FFFFFF;
-    --color-success: #00D4A4;
-    --color-success-soft: #E6F9F4;
-    --color-warning: #E8A317;
-    --color-warning-soft: #FFF8E7;
-    --color-error: #DC3545;
-    --color-error-soft: #FDE8E9;
-    --color-info: #3772CF;
-    --color-info-soft: #EBF0FA;
-    --color-rating: #00D4A4;
-    --color-orange: #FF6B4A;
-    --color-gold: #00D4A4;
+    --color-ink: #0c0a09;
+    --color-ink-light: #292524;
+    --color-primary: #292524;
+    --color-primary-hover: #0c0a09;
+    --color-accent: #292524;
+    --color-accent-hover: #0c0a09;
+    --color-accent-soft: #f0efed;
+    --color-canvas: #f5f5f5;
+    --color-canvas-dark: #0c0a09;
+    --color-surface: #ffffff;
+    --color-surface-soft: #fafafa;
+    --color-border: #e7e5e4;
+    --color-border-light: #f0efed;
+    --color-border-dark: #d6d3d1;
+    --color-text-muted: #777169;
+    --color-text-light: #a8a29e;
+    --color-text-soft: #a8a29e;
+    --color-text-disabled: #c0bcb8;
+    --color-white: #ffffff;
+    --color-success: #16a34a;
+    --color-success-soft: #e6f9ee;
+    --color-warning: #d97706;
+    --color-warning-soft: #fff8e7;
+    --color-error: #dc2626;
+    --color-error-soft: #fde8e9;
+    --color-info: #2563eb;
+    --color-info-soft: #ebf0fa;
+    --color-rating: #d4a700;
+    --color-orange: #ea580c;
+
+    /* Atmospheric gradient stops (pastel orbs) */
+    --gradient-mint: #a7e5d3;
+    --gradient-peach: #f4c5a8;
+    --gradient-lavender: #c8b8e0;
+    --gradient-sky: #a8c8e8;
+    --gradient-rose: #e8b8c4;
 
     /* Hero atmospheric gradients */
-    --hero-sky-from: #B8D4F0;
-    --hero-sky-to: #FFF8E7;
-    --hero-dark-from: #0A2E36;
-    --hero-dark-to: #1A6B5A;
+    --hero-sky-from: #f5f5f5;
+    --hero-sky-to: #fafafa;
+    --hero-dark-from: #0c0a09;
+    --hero-dark-to: #292524;
 
-    /* Typography — Inter only (UI), Geist Mono (code, unused) */
+    /* Typography — Waldenburg serif (300) for display, Inter for UI */
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-accent: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Times New Roman', Georgia, 'Noto Serif', serif;
+    --font-heading: 'Times New Roman', Georgia, 'Noto Serif', serif;
+    --font-serif: 'Times New Roman', Georgia, 'Noto Serif', serif;
+    --font-accent: 'Times New Roman', Georgia, 'Noto Serif', serif;
     --font-mono: 'Geist Mono', 'SF Mono', Menlo, Consolas, monospace;
 
     /* Spacing scale (4px base, 8px primary increment) */
@@ -78,8 +83,8 @@
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 24px 48px -8px rgba(0, 0, 0, 0.12);
     --shadow-xl: 0 32px 64px -12px rgba(0, 0, 0, 0.16);
-    --shadow-focus: 0 0 0 3px rgba(0, 212, 164, 0.3);
-    --shadow-brand: 0 8px 24px rgba(0, 212, 164, 0.08);
+    --shadow-focus: 0 0 0 3px rgba(41, 37, 36, 0.15);
+    --shadow-brand: 0 8px 24px rgba(12, 10, 9, 0.06);
 
     /* Transitions */
     --transition-fast: 0.15s ease;
@@ -90,27 +95,18 @@
     --container-max: 1280px;
     --container-wide: 1440px;
 
-    /* Legacy aliases (kept for existing rule compatibility — all map to mint/black/grey) */
+    /* Legacy aliases (kept for existing rule compatibility) */
     --color-bg: var(--color-canvas);
     --color-bg-alt: var(--color-surface);
     --color-bg-warm: var(--color-surface-soft);
-    --color-maroon: var(--color-accent);
-    --color-maroon-deep: var(--hero-dark-from);
-    --color-maroon-light: var(--color-accent-hover);
-    --color-accent-light: var(--color-accent-hover);
+    --color-accent-light: var(--color-accent);
     --color-success-light: var(--color-success-soft);
     --color-warning-light: var(--color-warning-soft);
     --color-error-light: var(--color-error-soft);
     --color-info-light: var(--color-info-soft);
-    --color-gold: var(--color-accent);
-    --color-gold-light: var(--color-accent-soft);
-    --color-gold-dark: var(--color-accent-hover);
     --color-cream: var(--color-canvas);
     --color-parchment: var(--color-surface);
-    --gradient-gold: var(--color-accent);
-    --gradient-overlay: var(--color-surface);
     --radius-pill: var(--radius-full);
-    --transition-base: var(--transition-base);
 }
 
 /* ── Reset & Base ── */
@@ -493,26 +489,41 @@ nav a:hover { color: var(--color-ink); }
 .footer-bottom a { color: var(--color-text-light); }
 .footer-bottom a:hover { color: var(--color-accent); }
 
+/* ── Gradient Orb Decorations ── */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+}
+.orb--mint { background: var(--gradient-mint); }
+.orb--peach { background: var(--gradient-peach); }
+.orb--lavender { background: var(--gradient-lavender); }
+.orb--sky { background: var(--gradient-sky); }
+.orb--rose { background: var(--gradient-rose); }
+
 /* ── Home Page ── */
 .home-hero {
     position: relative;
     min-height: 720px;
     padding: 72px 0;
-    background: linear-gradient(135deg, var(--hero-dark-from) 0%, var(--hero-dark-to) 100%);
-    color: var(--color-white);
+    background: var(--color-canvas);
+    color: var(--color-ink);
     overflow: hidden;
 }
 
-/* Atmospheric depth: layered radial glows + dot texture */
+/* Atmospheric pastel gradient orbs */
 .home-hero::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(60% 60% at 18% 22%, rgba(255,255,255,0.12), transparent 60%),
-        radial-gradient(50% 50% at 85% 12%, rgba(0,212,164,0.25), transparent 62%),
-        radial-gradient(70% 70% at 78% 90%, rgba(255,255,255,0.06), transparent 60%),
-        radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px) 0 0 / 26px 26px;
+        radial-gradient(50% 50% at 15% 20%, var(--gradient-mint) 0%, transparent 60%),
+        radial-gradient(45% 45% at 82% 15%, var(--gradient-peach) 0%, transparent 55%),
+        radial-gradient(40% 40% at 75% 85%, var(--gradient-lavender) 0%, transparent 55%),
+        radial-gradient(35% 35% at 20% 80%, var(--gradient-sky) 0%, transparent 50%);
     pointer-events: none;
     z-index: 1;
 }
@@ -523,8 +534,8 @@ nav a:hover { color: var(--color-ink); }
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--color-accent), transparent 50%, var(--color-accent));
+    height: 1px;
+    background: var(--color-border-light);
     z-index: 2;
 }
 
@@ -538,10 +549,10 @@ nav a:hover { color: var(--color-ink); }
 }
 
 .eyebrow {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-accent);
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
     margin-bottom: var(--space-md);
     display: block;
     font-weight: 600;
@@ -549,18 +560,18 @@ nav a:hover { color: var(--color-ink); }
 
 .home-hero h1 {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    line-height: 1.1;
+    font-weight: 300;
+    font-size: clamp(2.8rem, 5vw, 4rem);
+    line-height: 1.05;
     margin: 0 0 var(--space-lg) 0;
-    color: var(--color-white);
-    font-weight: 600;
-    letter-spacing: -1px;
+    color: var(--color-ink);
+    letter-spacing: -1.92px;
 }
 
 .lede {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: rgba(255,255,255,0.85);
+    color: var(--color-text-muted);
     margin-bottom: var(--space-xl);
     font-weight: 400;
     font-family: var(--font-main);
@@ -568,24 +579,24 @@ nav a:hover { color: var(--color-ink); }
 }
 
 .hero-actions { display: flex; gap: var(--space-md); flex-wrap: wrap; }
-.home-hero .btn-accent { 
-    background: var(--color-accent); 
-    color: var(--color-primary);
+.home-hero .btn-primary { 
+    background: var(--color-primary); 
+    color: var(--color-white);
 }
-.home-hero .btn-accent:hover { 
-    background: var(--color-accent-hover); 
+.home-hero .btn-primary:hover { 
+    background: var(--color-primary-hover); 
 }
 .home-hero .btn-outline { 
-    border-color: rgba(255,255,255,0.5); 
-    color: var(--color-white);
+    border-color: var(--color-border-dark); 
+    color: var(--color-ink);
     background: transparent;
 }
 .home-hero .btn-outline:hover { 
-    border-color: var(--color-white); 
-    background: rgba(255,255,255,0.1);
+    border-color: var(--color-ink); 
+    background: rgba(12,10,9,0.03);
 }
 .home-hero .btn:focus-visible {
-    box-shadow: 0 0 0 3px rgba(0, 212, 164, 0.5);
+    box-shadow: 0 0 0 3px rgba(41, 37, 36, 0.15);
 }
 
 .hero-frame { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
@@ -602,9 +613,9 @@ nav a:hover { color: var(--color-ink); }
     overflow: hidden;
     border-radius: var(--radius-lg);
     margin: 0 auto;
-    border: 1px solid rgba(255,255,255,0.25);
-    box-shadow: 0 24px 48px -8px rgba(0,0,0,0.35);
-    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-surface);
 }
 .hero-frame .hero-slide { position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:center top; opacity:0; visibility:hidden; }
 .hero-frame .hero-slide.is-active { opacity:1; visibility:visible; }
@@ -620,19 +631,19 @@ nav a:hover { color: var(--color-ink); }
     height: 10px;
     border: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.35);
+    background: var(--color-border);
     cursor: pointer;
     transition: background var(--transition-base), transform var(--transition-base);
 }
-.hero-dot:hover { background: rgba(255,255,255,0.7); }
-.hero-dot.is-active { background: var(--color-accent); }
+.hero-dot:hover { background: var(--color-text-muted); }
+.hero-dot.is-active { background: var(--color-ink); }
 
-/* Reusable atmospheric hero band for interior institute pages */
+/* Reusable atmospheric hero band for interior pages */
 .hero-band {
     position: relative;
     padding: var(--space-section) 0;
-    background: linear-gradient(135deg, var(--hero-dark-from) 0%, var(--hero-dark-to) 100%);
-    color: var(--color-white);
+    background: var(--color-canvas);
+    color: var(--color-ink);
     overflow: hidden;
 }
 .hero-band::before {
@@ -640,23 +651,23 @@ nav a:hover { color: var(--color-ink); }
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(55% 60% at 20% 18%, rgba(255,255,255,0.12), transparent 60%),
-        radial-gradient(50% 50% at 88% 14%, rgba(0,212,164,0.2), transparent 62%),
-        radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px) 0 0 / 26px 26px;
+        radial-gradient(45% 45% at 20% 15%, var(--gradient-mint) 0%, transparent 55%),
+        radial-gradient(40% 40% at 85% 20%, var(--gradient-peach) 0%, transparent 50%),
+        radial-gradient(35% 35% at 80% 85%, var(--gradient-lavender) 0%, transparent 50%);
     pointer-events: none;
 }
 .hero-band > .container { position: relative; z-index: 2; }
-.hero-band .eyebrow { color: var(--color-accent); }
+.hero-band .eyebrow { color: var(--color-text-muted); }
 .hero-band h1 {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    line-height: 1.15;
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.08;
     margin: 0 0 var(--space-md);
-    color: var(--color-white);
-    font-weight: 600;
-    letter-spacing: -0.5px;
+    color: var(--color-ink);
+    letter-spacing: -0.96px;
 }
-.hero-band .lede { color: rgba(255,255,255,0.85); max-width: 640px; }
+.hero-band .lede { color: var(--color-text-muted); max-width: 640px; }
 .hero-band .section-header { text-align: left; }
 .hero-band .section-header .lede { margin-left: 0; }
 
@@ -665,17 +676,17 @@ nav a:hover { color: var(--color-ink); }
     gap: var(--space-xxl);
     margin-top: var(--space-xl);
     padding-top: var(--space-lg);
-    border-top: 1px solid rgba(255,255,255,0.15);
+    border-top: 1px solid var(--color-border);
 }
 .hero-stat-value { 
     font-family: var(--font-main); 
     font-size: 1.75rem; 
-    color: var(--color-accent); 
+    color: var(--color-ink); 
     font-weight: 700;
 }
 .hero-stat-label { 
     font-size: 0.7rem; 
-    color: rgba(255,255,255,0.6); 
+    color: var(--color-text-muted); 
     text-transform: uppercase; 
     letter-spacing: 0.08em;
     margin-top: var(--space-xxs);

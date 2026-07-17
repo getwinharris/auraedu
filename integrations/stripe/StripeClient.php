@@ -28,7 +28,6 @@ final class StripeClient {
         $body = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-        curl_close($ch);
         if ($status === 401) throw new \RuntimeException('Stripe authentication failed',401);
         $decoded = is_string($body) && $body !== '' ? json_decode($body,true) : null;
         if ($status >= 300 || !is_array($decoded)) {
@@ -42,7 +41,6 @@ final class StripeClient {
         curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_USERPWD=>$this->secretKey.':',CURLOPT_TIMEOUT=>20]);
         $body = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if ($status >= 300) throw new \RuntimeException('Failed to retrieve Stripe session', $status);
         return json_decode($body,true) ?: [];
     }

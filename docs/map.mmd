@@ -16,7 +16,6 @@ mindmap
     CLI_doc_write["doc-write"]
     CLI_generate_code_map["generate-code-map"]
     CLI_generate_docs_map["generate-docs-map"]
-    CLI_generate_okf_bundle["generate-okf-bundle"]
     CLI_generate_project_map["generate-project-map"]
     CLI_handoff["handoff"]
     CLI_import_product_images["import-product-images"]
@@ -33,6 +32,7 @@ mindmap
 
     ### Agent Skills
     SKILL_admin_ui["admin-ui"]
+    SKILL_agent_evals["agent-evals"]
     SKILL_backend_json["backend-json"]
     SKILL_bapxphp_cli["bapxphp-cli"]
     SKILL_deployment["deployment"]
@@ -111,6 +111,7 @@ mindmap
     ADMIN_admin_blog["GET /admin/blog"]
 
     ### External Integrations
+    INTEG_githubchannel["GitHubChannel"]
     INTEG_googleoauthclient["GoogleOAuthClient"]
     INTEG_googlesitekitclient["GoogleSiteKitClient"]
     INTEG_metapixelclient["MetaPixelClient"]
@@ -130,6 +131,7 @@ mindmap
     CTRL_cloudagentcontroller["CloudAgentController"]
     CTRL_commercecontroller["CommerceController"]
     CTRL_consultationcontroller["ConsultationController"]
+    CTRL_mcpcontroller["McpController"]
     CTRL_publiccontroller["PublicController"]
     CTRL_remotedbcontroller["RemoteDbController"]
     CTRL_reviewcontroller["ReviewController"]
@@ -139,7 +141,9 @@ mindmap
     ### Services
     SVC_addressservice["AddressService"]
     SVC_agentcontextservice["AgentContextService"]
+    SVC_agentorchestratorservice["AgentOrchestratorService"]
     SVC_agentruntimeservice["AgentRuntimeService"]
+    SVC_aiservice["AiService"]
     SVC_appointmentservice["AppointmentService"]
     SVC_auditlogservice["AuditLogService"]
     SVC_authservice["AuthService"]
@@ -156,7 +160,6 @@ mindmap
     SVC_envservice["EnvService"]
     SVC_githubdocservice["GitHubDocService"]
     SVC_imageoptimizerservice["ImageOptimizerService"]
-    SVC_knowledgegraphservice["KnowledgeGraphService"]
     SVC_mailqueueservice["MailQueueService"]
     SVC_mailstorageservice["MailStorageService"]
     SVC_markdownrenderer["MarkdownRenderer"]
@@ -220,4 +223,4 @@ mindmap
     AGENTFILE_agents_md["AGENTS.md"]
 
     ### Coverage Gaps
-    GAP_services_without_schema_collection_mapping_secre["Services without schema collection mapping: SecretService, CartService, BlogService, AuthService, TaxService, SchemaService, ShippingService, EnvService, PaymentService, MediaService, StoragePermissionService, ProjectMapService, SupportBotService, MarkdownRenderer, BlogDraftService, AgentRuntimeService"]
+    GAP_services_without_schema_collection_mapping_secre["Services without schema collection mapping: SecretService, CartService, BlogService, AuthService, TaxService, SchemaService, ShippingService, EnvService, PaymentService, MediaService, StoragePermissionService, ProjectMapService, SupportBotService, MarkdownRenderer, BlogDraftService, AgentOrchestratorService, AgentRuntimeService"]

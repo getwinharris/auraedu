@@ -1,7 +1,7 @@
 {
   "event_type": "issues.opened",
   "issue": 8,
-  "actor": "getwinharris",
+  "actor": "bapXai",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
@@ -12,7 +12,7 @@
     "body": "Codebase audit found 15+ remaining references to astrologer, sacred items, and spiritual content across production code. Remove all of them: AuthService.requireAstrologer(), AuthController astrologer_slug session, ApiController $astrologers variable, MediaService astrologers context, admin dashboard astrologer links, SupportBotService astrologer responses, AgentController astrologerCount, robots.txt astrologer disallow, PublicController 'sacred items' SEO string.",
     "labels": ["cleanup"],
     "repository": {
-      "owner": "getwinharris",
+      "owner": "bapXai",
       "name": "auraedu"
     }
   },

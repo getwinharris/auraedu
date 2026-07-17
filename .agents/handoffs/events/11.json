@@ -1,7 +1,7 @@
 {
   "event_type": "issues.opened",
   "issue": 11,
-  "actor": "getwinharris",
+  "actor": "bapXai",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
@@ -12,7 +12,7 @@
     "body": "CSS in band.css still uses temple-*, varahi-*, deity-*, hero-deity class names from the spiritual era. Rename to match current medical institute branding: temple-scroll→hospital-scroll, temple-feature-card→hospital-card, varahi-slide→hero-slide, varahi-dot→hero-dot, hero-deity→hero-frame, deity-frame→image-frame. Update PHP view class references to match.",
     "labels": ["refactor", "css", "ui"],
     "repository": {
-      "owner": "getwinharris",
+      "owner": "bapXai",
       "name": "auraedu"
     }
   },

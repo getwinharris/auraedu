@@ -48,7 +48,7 @@
                 </div>
                 <div style="display:flex; justify-content:space-between; padding:var(--space-sm); background:var(--color-surface); border-radius:var(--radius-md);">
                     <span style="font-size:0.8rem;">Owner</span>
-                    <span style="font-weight:700; font-size:0.8rem;">@<?= e($owner ?? 'getwinharris') ?></span>
+                    <span style="font-weight:700; font-size:0.8rem;">@<?= e($owner ?? 'bapXai') ?></span>
                 </div>
             </div>
         </div>

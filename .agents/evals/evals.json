@@ -1,0 +1,340 @@
+{
+  "schema_version": 2,
+  "last_updated": "2026-07-17T00:00:00Z",
+  "judge_model": "gemini-3.1-pro",
+  "skills": [
+    {
+      "name": "admin-ui-css",
+      "path": ".agents/skills/admin-ui",
+      "version": "1",
+      "trigger": "when editing admin CSS, views, or sidebar navigation",
+      "evals": ["eval-admin-css-classes", "eval-admin-no-gold", "eval-admin-svg-icons", "eval-admin-no-inline-styles"]
+    },
+    {
+      "name": "schema",
+      "path": ".agents/skills/schema",
+      "version": "1",
+      "trigger": "when changing collections, admin fields, media fields, or agent context",
+      "evals": ["eval-schema-collections-php", "eval-schema-admin-forms"]
+    },
+    {
+      "name": "backend-routing",
+      "path": ".agents/skills/php-json-backend",
+      "version": "1",
+      "trigger": "when adding routes, controllers, or services",
+      "evals": ["eval-route-controller-service", "eval-audit-admin-mutations"]
+    },
+    {
+      "name": "frontend-templates",
+      "path": ".agents/skills/frontend-php",
+      "version": "1",
+      "trigger": "when editing public, account, shop, or cart templates",
+      "evals": ["eval-design-md-compliance"]
+    }
+  ],
+  "evals": [
+    {
+      "id": "eval-admin-css-classes",
+      "name": "admin-css-class-coverage",
+      "description": "Every CSS class referenced in admin views exists in admin.css",
+      "type": "assertion",
+      "task": "Edit admin views and stylesheets while maintaining class coverage",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "Every class in views/admin/*.php exists in assets/css/admin.css",
+        "No class attribute targets selectors that would miss admin.css definitions"
+      ],
+      "threshold": 0.85,
+      "pass_count": 1,
+      "trial_count": 1
+    },
+    {
+      "id": "eval-admin-no-gold",
+      "name": "admin-no-legacy-gold-tokens",
+      "description": "No var(--color-gold) in any admin view or stylesheet",
+      "type": "assertion",
+      "task": "Update admin views to use var(--color-primary) instead of deprecated var(--color-gold)",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "No var(--color-gold) in views/admin/*.php",
+        "No var(--color-gold) in assets/css/admin.css"
+      ],
+      "threshold": 0.90,
+      "pass_count": 1,
+      "trial_count": 1
+    },
+    {
+      "id": "eval-admin-svg-icons",
+      "name": "admin-svg-icon-replacement",
+      "description": "No Unicode icon characters in admin sidebar navigation",
+      "type": "assertion",
+      "task": "Replace Unicode icons with inline SVGs in admin sidebar",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "No Unicode icon characters (⊞ ▤ ◎ ◈ ▦ ⚙ ◉ ❯ ∷ ↗) in sidebar",
+        "Every nav item has an inline SVG icon element"
+      ],
+      "threshold": 0.90,
+      "pass_count": 1,
+      "trial_count": 1
+    },
+    {
+      "id": "eval-admin-no-inline-styles",
+      "name": "admin-no-inline-sidebar-styles",
+      "description": "No inline style attributes in admin sidebar HTML",
+      "type": "assertion",
+      "task": "Replace inline styles with CSS classes in admin sidebar",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "No style=\"...\" attributes in admin sidebar nav items",
+        "Submenu toggles use admin-nav__toggle class"
+      ],
+      "threshold": 0.90,
+      "pass_count": 1,
+      "trial_count": 1
+    },
+    {
+      "id": "eval-schema-collections-php",
+      "name": "schema-collections-consistency",
+      "description": "Schema changes update collections.php before database",
+      "type": "assertion",
+      "task": "Add a new collection or field to the schema",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "storage/schema/collections.php has the new field declared",
+        "Field name in collections.php matches database migration",
+        "Admin form field matches schema declaration"
+      ],
+      "threshold": 0.85,
+      "pass_count": 0,
+      "trial_count": 0
+    },
+    {
+      "id": "eval-schema-admin-forms",
+      "name": "schema-admin-form-consistency",
+      "description": "Admin CRUD forms reflect current schema",
+      "type": "assertion",
+      "task": "Update admin form view for a collection",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "Form field for every schema field exists in admin view",
+        "No form fields for deleted schema fields",
+        "Field labels match schema labels"
+      ],
+      "threshold": 0.85,
+      "pass_count": 0,
+      "trial_count": 0
+    },
+    {
+      "id": "eval-route-controller-service",
+      "name": "route-controller-service-wiring",
+      "description": "New routes have controller action + service method",
+      "type": "assertion",
+      "task": "Add a new API endpoint",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "Route registered in route file",
+        "Controller action exists and returns response",
+        "Service method exists for business logic",
+        "DatabaseService used for persistence",
+        "Audit log entry for admin mutations"
+      ],
+      "threshold": 0.90,
+      "pass_count": 0,
+      "trial_count": 0
+    },
+    {
+      "id": "eval-audit-admin-mutations",
+      "name": "audit-admin-mutations",
+      "description": "Admin mutations call AuditLogService",
+      "type": "assertion",
+      "task": "Add an admin CRUD operation",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "Every controller method that creates/updates/deletes data calls AuditLogService::log()"
+      ],
+      "threshold": 0.90,
+      "pass_count": 0,
+      "trial_count": 0
+    },
+    {
+      "id": "eval-design-md-compliance",
+      "name": "design-md-compliance",
+      "description": "Customer-facing UI follows Design.md tokens",
+      "type": "assertion",
+      "task": "Implement a new public-facing template",
+      "dimensions": {
+        "tool_selection": 0.1,
+        "argument_extraction": 0.15,
+        "result_utilization": 0.2,
+        "error_recovery": 0.15,
+        "plan_coherence": 0.2,
+        "task_completion": 0.2
+      },
+      "assertions": [
+        "Colors match Design.md color palette",
+        "Typography uses font stack from Design.md",
+        "Spacing uses defined rhythm units",
+        "Responsive breakpoints match Design.md"
+      ],
+      "threshold": 0.85,
+      "pass_count": 0,
+      "trial_count": 0
+    }
+  ],
+  "scores": [
+    {
+      "eval_id": "eval-admin-css-classes",
+      "run_id": "run-initial",
+      "timestamp": "2026-07-17T00:00:00Z",
+      "dimension_scores": {
+        "tool_selection": 0.9,
+        "argument_extraction": 0.85,
+        "result_utilization": 0.95,
+        "error_recovery": 0.7,
+        "plan_coherence": 1.0,
+        "task_completion": 1.0
+      },
+      "weighted_total": 0.91,
+      "assertions_passed": 2,
+      "assertions_total": 2,
+      "passed": true,
+      "model_used": "gemini-2.5-flash",
+      "duration_ms": 45000
+    },
+    {
+      "eval_id": "eval-admin-no-gold",
+      "run_id": "run-initial",
+      "timestamp": "2026-07-17T00:00:00Z",
+      "dimension_scores": {
+        "tool_selection": 0.95,
+        "argument_extraction": 1.0,
+        "result_utilization": 1.0,
+        "error_recovery": 0.85,
+        "plan_coherence": 1.0,
+        "task_completion": 1.0
+      },
+      "weighted_total": 0.97,
+      "assertions_passed": 2,
+      "assertions_total": 2,
+      "passed": true,
+      "model_used": "gemini-2.5-flash",
+      "duration_ms": 30000
+    },
+    {
+      "eval_id": "eval-admin-svg-icons",
+      "run_id": "run-initial",
+      "timestamp": "2026-07-17T00:00:00Z",
+      "dimension_scores": {
+        "tool_selection": 0.9,
+        "argument_extraction": 0.9,
+        "result_utilization": 0.95,
+        "error_recovery": 0.75,
+        "plan_coherence": 0.95,
+        "task_completion": 1.0
+      },
+      "weighted_total": 0.91,
+      "assertions_passed": 2,
+      "assertions_total": 2,
+      "passed": true,
+      "model_used": "gemini-2.5-flash",
+      "duration_ms": 60000
+    },
+    {
+      "eval_id": "eval-admin-no-inline-styles",
+      "run_id": "run-initial",
+      "timestamp": "2026-07-17T00:00:00Z",
+      "dimension_scores": {
+        "tool_selection": 0.9,
+        "argument_extraction": 0.95,
+        "result_utilization": 0.95,
+        "error_recovery": 0.8,
+        "plan_coherence": 0.95,
+        "task_completion": 1.0
+      },
+      "weighted_total": 0.93,
+      "assertions_passed": 2,
+      "assertions_total": 2,
+      "passed": true,
+      "model_used": "gemini-2.5-flash",
+      "duration_ms": 35000
+    }
+  ],
+  "comparisons": [
+    {
+      "skill_path": ".agents/skills/admin-ui",
+      "eval_id": "eval-admin-css-classes",
+      "without_skill": {
+        "score": 0.65,
+        "pass_count": 0,
+        "trial_count": 3
+      },
+      "with_skill": {
+        "score": 0.91,
+        "pass_count": 3,
+        "trial_count": 3
+      },
+      "delta": {
+        "score": 0.26,
+        "pass_rate": 1.0
+      },
+      "timestamp": "2026-07-17T00:00:00Z"
+    }
+  ]
+}

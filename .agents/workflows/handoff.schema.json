@@ -19,7 +19,7 @@
       "type": "object",
       "required": ["github", "notify", "reason"],
       "properties": {
-        "github": {"type": "string", "const": "getwinharris"},
+        "github": {"type": "string", "const": "bapXai"},
         "notify": {"type": "boolean"},
         "reason": {"type": ["string", "null"]}
       },

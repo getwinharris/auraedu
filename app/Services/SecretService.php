@@ -48,14 +48,13 @@ final class SecretService {
         if ($model === '') $model = 'gemma-4-31b-it';
         if ($endpoint === '') {
             if (str_contains($model, 'gemini') || str_contains($model, 'gemma')) {
-                $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/';
+                $endpoint = 'https://generativelanguage.googleapis.com/v1beta/openai/';
             } else {
                 $endpoint = 'https://api.openai.com/v1';
             }
         }
         $provider = 'openai';
-        if (str_contains($endpoint, 'googleapis')) $provider = 'google';
-        elseif (str_contains($endpoint, 'anthropic')) $provider = 'anthropic';
+        if (str_contains($endpoint, 'anthropic')) $provider = 'anthropic';
         return compact('provider', 'model', 'endpoint', 'apiKey') + ['configured' => $apiKey !== ''];
     }
     private function decodeRecord(array $record): array {
@@ -130,6 +129,10 @@ final class SecretService {
             'turn_server_url' => (string)(getenv('TURN_SERVER_URL') ?: ''),
             'turn_username' => (string)(getenv('TURN_USERNAME') ?: ''),
             'turn_credential' => (string)(getenv('TURN_CREDENTIAL') ?: ''),
+            'github_webhook_secret' => (string)(getenv('GITHUB_WEBHOOK_SECRET') ?: ''),
+            'github_token' => (string)(getenv('GITHUB_TOKEN') ?: ''),
+            'github_owner' => (string)(getenv('GITHUB_OWNER') ?: ''),
+            'github_repo' => (string)(getenv('GITHUB_REPO') ?: ''),
         ];
     }
     private function normalize(array $values): array {

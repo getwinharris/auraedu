@@ -1,0 +1,61 @@
+# Tool RAG: Per-skill tool selection rules
+# Agent reads before executing to optimize tool choice
+
+defaults:
+  preferred_tool_order: [read, grep, glob, bash, write, edit]
+  avoid_for_large_output: [bash]  # use grep/read instead
+
+skills:
+  admin-ui:
+    rules:
+      - pattern: "CSS class coverage"
+        preferred_tool: grep
+        avoid: [bash, find]
+        files: [views/admin/, assets/css/]
+      - pattern: "sidebar navigation"
+        preferred_tool: read
+        context_needed: [views/layouts/admin.php, assets/css/admin.css]
+      - pattern: "color token validation"
+        preferred_tool: grep
+        pattern: "var\\(--color-"
+        path: ["views/admin", "assets/css"]
+
+  schema:
+    rules:
+      - pattern: "collection field"
+        preferred_tool: read
+        files: [storage/schema/collections.php]
+      - pattern: "admin form field"
+        preferred_tool: grep + read
+        files: [views/admin/]
+      - pattern: "agent context"
+        preferred_tool: grep
+        files: [app/Services/AgentContextService.php]
+
+  backend-routing:
+    rules:
+      - pattern: "route registration"
+        preferred_tool: grep
+        pattern: "Router::"
+        files: [app/]
+      - pattern: "controller action"
+        preferred_tool: read
+        files: [app/Controllers/]
+      - pattern: "service method"
+        preferred_tool: read
+        files: [app/Services/]
+      - pattern: "existing implementation"
+        preferred_tool: read
+        context_needed: true  # read neighboring files for convention
+
+  frontend-templates:
+    rules:
+      - pattern: "Design.md token"
+        preferred_tool: read
+        files: [Design.md]
+      - pattern: "template partial"
+        preferred_tool: read
+        files: [views/]
+      - pattern: "component pattern"
+        preferred_tool: read + grep
+        files: [views/]

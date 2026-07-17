@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-use App\Services\{AuditLogService,AuthService,BlogDraftService,EnvService,MailStorageService,MarkdownRenderer,MediaService,OrderService,ResourceService,SchemaService,SecretService,SettingsService,StoragePermissionService};
+use App\Services\{AiService,AuditLogService,AuthService,BlogDraftService,EnvService,MailStorageService,MarkdownRenderer,MediaService,OrderService,ResourceService,SchemaService,SecretService,SettingsService,StoragePermissionService};
 final class AdminController extends BaseController {
     protected string $layout = 'admin';
     public function __construct() {
@@ -74,51 +74,14 @@ final class AdminController extends BaseController {
                 if (!empty($files)) $attachments = "\n\nAttachments available in .agents/temp/: " . implode(', ', $files);
             }
             $context = "Site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Appointments: {$practitionerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue (sum of totals): ₹" . number_format($revenue, 2) . $attachments;
-            if (!empty($modelConfig['apiKey'])) {
-                $answer = $this->callAiApi($modelConfig, $message, $context);
-            } else {
-                $answer = "AI model not configured. Go to Admin → Integrations and set api_endpoint, agent_api_key, and agent_model.";
-            }
+            $answer = (new AiService())->call([
+                ['role' => 'system', 'content' => $context],
+                ['role' => 'user', 'content' => $message],
+            ], ['max_tokens' => 1024, 'timeout' => 30]);
             $this->jsonResponse(['answer'=>$answer]);
         } catch (\Throwable $e) {
             $this->jsonResponse(['error'=>'Agent error: '.$e->getMessage()],500);
         }
-    }
-    private function callAiApi(array $config, string $message, string $context): string {
-        $endpoint = rtrim($config['endpoint'] ?? 'https://api.openai.com/v1', '/');
-        $model = $config['model'] ?? 'gemma-4-31b-it';
-        $key = $config['apiKey'] ?? '';
-        $provider = $config['provider'] ?? 'openai';
-        $prompt = "You are the AI assistant for the site. Answer concisely in Markdown.\n\n{$context}\n\nQuestion: {$message}";
-        if ($provider === 'google') {
-            $url = $endpoint . '/' . rawurlencode($model) . ':generateContent';
-            $payload = json_encode(['contents'=>[['parts'=>[['text'=>$prompt]]]],'generationConfig'=>['temperature'=>0.3,'maxOutputTokens'=>1024]]);
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_POST=>true, CURLOPT_HTTPHEADER=>['Content-Type: application/json', 'x-goog-api-key: '.$key], CURLOPT_POSTFIELDS=>$payload, CURLOPT_TIMEOUT=>30, CURLOPT_CONNECTTIMEOUT=>10]);
-            $body = curl_exec($ch);
-            $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            if ($status !== 200 || $body === false) return "API error (HTTP {$status}). Check model config.";
-            $result = json_decode($body, true);
-            return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'No response.';
-        }
-        $url = $endpoint . '/chat/completions';
-        $payload = json_encode(['model'=>$model,'messages'=>[['role'=>'system','content'=>$context],['role'=>'user','content'=>$message]],'max_tokens'=>1024]);
-        $ch = curl_init($url);
-        $headers = ['Content-Type: application/json'];
-        if ($provider === 'anthropic') {
-            $headers[] = 'x-api-key: ' . $key;
-            $headers[] = 'anthropic-version: 2023-06-01';
-        } else {
-            $headers[] = 'Authorization: Bearer ' . $key;
-        }
-        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_POST=>true, CURLOPT_HTTPHEADER=>$headers, CURLOPT_POSTFIELDS=>$payload, CURLOPT_TIMEOUT=>30, CURLOPT_CONNECTTIMEOUT=>10]);
-        $body = curl_exec($ch);
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($status !== 200 || $body === false) return "API error (HTTP {$status}). Check endpoint/key/model in Admin → Integrations.";
-        $result = json_decode($body, true);
-        return $result['choices'][0]['message']['content'] ?? 'No response.';
     }
     public function appearance(): void{
         $s=(new SettingsService())->public();
@@ -518,7 +481,7 @@ final class AdminController extends BaseController {
             'build' => $totalCount - $doneCount,
         ];
 
-        $owner = getenv('OWNER_GITHUB') ?: 'getwinharris';
+        $owner = getenv('OWNER_GITHUB') ?: 'bapXai';
         $secrets = new SecretService();
         $modelConfig = $secrets->getModelConfig();
 
@@ -546,7 +509,7 @@ final class AdminController extends BaseController {
     }
 
     public function terminalRun(): void {
-        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $input = $this->parsedInput() + $_POST;
         $cmd = trim((string)($input['command'] ?? ''));
         if ($cmd === '') {$this->jsonResponse(['error' => 'Command is required'], 400); return;}
         $safe = false;

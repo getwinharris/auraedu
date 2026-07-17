@@ -53,7 +53,7 @@ commerce or spiritual consultation. Architecture is preserved — we repurpose, 
 | `/admin/blog*`, `/admin/appearance*`, `/admin/shipping`, `/admin/tax-report`, `/admin/consultation-analytics` | Retain | Content/ops. |
 | `/admin/contact-submissions*`, `/admin/email-inbox`, `/admin/email-outbox` | Retain | Comms. |
 | `/admin/developer/project-map`, `/admin/developer/workflow` | Retain | Dev tooling. |
-| `/admin/environment/fix-permissions` | Retain | (currently commented GET route per AGENTS.md known issue). |
+| `/admin/environment/fix-permissions` | Retain | Working — route registered and controller active. |
 
 ## API routes
 | Route | Class | Action |

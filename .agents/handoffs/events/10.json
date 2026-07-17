@@ -1,7 +1,7 @@
 {
   "event_type": "issues.opened",
   "issue": 10,
-  "actor": "getwinharris",
+  "actor": "bapXai",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
@@ -12,7 +12,7 @@
     "body": "Admin panel still shows 'Temples' in dashboard card and media context dropdown. Update labels to 'Hospital Facilities'. Admin URL path /admin/temples kept for backward compat with MySQL table name.",
     "labels": ["admin", "ui"],
     "repository": {
-      "owner": "getwinharris",
+      "owner": "bapXai",
       "name": "auraedu"
     }
   },

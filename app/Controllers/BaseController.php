@@ -6,15 +6,25 @@ abstract class BaseController {
     protected bool $isApiRequest = false;
     protected string $seoKey = 'home';
     protected array $seoOverrides = [];
-    
+    private static ?array $parsedJsonInput = null;
+
     protected function redirect(string $path): never { session_write_close(); header('Location: ' . $path); exit; }
     protected function flash(string $message, string $type = 'info'): void { $_SESSION['flash'] = ['message' => $message, 'type' => $type]; }
 
+    protected function parsedInput(): array {
+        if (self::$parsedJsonInput === null) {
+            $raw = file_get_contents('php://input');
+            self::$parsedJsonInput = ($raw !== false && $raw !== '') ? (json_decode($raw, true) ?? []) : [];
+        }
+        return self::$parsedJsonInput;
+    }
+
     protected function validateCsrf(): void {
-        $token = $_POST['_csrf'] ?? '';
+        $token = $_POST['_csrf'] ?? $this->parsedInput()['_csrf'] ?? '';
         $expected = $_SESSION['csrf_token'] ?? '';
         if ($token === '' || !hash_equals($expected, $token)) {
-            if ($this->isApiRequest || strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') === 0 || ($_SERVER['CONTENT_TYPE'] ?? '') === 'application/json') {
+            $acceptsJson = strpos($_SERVER['HTTP_ACCEPT'] ?? '', '/json') !== false;
+            if ($this->isApiRequest || strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') === 0 || ($_SERVER['CONTENT_TYPE'] ?? '') === 'application/json' || $acceptsJson) {
                 $this->jsonResponse(['error' => 'Security token invalid.'], 419);
             }
             $this->flash('Security token invalid. Please try again.', 'error');
@@ -40,6 +50,7 @@ abstract class BaseController {
     }
     
     protected function jsonResponse(array $data, int $status = 200): void {
+        while (ob_get_level()) ob_end_clean();
         http_response_code($status);
         header('Content-Type: application/json');
         echo json_encode($data);

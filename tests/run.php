@@ -95,8 +95,8 @@ $tests['admin sidebar split into two sections'] = function (): void {
     $layout = file_get_contents(app_path('views/layouts/admin.php'));
     assertTrue(str_contains($layout, 'PRODUCT &amp; BUILD'), 'Sidebar should have PRODUCT & BUILD section');
     assertTrue(str_contains($layout, 'AGENTS &amp; WORKSPACE'), 'Sidebar should have AGENTS & WORKSPACE section');
-    assertTrue(str_contains($layout, 'admin-sidebar__divider'), 'Sidebar should have divider between sections');
-    assertTrue(str_contains($layout, 'admin-sidebar__section-label'), 'Sidebar should use section labels');
+    assertTrue(str_contains($layout, 'admin-nav__divider'), 'Sidebar should have divider between sections');
+    assertTrue(str_contains($layout, 'admin-nav__section'), 'Sidebar should use section labels');
 };
 
 $tests['admin sidebar links all admin routes'] = function (): void {
@@ -303,6 +303,76 @@ $tests['env file defines required keys'] = function (): void {
         assertTrue(($env[$key] ?? '') !== '', ".env should define {$key}");
     }
 };
+
+$tests['ai chat and mcp tool definitions are correctly registered'] = function (): void {
+    $ai = new App\Controllers\AiChatController();
+    $defs = $ai->getToolDefinitions();
+    assertTrue(is_array($defs) && !empty($defs), 'Tool definitions must be a non-empty array');
+    
+    $toolNames = array_column(array_column($defs, 'function'), 'name');
+    assertTrue(in_array('bapXaura_map', $toolNames, true), 'bapXaura_map tool should be registered');
+    assertTrue(in_array('search_code', $toolNames, true), 'search_code tool should be registered');
+    assertTrue(in_array('read_file', $toolNames, true), 'read_file tool should be registered');
+    assertTrue(in_array('list_dir', $toolNames, true), 'list_dir tool should be registered');
+};
+
+$tests['admin CSS classes used in views are defined in admin.css'] = function (): void {
+    $css = file_get_contents(app_path('assets/css/admin.css'));
+    $views = glob(app_path('views/admin/**/*.php'));
+    $views = array_merge($views, glob(app_path('views/admin/*.php')));
+    $usedClasses = [];
+    foreach ($views as $vf) {
+        $content = file_get_contents($vf);
+        preg_match_all('/class="([^"]+)"/', $content, $m);
+        foreach ($m[1] as $cls) {
+            foreach (explode(' ', $cls) as $c) {
+                $c = trim($c);
+                if ($c === '' || str_contains($c, '<?') || str_contains($c, '$') || str_contains($c, "'") || $c === '===' || $c === '?' || $c === ':' || $c === '?>' || $c === '??' || $c === '!==') continue;
+                if (!str_starts_with($c, 'btn-') && !str_starts_with($c, 'flash-') && !in_array($c, ['admin-nav__link--active', 'admin-submenu', 'open'])) {
+                    $usedClasses[$c] = true;
+                }
+            }
+        }
+    }
+    $adminCssClasses = [];
+    preg_match_all('/\.([\w-]+(?:::[\w-]+)?)(?=[,\s]*[\.{#])/', $css, $matches);
+    foreach ($matches[1] as $cls) {
+        $adminCssClasses[$cls] = true;
+    }
+    $missing = [];
+    foreach (array_keys($usedClasses) as $cls) {
+        if (!isset($adminCssClasses[$cls])) {
+            $missing[] = $cls;
+        }
+    }
+    assertSame([], $missing, 'All admin CSS classes should be defined in admin.css');
+};
+
+$tests['admin dashboard uses Linear design tokens (no var(--color-gold))'] = function (): void {
+    $views = glob(app_path('views/admin/**/*.php'));
+    $views = array_merge($views, glob(app_path('views/admin/*.php')));
+    $found = [];
+    foreach ($views as $vf) {
+        $content = file_get_contents($vf);
+        if (str_contains($content, 'var(--color-gold)')) {
+            $found[] = basename($vf);
+        }
+    }
+    assertSame([], $found, 'No admin view should use var(--color-gold) — replace with var(--color-primary)');
+};
+
+$tests['admin sidebar uses SVG icons instead of Unicode text replacements'] = function (): void {
+    $layout = file_get_contents(app_path('views/layouts/admin.php'));
+    $unicodeIcons = ['⊞', '▤', '◎', '◈', '▦', '⚙', '◉', '❯', '∷', '↗'];
+    $found = [];
+    foreach ($unicodeIcons as $icon) {
+        if (str_contains($layout, $icon)) {
+            $found[] = $icon;
+        }
+    }
+    assertSame([], $found, 'Sidebar should not contain Unicode icons — use inline SVGs');
+};
+
 
 foreach ($tests as $name => $test) {
     try {

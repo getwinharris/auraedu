@@ -12,28 +12,86 @@ final class SupportBotService {
         $message = trim($message);
         if ($message === '') throw new \InvalidArgumentException('Message is required.');
         $context = $this->customerContext($user);
-        $reply = !$context['signed_in'] ? $this->fallbackReply($message, $context) : null;
-        if ($reply === null) {
-            $aiReply = $this->googleReply($message, $context);
-            if ($aiReply !== null) {
-                $candidate = $this->cleanReply($aiReply);
-                if (!$this->looksInternal($candidate)) $reply = $candidate;
-            }
+        $reply = null;
+        $aiReply = $this->googleReply($message, $context);
+        if ($aiReply !== null) {
+            $candidate = $this->cleanReply($aiReply);
+            if (!$this->looksInternal($candidate)) $reply = $candidate;
         }
         $reply ??= $this->fallbackReply($message, $context);
-        $result = ['reply' => $reply, 'ticket_id' => null, 'memory' => 'browser_session'];
+        $result = ['reply' => $reply, 'ticket_id' => null, 'booking_id' => null, 'browser_action' => null, 'memory' => 'browser_session'];
         $email = !empty($user['email']) ? (string)$user['email'] : '';
+
+        $bookingResult = $this->tryCreateBooking($message, $user, $context);
+        if ($bookingResult !== null) {
+            $result['booking_id'] = $bookingResult['id'];
+            $result['reply'] .= ' Your booking has been created. The consultant will confirm the schedule.';
+            $result['actions'][] = ['type' => 'navigate', 'label' => 'View My Sessions', 'path' => '/account/dashboard/sessions'];
+        }
+
         $escalated = $this->shouldEscalate($message, $reply, $user);
-        if ($escalated && $email !== '') {
+        if ($escalated && $email !== '' && $result['ticket_id'] === null) {
             try {
                 $ticket = (new SupportTicketService())->create($email, $message, 'escalated from support bot');
                 $result['ticket_id'] = $ticket['id'];
                 $result['reply'] .= ' I have created a support ticket to get a human to review your request.';
             } catch (\Throwable) {}
         }
+
+        $browserAction = $this->tryBrowserAction($message);
+        if ($browserAction !== null) $result['browser_action'] = $browserAction;
+
         $actions = $this->extractActions($reply);
-        if ($actions !== []) $result['actions'] = $actions;
+        if ($actions !== []) $result['actions'] = array_merge($result['actions'] ?? [], $actions);
         return $result;
+    }
+
+    private function tryCreateBooking(string $message, ?array $user, array $context): ?array {
+        if (empty($user['email'])) return null;
+        if (!preg_match('/\b(book|booking|appointment|schedule|consult)\b/i', $message)) return null;
+        if (!preg_match('/\b(consultant|session|therapy|counsel|follow.?up)\b/i', $message)) return null;
+        $slug = null;
+        $products = $context['site']['products'] ?? [];
+        foreach ($products as $p) {
+            if (!empty($p['slug']) && stripos($p['name'] ?? '', 'consult') !== false) {
+                $slug = $p['slug'];
+                break;
+            }
+        }
+        $slug ??= 'general-consultation';
+        $id = bin2hex(random_bytes(8));
+        $session = [
+            'id' => $id,
+            'customer_email' => strtolower(trim((string)$user['email'])),
+            'customer_name' => $user['name'] ?? '',
+            'consultant_slug' => $slug,
+            'mode' => 'booking',
+            'session_type' => 'Consultation booking (auto)',
+            'status' => 'requested',
+            'preferred_date' => date('Y-m-d', strtotime('+1 day')),
+            'preferred_time' => '10:00',
+            'phone' => $user['phone'] ?? '',
+            'notes' => 'Auto-created by support bot: ' . mb_substr($message, 0, 500),
+            'date' => date('Y-m-d', strtotime('+1 day')),
+            'time' => '10:00',
+            'created_at' => date('c'),
+        ];
+        try {
+            (new \App\Services\ResourceService('appointments'))->save($session);
+            return $session;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function tryBrowserAction(string $message): ?array {
+        if (preg_match('/\b(search|look up|find|navigate to|go to|open)\s+(.+)/i', $message, $m)) {
+            return ['type' => 'navigate', 'query' => trim($m[2])];
+        }
+        if (preg_match('/\b(browse|explore)\b/i', $message)) {
+            return ['type' => 'navigate', 'query' => $message];
+        }
+        return null;
     }
 
     private function customerContext(?array $user): array {
@@ -50,57 +108,46 @@ final class SupportBotService {
 
     private function googleReply(string $message, array $context): ?string {
         $secrets = $this->secrets->all();
+        $endpoint = rtrim(trim((string)(getenv('API_ENDPOINT') ?: getenv('BAPX_AI_ENDPOINT') ?: ($secrets['api_endpoint'] ?? 'https://generativelanguage.googleapis.com/v1beta/openai/'))), '/');
         $key = trim((string)(getenv('AGENT_API_KEY') ?: getenv('SUPPORT_BOT_GOOGLE_API_KEY') ?: ($secrets['agent_api_key'] ?? $secrets['support_bot_google_api_key'] ?? '')));
         $model = trim((string)(getenv('AGENT_MODEL') ?: getenv('SUPPORT_BOT_MODEL') ?: ($secrets['agent_model'] ?? $secrets['support_bot_model'] ?? 'gemma-4-31b-it'))) ?: 'gemma-4-31b-it';
         if ($key === '' || !function_exists('curl_init')) return null;
-        $prompt = "You are AuraEdu support bot.\n"
-            . "Return only the final customer-facing answer. Do not include reasoning, analysis, markdown bullets, code, tool calls, or hidden thoughts.\n"
-            . "Use only this JSON context for the signed-in customer and public site links. Never mention, infer, or access other users' data. If data is missing, ask the customer to use the contact form.\n"
-            . "Allowed help: product, cart, checkout, delivery address, order, consultant booking, and navigation details from the JSON.\n"
-            . "When useful, include one exact internal path from site.pages or a matching product path (e.g., /shop, /cart, /checkout, /product/slug, /consult). Mention the path in the reply so the UI can show a navigation button. Never invent admin paths, external URLs, or claim that an action already happened.\n"
-            . "Customer context JSON: "
-            . json_encode($context, JSON_UNESCAPED_SLASHES)
-            . "\nCustomer question: " . $message
-            . "\nSupport reply:";
+        $systemPrompt = 'You are AuraEdu support bot. Answer concisely. Use the context for site-specific data. You can use general knowledge for questions about the AI, the platform, or common knowledge.';
         $payload = json_encode([
-            'contents' => [['parts' => [['text' => $prompt]]]],
-            'generationConfig' => ['temperature' => 0.2, 'maxOutputTokens' => 220],
+            'model' => $model,
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => 'Context: ' . json_encode($context, JSON_UNESCAPED_SLASHES) . "\n\nCustomer: " . $message],
+            ],
+            'max_tokens' => 220,
+            'temperature' => 0.3,
         ], JSON_UNESCAPED_SLASHES);
-        $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode($model) . ':generateContent');
+        $ch = curl_init($endpoint . '/chat/completions');
+        $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $key];
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $key],
+            CURLOPT_HTTPHEADER => $headers,
             CURLOPT_TIMEOUT => 12,
         ]);
         $body = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($status >= 300 || !$body) return null;
         $json = json_decode($body, true) ?: [];
-        return trim((string)($json['candidates'][0]['content']['parts'][0]['text'] ?? '')) ?: null;
+        return trim((string)($json['choices'][0]['message']['content'] ?? '')) ?: null;
     }
 
     private function cleanReply(string $reply): string {
         $reply = preg_replace('/<thought\b[^>]*>.*?<\/thought>/is', '', $reply) ?? $reply;
-        $lines = array_filter(array_map('trim', preg_split('/\R/', $reply) ?: []));
-        $clean = [];
-        foreach ($lines as $line) {
-            $line = preg_replace('/^\s*[\*\-]\s*/', '', $line) ?? $line;
-            if (preg_match('/^(role|constraint|customer context|customer question|the customer|i need|greeting|list the|maintain a|answer only|support reply)\b/i', $line)) continue;
-            $line = trim($line, " \t\n\r\0\x0B`*");
-            if ($line !== '') $clean[] = $line;
-        }
-        $text = trim(implode(' ', $clean));
-        if (preg_match_all('/"([^"]{20,700})"/', $text, $matches) && !empty($matches[1])) {
-            $text = end($matches[1]);
-        }
-        if ($text === '') $text = 'I can help with products, orders, delivery addresses, payments, and consultant bookings. Please ask one specific question.';
-        return strlen($text) > 900 ? substr($text, 0, 897) . '...' : $text;
+        $reply = preg_replace('/^\s*[\*\-]\s*/m', '', $reply) ?? $reply;
+        $reply = trim($reply, " \t\n\r\0\x0B`*\"");
+        if ($reply === '') $reply = 'I can help with products, orders, delivery addresses, payments, and consultant bookings. Please ask one specific question.';
+        return strlen($reply) > 900 ? substr($reply, 0, 897) . '...' : $reply;
     }
 
     private function looksInternal(string $reply): bool {
-        return (bool)preg_match('/\b(signed_in|customer context|context json|site\.pages|wallet_transactions|support_scope|generationconfig|tool call|role:|constraint|the user said|the bot should|the bot needs|allowed scope)\b/i', $reply);
+        return (bool)preg_match('/\b(role:|constraint|the user said|the bot should|the bot needs|generationconfig|tool call)\b/i', $reply);
     }
 
     private function fallbackReply(string $message, array $context): string {

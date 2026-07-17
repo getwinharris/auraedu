@@ -15,7 +15,7 @@
         Configure the AI model in <a href="/admin/integrations">Integrations</a>
         (keys: <code>agent_api_key</code>, <code>agent_model</code>, <code>api_endpoint</code>).
     </p>
-    <?php if (empty($modelConfig['api_key'])): ?>
+    <?php if (empty($modelConfig['apiKey'])): ?>
         <div style="background:var(--color-warning-bg, #fff3cd); border:1px solid var(--color-warning-border, #ffc107); border-radius:var(--radius-md); padding:var(--space-md); margin-bottom:var(--space-lg);">
             <strong>AI model not configured.</strong>
             Go to <a href="/admin/integrations">Admin → Integrations</a> and set endpoint, api_key, and model first.
@@ -132,7 +132,7 @@ async function askAgent(e) {
     messages.innerHTML += '<div class="agent-message agent-message--user" style="padding:var(--space-sm) var(--space-md); background:var(--color-maroon); color:#fff; border-radius:var(--radius-md); font-size:0.85rem; align-self:flex-end; max-width:80%;">' + escapeHtml(msg) + '</div>';
     input.value = '';
     try {
-        const resp = await fetch('/admin/agent/ask', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'message='+encodeURIComponent(msg) + '&_csrf=' + encodeURIComponent(document.querySelector('input[name="_csrf"]')?.value || '') });
+        const resp = await fetch('/admin/agent/ask', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'}, body:'message='+encodeURIComponent(msg) + '&_csrf=' + encodeURIComponent(document.querySelector('input[name="_csrf"]')?.value || '') });
         const data = await resp.json();
         if (data.error) {
             messages.innerHTML += '<div class="agent-message agent-message--error" style="padding:var(--space-sm) var(--space-md); background:var(--color-error-bg, #f8d7da); border:1px solid var(--color-error, #dc3545); border-radius:var(--radius-md); font-size:0.85rem; color:var(--color-error, #dc3545);">Error: ' + escapeHtml(data.error) + '</div>';

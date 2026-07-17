@@ -1,8 +1,8 @@
 <?php
 namespace App\Controllers;
 
-use App\Services\AgentRuntimeService;
-use App\Services\SecretService;
+use App\Integrations\GitHub\GitHubChannel;
+use App\Services\{AgentRuntimeService, AiService, SecretService};
 
 final class CloudAgentController extends BaseController {
     public function webhook(): void {
@@ -15,19 +15,21 @@ final class CloudAgentController extends BaseController {
             return;
         }
 
-        if ($signature !== '' && !$this->verifySignature($payload, $signature)) {
+        $secrets = (new SecretService())->all();
+        $channel = new GitHubChannel(
+            $secrets['github_webhook_secret'] ?? '',
+            $secrets['github_token'] ?? '',
+            $secrets['github_owner'] ?: 'bapXai',
+            $secrets['github_repo'] ?? ''
+        );
+
+        if ($signature !== '' && !$channel->verifyWebhook($payload, $signature)) {
             $this->jsonResponse(['error' => 'Invalid signature'], 403);
             return;
         }
 
-        if ($event === 'ping') {
-            $this->jsonResponse(['message' => 'pong', 'event' => $event]);
-            return;
-        }
-
         try {
-            $runtime = new AgentRuntimeService();
-            $result = $runtime->processWebhook($payload, $event);
+            $result = $channel->dispatch($payload, $event);
             $this->jsonResponse($result);
         } catch (\Throwable $e) {
             $this->jsonResponse(['error' => 'Agent runtime error: ' . $e->getMessage()], 500);
@@ -35,7 +37,7 @@ final class CloudAgentController extends BaseController {
     }
 
     public function status(): void {
-        $owner = getenv('OWNER_GITHUB') ?: 'getwinharris';
+        $owner = getenv('OWNER_GITHUB') ?: 'bapXai';
         $runtime = new AgentRuntimeService();
         $handoffEvents = glob(app_path('.agents/handoffs/events/*.json')) ?: [];
 
@@ -84,12 +86,13 @@ final class CloudAgentController extends BaseController {
         try {
             $runtime = new AgentRuntimeService();
             $db = new \App\Services\DatabaseService();
-            $secrets = new SecretService();
-            $mc = $secrets->getModelConfig();
             $siteContext = "- Users: " . count($db->read('users')) . "\n- Orders: " . count($db->read('orders')) . "\n- Products: " . count($db->read('products'));
 
             $promptText = $runtime->buildRolePrompt($role, $issueNum, $issueTitle, $issueBody, $siteContext, []);
-            $response = !empty($mc['apiKey']) ? $this->callAi($mc, $promptText) : 'AI not configured. Admin → Integrations.';
+            $response = (new AiService())->call([
+                ['role' => 'system', 'content' => 'You are a bapXaura agent. Respond concisely.'],
+                ['role' => 'user', 'content' => $promptText],
+            ], ['max_tokens' => 2048, 'timeout' => 60]);
 
             $this->jsonResponse([
                 'role' => $role,
@@ -99,46 +102,5 @@ final class CloudAgentController extends BaseController {
         } catch (\Throwable $e) {
             $this->jsonResponse(['error' => $e->getMessage()], 500);
         }
-    }
-
-    private function callAi(array $mc, string $prompt): string {
-        $endpoint = rtrim($mc['endpoint'] ?? 'https://api.openai.com/v1', '/');
-        $model = $mc['model'] ?? 'gemma-4-31b-it';
-        $key = $mc['apiKey'] ?? '';
-        $provider = $mc['provider'] ?? 'openai';
-
-        if ($provider === 'google') {
-            $url = $endpoint . '/' . rawurlencode($model) . ':generateContent';
-            $payload = json_encode(['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['temperature' => 0.3, 'maxOutputTokens' => 2048]]);
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $key], CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 60, CURLOPT_CONNECTTIMEOUT => 10]);
-            $body = curl_exec($ch);
-            $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            if ($status !== 200 || $body === false) return "API error (HTTP {$status})";
-            $result = json_decode($body, true);
-            return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'No response.';
-        }
-
-        $url = $endpoint . '/chat/completions';
-        $payload = json_encode(['model' => $model, 'messages' => [['role' => 'system', 'content' => 'You are a bapXaura agent. Respond concisely.'], ['role' => 'user', 'content' => $prompt]], 'max_tokens' => 2048]);
-        $ch = curl_init($url);
-        $headers = ['Content-Type: application/json'];
-        if ($provider === 'anthropic') { $headers[] = 'x-api-key: ' . $key; $headers[] = 'anthropic-version: 2023-06-01'; }
-        else { $headers[] = 'Authorization: Bearer ' . $key; }
-        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 60, CURLOPT_CONNECTTIMEOUT => 10]);
-        $body = curl_exec($ch);
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($status !== 200 || $body === false) return "API error (HTTP {$status})";
-        $result = json_decode($body, true);
-        return $result['choices'][0]['message']['content'] ?? 'No response.';
-    }
-
-    private function verifySignature(array $payload, string $signature): bool {
-        $secret = getenv('GITHUB_WEBHOOK_SECRET') ?: '';
-        if ($secret === '') return true;
-        $expected = 'sha256=' . hash_hmac('sha256', json_encode($payload), $secret);
-        return hash_equals($expected, $signature);
     }
 }

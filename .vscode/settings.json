@@ -1,0 +1,43 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+  "editor.rulers": [120],
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "storage/kittentts/": true,
+    ".bin/chrome-linux/": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  "php.validate.enable": true,
+  "php.suggest.basic": false,
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+    "editor.tabSize": 4
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "intelephense.files.maxSize": 5000000,
+  "intelephense.environment.phpVersion": "8.2.0",
+  "intelephense.files.associations": ["*.php"],
+  "phpcs.enable": true,
+  "phpcs.standard": "PSR12",
+  "phpstan.enable": true,
+  "phpstan.level": 6,
+  "phpstan.config": "phpstan.neon",
+  "files.associations": {
+    "*.php": "php",
+    "*.mmd": "mermaid"
+  },
+  "workbench.colorTheme": "Default Dark+",
+  "editor.minimap.enabled": false
+}
