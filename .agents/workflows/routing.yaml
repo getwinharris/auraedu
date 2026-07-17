@@ -61,7 +61,7 @@ roles:
       failed: rollback
 
 notifications:
-  owner: getwinharris
+  owner: bapXai
   notify_on:
     - plan_ready
     - business_decision_required

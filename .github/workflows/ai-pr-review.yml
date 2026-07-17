@@ -27,67 +27,68 @@ jobs:
           extensions: curl, json, mbstring
       - name: Collect PR diff
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1
-          git diff origin/${{ github.base_ref }}...HEAD -- . ':!.github' 2>/dev/null | head -5000 > /tmp/pr_diff.txt
+          git fetch origin ${{ github.base_ref }} --depth=1 2>/dev/null || true
+          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD -- . ':!.github' 2>/dev/null | head -8000)
+          if [ -z "$DIFF" ]; then
+            # fallback: diff against merge-base
+            MB=$(git merge-base HEAD origin/${{ github.base_ref }} 2>/dev/null || echo "")
+            if [ -n "$MB" ]; then
+              DIFF=$(git diff "$MB"..HEAD -- . ':!.github' 2>/dev/null | head -8000)
+            fi
+          fi
+          echo "$DIFF" > /tmp/pr_diff.txt
+          echo "DIFF_SIZE=$(wc -c < /tmp/pr_diff.txt)" >> $GITHUB_ENV
       - name: Review via Agent API
         id: review
-        env:
-          AGENT_ENDPOINT: ${{ secrets.AGENT_ENDPOINT }}
-          BAPX_AI_ENDPOINT: ${{ secrets.BAPX_AI_ENDPOINT }}
-          BAPX_AI_API_KEY: ${{ secrets.BAPX_AI_API_KEY }}
-          BAPX_AI_MODEL: ${{ secrets.BAPX_AI_MODEL }}
         run: |
           php -r '
             $diff = file_get_contents("/tmp/pr_diff.txt");
             if (trim($diff) === "") { echo "No diff to review.\n"; exit(0); }
-            $msg = "Review this PHP diff and note issues (code style, security, bugs, edge cases). Be concise:\n\n```diff\n" . $diff . "\n```";
-            $endpoint = getenv("AGENT_ENDPOINT") ?: getenv("BAPX_AI_ENDPOINT") ?: "";
+            $msg = "Review this PHP diff for code style, security bugs, edge cases. Be concise:\n\n```diff\n" . $diff . "\n```";
+            $endpoint = getenv("AGENT_ENDPOINT") ?: "";
             $apiKey = getenv("BAPX_AI_API_KEY") ?: "";
-            $model = getenv("BAPX_AI_MODEL") ?: "";
+            $model = getenv("BAPX_AI_MODEL") ?: "gemma-4-31b-it";
             if ($endpoint === "" || $apiKey === "") {
-              $appUrl = getenv("APP_URL");
-              if ($appUrl === "") { echo "Skip: APP_URL not set, no AI endpoint configured.\n"; exit(0); }
-              $payload = json_encode(["message" => $msg, "source" => "pr-review"]);
-              $ch = curl_init($appUrl . "/api/agent");
-              curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
-                CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 15
-              ]);
+              $appUrl = getenv("APP_URL") ?: "";
+              if ($appUrl === "") {
+                echo "Skip: no AI endpoint configured. Set AGENT_ENDPOINT + BAPX_AI_API_KEY or APP_URL secrets.\n";
+                exit(0);
+              }
+              $payload = json_encode(["messages" => [["role" => "user", "content" => $msg]], "model" => "gemma-4-31b-it", "max_tokens" => 2048]);
+              $ch = curl_init($appUrl . "/api/chat/completions");
+              curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ["Content-Type: application/json"], CURLOPT_POSTFIELDS => $payload, CURLOPT_TIMEOUT => 60]);
               $resp = curl_exec($ch);
-              $body = curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200 ? json_decode($resp, true)["answer"] ?? "" : "";
-              curl_close($ch);
-              if ($body === "") { echo "Skip: empty AI response.\n"; exit(0); }
-              echo $body;
-            } else {
-              $provider = str_contains($endpoint, "googleapis") ? "google" : "openai";
-              $prompt = "You are an expert PHP code reviewer. Review the following diff.\n\nUser: " . $msg;
-              if ($provider === "google") {
-                $url = rtrim($endpoint, "/") . "/" . rawurlencode($model) . ":generateContent";
-                $pl = json_encode(["contents" => [["parts" => [["text" => $prompt]]]], "generationConfig" => ["temperature" => 0.2, "maxOutputTokens" => 2048]]);
-                $ch = curl_init($url);
-                curl_setopt_array($ch, [
-                  CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
-                  CURLOPT_HTTPHEADER => ["Content-Type: application/json", "x-goog-api-key: " . $apiKey],
-                  CURLOPT_POSTFIELDS => $pl, CURLOPT_TIMEOUT => 60
-                ]);
-                $body = curl_exec($ch);
-                $result = json_decode($body, true);
-                echo $result["candidates"][0]["content"]["parts"][0]["text"] ?? "Review failed.";
-                curl_close($ch);
+              $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+              if ($httpCode === 200) {
+                $json = json_decode($resp, true);
+                $content = $json["choices"][0]["message"]["content"] ?? null;
+                if ($content) { echo $content; }
+                else { echo "Review failed: empty response from app endpoint.\n"; exit(1); }
               } else {
-                $url = rtrim($endpoint, "/") . "/chat/completions";
-                $pl = json_encode(["model" => $model, "messages" => [["role" => "user", "content" => $prompt]], "max_tokens" => 2048]);
+                echo "Review failed: HTTP $httpCode from app endpoint.\n"; exit(1);
+              }
+            } else {
+              $url = rtrim($endpoint, "/");
+              if (str_contains($endpoint, "googleapis")) {
+                $url .= "/" . rawurlencode($model) . ":generateContent";
+                $pl = json_encode(["contents" => [["parts" => [["text" => $msg]]]], "generationConfig" => ["temperature" => 0.2, "maxOutputTokens" => 2048]]);
                 $ch = curl_init($url);
-                curl_setopt_array($ch, [
-                  CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
-                  CURLOPT_HTTPHEADER => ["Content-Type: application/json", "Authorization: Bearer " . $apiKey],
-                  CURLOPT_POSTFIELDS => $pl, CURLOPT_TIMEOUT => 60
-                ]);
+                curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ["Content-Type: application/json", "x-goog-api-key: " . $apiKey], CURLOPT_POSTFIELDS => $pl, CURLOPT_TIMEOUT => 60]);
                 $body = curl_exec($ch);
                 $result = json_decode($body, true);
-                echo $result["choices"][0]["message"]["content"] ?? "Review failed.";
-                curl_close($ch);
+                $text = $result["candidates"][0]["content"]["parts"][0]["text"] ?? null;
+                if ($text) { echo $text; }
+                else { echo "Review failed: " . ($result["error"]["message"] ?? "unknown error") . "\n"; exit(1); }
+              } else {
+                $url = rtrim($url, "/") . "/chat/completions";
+                $pl = json_encode(["model" => $model, "messages" => [["role" => "user", "content" => $msg]], "max_tokens" => 2048]);
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ["Content-Type: application/json", "Authorization: Bearer " . $apiKey], CURLOPT_POSTFIELDS => $pl, CURLOPT_TIMEOUT => 60]);
+                $body = curl_exec($ch);
+                $result = json_decode($body, true);
+                $text = $result["choices"][0]["message"]["content"] ?? null;
+                if ($text) { echo $text; }
+                else { echo "Review failed: " . ($result["error"]["message"] ?? "unknown error") . "\n"; exit(1); }
               }
             }
           ' > review_output.txt 2>&1
@@ -98,10 +99,24 @@ jobs:
           script: |
             const fs = require("fs");
             const review = fs.readFileSync("review_output.txt", "utf8").trim();
-            if (!review) { console.log("No review to post"); return; }
+            if (!review || review.startsWith("Skip:") || review.startsWith("No diff") || review.startsWith("Review failed")) {
+              console.log(review);
+              return;
+            }
+            const hdr = "<!-- bapx-handoff\n" + JSON.stringify({
+              schema_version: "1.0",
+              event_id: "EVT-REVIEW-" + context.issue.number,
+              workflow_id: "WF-PR-" + context.issue.number,
+              pull_request: context.issue.number,
+              from_role: "reviewer",
+              to_role: "author",
+              head_sha: "${{ github.sha }}",
+              status: "approved",
+              owner: { github: "bapXai", notify: false, reason: null }
+            }, null, 2) + "\n-->\n\n";
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "## 🤖 AI Code Review\n\n" + review + "\n\n---\n*Auto-generated by [ai-pr-review.yml](https://github.com/${{ github.repository }}/blob/main/.github/workflows/ai-pr-review.yml)*"
+              body: hdr + "## bapx-reviewer: AI Code Review\n\n" + review + "\n\n---\n*Auto-generated by [ai-pr-review.yml](https://github.com/${{ github.repository }}/blob/main/.github/workflows/ai-pr-review.yml)*"
             });

@@ -1,7 +1,7 @@
 {
   "event_type": "issues.opened",
   "issue": 5,
-  "actor": "getwinharris",
+  "actor": "bapXai",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
@@ -18,7 +18,7 @@
     "labels": []
   },
   "repository": {
-    "owner": "getwinharris",
+    "owner": "bapXai",
     "name": "auraedu"
   },
   "objectives": [

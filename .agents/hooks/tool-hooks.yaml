@@ -1,0 +1,65 @@
+# Tool Hooks Configuration
+# Hooks fire before/after every tool execution in the agent pipeline
+
+before_tool_call:
+  - name: validate_scope
+    action: block_if_not_project_scope
+    description: Blocks tool calls that target files outside the project
+    applies_to: [read_file, write_file, list_dir]
+
+  - name: check_rate_limit
+    action: throttle_if_exceeded
+    description: Rate-limits tool calls per session
+    max_per_minute: 30
+    applies_to: [bapXaura_db_query, bapXaura_ci]
+
+  - name: deny_write
+    action: block_unless_permitted
+    description: Read-only role enforcement — blocks write/edit for reviewer role
+    applies_to: [write, edit]  # these aren't tool names but tool categories
+
+  - name: validate_file_write
+    action: check_path_and_permissions
+    description: Validates file paths before write operations
+    rules:
+      - block: [".env", "storage/secrets", ".git/"]
+      - warn: ["config/"]
+
+  - name: validate_arguments
+    action: check_required_params
+    description: Ensures required arguments are present before tool call
+    applies_to: all
+
+after_tool_call:
+  - name: log_tool_usage
+    action: record_telemetry
+    description: Records tool call to telemetry.json
+    fields: [tool_name, duration_ms, success, tokens_used]
+
+  - name: record_evidence
+    action: append_to_handoff
+    description: Appends tool result summary to handoff evidence
+    applies_to: [bapXaura_ci, bapXaura_test]
+
+  - name: log_finding
+    action: append_to_review
+    description: Appends review findings
+    applies_to: [search_code, read_file]
+
+  - name: log_conversation
+    action: save_to_conversation_log
+    description: Saves support conversation to audit log
+    applies_to: all
+    channel: [support]
+
+on_error:
+  - name: retry_on_timeout
+    action: retry
+    max_retries: 2
+    backoff_ms: 1000
+    applies_to: [bapXaura_ci, bapXaura_test]
+
+  - name: escalate_on_auth_failure
+    action: notify_owner
+    description: Notifies owner if tool call fails due to permissions
+    applies_to: all

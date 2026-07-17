@@ -1,39 +1,44 @@
 {
-  "event_type": "issues.opened",
-  "issue": 8,
-  "actor": "getwinharris",
-  "workflow": {
-    "current_role": "merge_bot",
-    "next_role": "deployment",
-    "sequence": [
-      "cto",
-      "worker",
-      "reviewer",
-      "cto"
-    ]
-  },
-  "payload": {
-    "title": "bug: Admin sidebar test failures — PRODUCT & BUILD section and top items checks fail",
-    "body": "## Bug Report\n\n### Description\nTwo admin sidebar tests fail in `tests/run.php`:\n\n1. `admin sidebar split into two sections: Sidebar should have PRODUCT & BUILD section`\n2. `admin sidebar product section has top items: Product section should include /admin`\n\n### Evidence\n```\nFAIL admin sidebar split into two sections: Sidebar should have PRODUCT & BUILD section\nFAIL admin sidebar product section has top items: Product section should include /admin\n```\n\n### Investigation needed\nThe tests check for specific section headings in the admin sidebar template (`views/layouts/admin.php`). The sidebar was recently split into PRODUCT & BUILD / AGENTS & WORKSPACE sections in PR #4.\n\nCheck:\n- Whether the sidebar template has the expected section headers\n- Whether the test assertions match the actual HTML structure\n- Whether the test was updated to reflect the new sidebar split\n\n### Test file\n`tests/run.php` — search for \"Sidebar should have\"\n\n### Template file\n`views/layouts/admin.php` — the admin sidebar markup",
-    "labels": []
-  },
-  "repository": {
-    "owner": "getwinharris",
-    "name": "auraedu"
+  "schema_version": "1.0",
+  "event_id": "EVT-CURRENT",
+  "workflow_id": "WF-ISSUE-2",
+  "issue": 2,
+  "from_role": "final_verifier",
+  "to_role": "merge_bot",
+  "status": "completed",
+  "owner": {
+    "github": "bapXai",
+    "notify": false,
+    "reason": null
   },
   "objectives": [
     {
-      "id": "OBJ-8-1",
-      "status": "gap",
-      "evidence": [],
-      "browser_evidence": [],
-      "unresolved": [
-        "Handoff created - awaiting CTO"
-      ]
+      "id": "OBJ-CLEANUP-1",
+      "status": "pass",
+      "evidence": ["Deleted ConsultationController, AstrologerService, astrologer views, admin forms", "Removed all astrologer routes from ProjectMapService and index.php", "756 lines of astrologer CSS removed", "68 astrologer image files deleted"],
+      "unresolved": []
+    },
+    {
+      "id": "OBJ-CLEANUP-2",
+      "status": "pass",
+      "evidence": ["Temple→Hospital labels in admin nav", "Temple schema preserved for backward compat", "Route descriptions updated"],
+      "unresolved": ["Temple→Hospital views/content rewrite deferred to content migration"]
     }
   ],
-  "telemetry": {
-    "started_at": "2026-07-16T22:15:24.319Z",
-    "handoffs_completed": 0
-  }
+  "files_changed": [
+    "AGENTS.md",
+    ".agents/workflows/routing.yaml",
+    ".agents/workflows/cto-workflow.md",
+    ".agents/workflows/worker.md",
+    ".agents/workflows/reviewer.md",
+    ".agents/workflows/documenter.md",
+    ".agents/workflows/handoff.schema.json"
+  ],
+  "commands_run": [
+    "bapXaura update",
+    "bapXaura ci"
+  ],
+  "risks": [
+    "MySQL 'temples' table still uses old name — rename blocked until remote DB access"
+  ]
 }

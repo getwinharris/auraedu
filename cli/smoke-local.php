@@ -128,6 +128,35 @@ try {
     if (!str_contains($unknown['body'], 'Page not found')) {
         $failures[] = "Unknown route should render the PHP 404 page";
     }
+
+    // ── AI & MCP Endpoint Verification ──
+    $modelsResp = httpRequest($base . '/models');
+    echo "{$modelsResp['status']} GET /models\n";
+    $modelsData = json_decode($modelsResp['body'], true);
+    if ($modelsResp['status'] !== 200 || json_last_error() !== JSON_ERROR_NONE || !isset($modelsData['data'])) {
+        $failures[] = "GET /models did not return valid models list";
+    }
+
+    $toolsResp = httpRequest($base . '/chat/tools');
+    echo "{$toolsResp['status']} GET /chat/tools\n";
+    $toolsData = json_decode($toolsResp['body'], true);
+    if ($toolsResp['status'] !== 200 || json_last_error() !== JSON_ERROR_NONE || empty($toolsData)) {
+        $failures[] = "GET /chat/tools did not return valid tools registry JSON";
+    }
+
+    $mcpToolsResp = httpRequest($base . '/mcp/tools/list', 'POST', '{}');
+    echo "{$mcpToolsResp['status']} POST /mcp/tools/list\n";
+    $mcpToolsData = json_decode($mcpToolsResp['body'], true);
+    if ($mcpToolsResp['status'] !== 200 || json_last_error() !== JSON_ERROR_NONE || !isset($mcpToolsData['result']['tools'])) {
+        $failures[] = "POST /mcp/tools/list did not return valid MCP tools list";
+    }
+
+    $mcpInvalidResp = httpRequest($base . '/mcp', 'POST', '{"jsonrpc":"1.0"}');
+    echo "{$mcpInvalidResp['status']} POST /mcp with invalid jsonrpc\n";
+    $mcpInvalidData = json_decode($mcpInvalidResp['body'], true);
+    if ($mcpInvalidResp['status'] !== 500 || json_last_error() !== JSON_ERROR_NONE || !isset($mcpInvalidData['error'])) {
+        $failures[] = "POST /mcp with invalid jsonrpc should return 500 with error payload";
+    }
 } finally {
     foreach ($pipes as $pipe) {
         if (is_resource($pipe)) fclose($pipe);

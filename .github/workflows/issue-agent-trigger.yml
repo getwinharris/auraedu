@@ -102,10 +102,20 @@ jobs:
               issue_number: issue,
               labels: ['sub-agent-ready']
             });
+            const hdr = "<!-- bapx-handoff\n" + JSON.stringify({
+              schema_version: "1.0",
+              event_id: "EVT-TRIGGER-" + issue,
+              workflow_id: "WF-ISSUE-" + issue,
+              issue: issue,
+              from_role: "system",
+              to_role: "cto",
+              status: "dispatched",
+              owner: { github: "bapXai", notify: true, reason: "New issue opened for CTO planning" }
+            }, null, 2) + "\n-->";
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: issue,
-              body: `## Handoff dispatched
+              body: hdr + `\n## bapx-cto: Handoff dispatched
 
             | Field | Value |
             |-------|-------|

@@ -188,7 +188,6 @@ final class BrowserSession {
         ]);
         $resp = curl_exec($ch);
         $info = curl_getinfo($ch);
-        curl_close($ch);
         return [
             "http_code" => $info["http_code"] ?? 0,
             "content_type" => $info["content_type"] ?? "",

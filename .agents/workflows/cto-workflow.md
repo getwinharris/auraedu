@@ -45,7 +45,7 @@ Post as issue_comment or PR review comment:
   "head_sha": "<sha>",
   "status": "ready",
   "owner": {
-    "github": "getwinharris",
+    "github": "bapXai",
     "notify": false,
     "reason": null
   }

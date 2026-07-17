@@ -104,7 +104,7 @@ if (str_starts_with($uri, '/temples')) {
 }
 
 // PHP routes (admin + public pages)
-$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/consult','/consultation','/hospitals','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/courses','/eligibility','/scope','/gallery','/faculty','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml'];
+$phpRoutes = ['/','/shop','/shop/','/product','/cart','/checkout','/payment','/support','/about','/contact','/consult','/consultation','/hospitals','/auth','/login','/logout','/register','/forgot-password','/reset-password','/account','/reviews','/sri-panchami-education','/education','/courses','/eligibility','/scope','/gallery','/faculty','/categories','/terms','/privacy','/blog','/docs','/help','/sitemap.xml','/models','/chat','/mcp','/agent','/create-order','/verify-payment'];
 $isPhpRoute = false;
 foreach ($phpRoutes as $route) {
     if (strpos($uri, $route . '/') === 0 || $uri === $route) {

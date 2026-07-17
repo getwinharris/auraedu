@@ -22,7 +22,7 @@ final class AiChatController extends BaseController {
         $maxTokens = min((int)($input['max_tokens'] ?? 2048), 4096);
         $temperature = (float)($input['temperature'] ?? 0.7);
         $stream = !empty($input['stream']);
-        $tools = $input['tools'] ?? $this->toolRegistry;
+        $tools = $input['tools'] ?? $this->toolRegistry['_definitions'] ?? [];
 
         try {
             $secrets = new SecretService();
@@ -89,11 +89,6 @@ final class AiChatController extends BaseController {
     private function callUpstream(array $mc, string $model, array $messages, array $tools, int $maxTokens, float $temperature): array {
         $endpoint = rtrim($mc['endpoint'] ?? 'https://api.openai.com/v1', '/');
         $key = $mc['apiKey'] ?? '';
-        $provider = $mc['provider'] ?? 'openai';
-
-        if ($provider === 'google') {
-            return $this->callGoogle($endpoint, $model, $messages, $key);
-        }
 
         $url = $endpoint . '/chat/completions';
         $payload = [
@@ -109,13 +104,7 @@ final class AiChatController extends BaseController {
         }
 
         $ch = curl_init($url);
-        $headers = ['Content-Type: application/json'];
-        if ($provider === 'anthropic') {
-            $headers[] = 'x-api-key: ' . $key;
-            $headers[] = 'anthropic-version: 2023-06-01';
-        } else {
-            $headers[] = 'Authorization: Bearer ' . $key;
-        }
+        $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $key];
 
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -128,7 +117,6 @@ final class AiChatController extends BaseController {
 
         $body = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         if ($body === false || $status !== 200) {
             $errorDetail = $body ?: 'No response body';
@@ -153,59 +141,6 @@ final class AiChatController extends BaseController {
             ]],
             'usage' => ['prompt_tokens' => 0, 'completion_tokens' => 0, 'total_tokens' => 0],
         ];
-    }
-
-    private function callGoogle(string $endpoint, string $model, array $messages, string $key): array {
-        $converted = $this->messagesToGoogle($messages);
-        $url = $endpoint . '/' . rawurlencode($model) . ':generateContent';
-        $payload = json_encode([
-            'contents' => $converted['contents'],
-            'systemInstruction' => $converted['system'] ?? null,
-            'generationConfig' => ['temperature' => 0.3, 'maxOutputTokens' => 2048],
-        ]);
-
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $key],
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 60,
-            CURLOPT_CONNECTTIMEOUT => 10,
-        ]);
-        $body = curl_exec($ch);
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($body === false || $status !== 200) {
-            return $this->openAiResponse($model, "Google API error (HTTP {$status})", []);
-        }
-
-        $result = json_decode($body, true);
-        $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'No response.';
-        return $this->openAiResponse($model, $text, []);
-    }
-
-    private function messagesToGoogle(array $messages): array {
-        $contents = [];
-        $system = null;
-        foreach ($messages as $msg) {
-            $role = $msg['role'] ?? 'user';
-            if ($role === 'system') {
-                $system = ['parts' => [['text' => $msg['content'] ?? '']]];
-                continue;
-            }
-            $googleRole = ($role === 'assistant') ? 'model' : 'user';
-            $contents[] = [
-                'role' => $googleRole,
-                'parts' => [['text' => $msg['content'] ?? '']],
-            ];
-        }
-        $result = ['contents' => $contents];
-        if ($system) {
-            $result['system'] = $system;
-        }
-        return $result;
     }
 
     private function executeTool(array $toolCall): string {
@@ -343,6 +278,18 @@ final class AiChatController extends BaseController {
         $this->jsonResponse($registry['_definitions'] ?? []);
     }
 
+    public function getToolDefinitions(): array {
+        return $this->buildTools()['_definitions'] ?? [];
+    }
+
+    public function executeToolCall(string $name, array $arguments): string {
+        $toolCall = [
+            'id' => 'call-' . bin2hex(random_bytes(4)),
+            'function' => ['name' => $name, 'arguments' => json_encode($arguments)],
+        ];
+        return $this->executeTool($toolCall);
+    }
+
     private function toolDescription(string $name): string {
         $descriptions = [
             'bapXaura_map' => 'Generate the project map (routes, controllers, services, views, schema)',
@@ -363,22 +310,22 @@ final class AiChatController extends BaseController {
 
     private function toolParameters(string $name): array {
         $params = [
-            'bapXaura_map' => ['type' => 'object', 'properties' => [], 'required' => []],
-            'bapXaura_schema_list' => ['type' => 'object', 'properties' => [], 'required' => []],
+            'bapXaura_map' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
+            'bapXaura_schema_list' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
             'bapXaura_schema_show' => [
                 'type' => 'object',
                 'properties' => ['collection' => ['type' => 'string', 'description' => 'Collection name from collections.php']],
                 'required' => ['collection'],
             ],
-            'bapXaura_ci' => ['type' => 'object', 'properties' => [], 'required' => []],
-            'bapXaura_test' => ['type' => 'object', 'properties' => [], 'required' => []],
+            'bapXaura_ci' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
+            'bapXaura_test' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
             'bapXaura_handoff_next' => [
                 'type' => 'object',
                 'properties' => ['issue' => ['type' => 'integer', 'description' => 'GitHub issue number']],
                 'required' => ['issue'],
             ],
-            'bapXaura_route_list' => ['type' => 'object', 'properties' => [], 'required' => []],
-            'bapXaura_status' => ['type' => 'object', 'properties' => [], 'required' => []],
+            'bapXaura_route_list' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
+            'bapXaura_status' => ['type' => 'object', 'properties' => new \stdClass, 'required' => []],
             'bapXaura_db_query' => [
                 'type' => 'object',
                 'properties' => [
@@ -409,7 +356,7 @@ final class AiChatController extends BaseController {
                 'required' => ['path'],
             ],
         ];
-        return $params[$name] ?? ['type' => 'object', 'properties' => [], 'required' => []];
+        return $params[$name] ?? ['type' => 'object', 'properties' => new \stdClass, 'required' => []];
     }
 
     private function execBash(string $cmd, array $opts = []): array {

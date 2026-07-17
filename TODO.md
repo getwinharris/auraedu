@@ -74,7 +74,7 @@ category: root
 
 - [ ] `.mobile-cart-tray` class misnomer — shows at all viewports, rename
 - [ ] `wallet_transactions` schema missing `admin_managed` key
-- [ ] `/admin/environment` GET route + controller still commented out
+- [x] `/admin/environment` GET route + controller restored and working
 - [ ] Test for `docs/README.md` validates file exists but should validate content
 
 ## Phase H: Architecture Decisions

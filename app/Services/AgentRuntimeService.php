@@ -5,9 +5,12 @@ final class AgentRuntimeService {
     private SecretService $secrets;
     private array $routing;
 
+    private AiService $ai;
+
     public function __construct() {
         $this->secrets = new SecretService();
         $this->routing = $this->loadRouting();
+        $this->ai = new AiService($this->secrets);
     }
 
     public function processWebhook(array $payload, string $event): array {
@@ -46,13 +49,10 @@ final class AgentRuntimeService {
         $siteContext = $this->buildSiteContext($db);
 
         $aiPrompt = $this->buildRolePrompt($role, $issueNum, $issueTitle, $issueBody, $siteContext, $payload);
-        $mc = $this->secrets->getModelConfig();
-
-        if (empty($mc['apiKey'])) {
-            return ['handled' => false, 'reason' => 'AI not configured'];
-        }
-
-        $response = $this->callAi($mc, $aiPrompt);
+        $response = $this->ai->call([
+            ['role' => 'system', 'content' => 'You are a precise, action-oriented agent in an automated orchestration system.'],
+            ['role' => 'user', 'content' => $aiPrompt],
+        ], ['max_tokens' => 2048, 'timeout' => 60]);
         $parsed = $this->parseAiResponse($response, $role);
 
         $result = [
@@ -72,26 +72,26 @@ final class AgentRuntimeService {
 
     private function routeEvent(string $event, string $action): ?string {
         $eventKey = "{$event}.{$action}";
-        $map = [
-            'issues.opened' => 'cto',
-            'issues.edited' => 'cto',
-            'pull_request.opened' => 'reviewer',
-            'pull_request.synchronize' => 'reviewer',
-            'push.main' => 'deployment',
-        ];
-        return $map[$eventKey] ?? null;
+        foreach ($this->routing as $role => $config) {
+            if (in_array($eventKey, $config['handle'] ?? [], true)) {
+                return $role;
+            }
+        }
+        return null;
     }
 
     public function buildRolePrompt(string $role, int $issueNum, string $title, string $body, string $context, array $payload): string {
-        $roleDescriptions = [
-            'cto' => 'You are the CTO. Your job is to analyze issues and create a plan with specific, actionable objectives. Format your response with clear numbered objectives (OBJ-{issue}-{n}) and acceptance criteria.',
-            'worker' => 'You are the Worker agent. Your job is to implement one specific objective. Write clean, tested code following existing patterns.',
-            'reviewer' => 'You are the Reviewer agent. Your job is to review the implementation diff for correctness, test coverage, and schema consistency.',
-            'fixer' => 'You are the Fixer agent. Your job is to fix issues identified during review.',
-            'documenter' => 'You are the Documenter agent. Your job is to update affected durable documentation after changes are merged.',
-        ];
-
-        $desc = $roleDescriptions[$role] ?? "You are a {$role} agent in the bapXaura orchestration system.";
+        $roleFile = app_path('.agents/roles/' . $role . '.md');
+        $roleContent = '';
+        if (is_file($roleFile)) {
+            $content = file_get_contents($roleFile);
+            if (preg_match('/^---.*?---\s*(.*)$/s', $content, $m)) {
+                $roleContent = trim($m[1]);
+            } else {
+                $roleContent = trim($content);
+            }
+        }
+        $desc = $roleContent ?: "You are a {$role} agent in the bapXaura orchestration system.";
 
         return <<<PROMPT
 {$desc}
@@ -107,70 +107,6 @@ final class AgentRuntimeService {
 Respond with a clear analysis and action plan. For CTO role, include numbered objectives.
 Use JSON where appropriate for structured data.
 PROMPT;
-    }
-
-    private function callAi(array $mc, string $prompt): string {
-        $endpoint = rtrim($mc['endpoint'] ?? 'https://api.openai.com/v1', '/');
-        $model = $mc['model'] ?? 'gemma-4-31b-it';
-        $key = $mc['apiKey'] ?? '';
-        $provider = $mc['provider'] ?? 'openai';
-
-        if ($provider === 'google') {
-            $url = $endpoint . '/' . rawurlencode($model) . ':generateContent';
-            $payload = json_encode([
-                'contents' => [['parts' => [['text' => $prompt]]]],
-                'generationConfig' => ['temperature' => 0.3, 'maxOutputTokens' => 2048],
-            ]);
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $key],
-                CURLOPT_POSTFIELDS => $payload,
-                CURLOPT_TIMEOUT => 60,
-                CURLOPT_CONNECTTIMEOUT => 10,
-            ]);
-            $body = curl_exec($ch);
-            $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            if ($status !== 200 || $body === false) return "API error (HTTP {$status})";
-            $result = json_decode($body, true);
-            return $result['candidates'][0]['content']['parts'][0]['text'] ?? 'No response.';
-        }
-
-        $url = $endpoint . '/chat/completions';
-        $payload = json_encode([
-            'model' => $model,
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are a precise, action-oriented agent in an automated orchestration system.'],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'max_tokens' => 2048,
-            'temperature' => 0.3,
-        ]);
-
-        $ch = curl_init($url);
-        $headers = ['Content-Type: application/json'];
-        if ($provider === 'anthropic') {
-            $headers[] = 'x-api-key: ' . $key;
-            $headers[] = 'anthropic-version: 2023-06-01';
-        } else {
-            $headers[] = 'Authorization: Bearer ' . $key;
-        }
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 60,
-            CURLOPT_CONNECTTIMEOUT => 10,
-        ]);
-        $body = curl_exec($ch);
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($status !== 200 || $body === false) return "API error (HTTP {$status})";
-        $result = json_decode($body, true);
-        return $result['choices'][0]['message']['content'] ?? 'No response.';
     }
 
     private function parseAiResponse(string $response, string $role): array {
@@ -205,13 +141,15 @@ PROMPT;
 
         $db = new DatabaseService();
         $context = $this->buildSiteContext($db);
-        $mc = $this->secrets->getModelConfig();
 
         $prompt = "Handoff from {$handoff['from_role']} to {$toRole} for objective {$objectiveId} on issue #{$issue}.\n\nStatus: {$handoff['status']}\n\n" .
                   ($handoff['blocking_findings'] ? "Blocking findings: " . implode(', ', $handoff['blocking_findings']) : '') .
                   "\n\nSite data:\n{$context}\n\nExecute your role.";
 
-        $response = !empty($mc['apiKey']) ? $this->callAi($mc, $prompt) : 'AI not configured.';
+        $response = $this->ai->call([
+            ['role' => 'system', 'content' => 'You are a precise, action-oriented agent in an automated orchestration system.'],
+            ['role' => 'user', 'content' => $prompt],
+        ], ['max_tokens' => 2048, 'timeout' => 60]);
 
         return [
             'handled' => true,

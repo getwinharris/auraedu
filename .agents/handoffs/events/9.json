@@ -1,7 +1,7 @@
 {
   "event_type": "issues.opened",
   "issue": 9,
-  "actor": "getwinharris",
+  "actor": "bapXai",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
@@ -12,7 +12,7 @@
     "body": "TempleService still uses the old 'temples' naming. Create HospitalService as the primary service and add a backward-compatible alias. Depends on MySQL 'temples' table rename to 'hospitals'.",
     "labels": ["refactor", "schema"],
     "repository": {
-      "owner": "getwinharris",
+      "owner": "bapXai",
       "name": "auraedu"
     }
   },

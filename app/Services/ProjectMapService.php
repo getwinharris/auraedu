@@ -6,7 +6,7 @@ final class ProjectMapService {
     ];
 
     public const SHARED_CONTROLLERS = ['BaseController'];
-    public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter', 'KnowledgeGraphService', 'BrowserSession'];
+    public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter', 'BrowserSession'];
     public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'admin/environment', 'admin/workspace/_nav', 'admin/workspace/intake', 'admin/workspace/plan', 'admin/workspace/build', 'admin/workspace/monitor'];
     public const KNOWN_UNWIRED_COLLECTIONS = ['wallet_transactions', 'media_files'];
 
@@ -133,9 +133,14 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/admin/blog/preview','name'=>'admin.blog.preview','page'=>'admin/blog','controller'=>'AdminController@previewBlog','services'=>['BlogService','MarkdownRenderer']],
             ['method'=>'POST','path'=>'/admin/blog/ai-draft','name'=>'admin.blog.ai-draft','page'=>'admin/blog','controller'=>'AdminController@aiDraftBlog','services'=>['BlogService','BlogDraftService']],
             ['method'=>'POST','path'=>'/api/agent','name'=>'api.agent','page'=>'public/404','controller'=>'AgentController@ask','services'=>['SecretService','DatabaseService']],
+            ['method'=>'POST','path'=>'/agent/chat','name'=>'api.agent.chat','page'=>'public/404','controller'=>'AgentController@chat','services'=>['AgentOrchestratorService']],
             ['method'=>'POST','path'=>'/api/tts/tokenize','name'=>'api.tts.tokenize','page'=>'public/404','controller'=>'TtsController@tokenize','services'=>[]],
             ['method'=>'POST','path'=>'/chat/completions','name'=>'api.chat.completions','page'=>'public/404','controller'=>'AiChatController@chat','services'=>['SecretService']],
             ['method'=>'GET','path'=>'/chat/tools','name'=>'api.chat.tools','page'=>'public/404','controller'=>'AiChatController@tools','services'=>[]],
+            ['method'=>'GET','path'=>'/models','name'=>'api.models.list','page'=>'public/404','controller'=>'McpController@models','services'=>[]],
+            ['method'=>'POST','path'=>'/mcp','name'=>'api.mcp','page'=>'public/404','controller'=>'McpController@handle','services'=>[]],
+            ['method'=>'POST','path'=>'/mcp/tools/list','name'=>'api.mcp.tools.list','page'=>'public/404','controller'=>'McpController@listTools','services'=>[]],
+            ['method'=>'POST','path'=>'/mcp/tools/call','name'=>'api.mcp.tools.call','page'=>'public/404','controller'=>'McpController@callTool','services'=>[]],
             ['method'=>'POST','path'=>'/agent/webhook','name'=>'api.agent.webhook','page'=>'public/404','controller'=>'CloudAgentController@webhook','services'=>['AgentRuntimeService']],
             ['method'=>'GET','path'=>'/agent/status','name'=>'api.agent.status','page'=>'public/404','controller'=>'CloudAgentController@status','services'=>[]],
             ['method'=>'GET','path'=>'/agent/handoffs','name'=>'api.agent.handoffs','page'=>'public/404','controller'=>'CloudAgentController@handoffs','services'=>[]],
@@ -206,6 +211,8 @@ final class ProjectMapService {
         $adminPostRoutes = array_values(array_filter($map['routes'], fn($r) => str_starts_with($r['path'] ?? '', '/admin') && ($r['method'] ?? 'GET') === 'POST' && !str_contains($r['path'] ?? '', 'sw.js') && !str_contains($r['path'] ?? '', 'manifest.json') && !str_contains($r['path'] ?? '', '/agent/ask') && !str_contains($r['path'] ?? '', '/blog/preview') && !str_contains($r['path'] ?? '', '/blog/ai-draft')));
         $allScCollections = array_values(array_unique(array_merge(...array_values(self::serviceCollections()))));
 
+        $yamlContent = self::scanYamlFrontmatter();
+
         $gaps = [
             'missing_route_mappings' => array_values(array_filter($map['routes'], fn($route) => empty($route['controller']) || empty($route['page']))),
             'missing_controller_files' => array_values(array_diff($routeControllers, $controllers)),
@@ -229,6 +236,7 @@ final class ProjectMapService {
             'schema_collections' => $schemaCollections,
             'storage_files' => $storageFiles,
             'tools' => $tools,
+            'yaml_content' => $yamlContent,
             'gaps' => $gaps,
             'summary' => [
                 'routes' => count($map['routes']),
@@ -239,9 +247,44 @@ final class ProjectMapService {
                 'schema_collections' => count($schemaCollections),
                 'storage_files' => count($storageFiles),
                 'tools' => count($tools),
+                'yaml_content_files' => $yamlContent['total_files'] ?? 0,
                 'gaps' => array_sum(array_map('count', $gaps)),
             ],
         ];
+    }
+
+    private static function scanYamlFrontmatter(): array {
+        $dirs = [
+            app_path('content') => ['content'],
+            app_path('docs') => ['docs'],
+            app_path('.agents/skills') => ['skills'],
+            app_path('.agents/workflows') => ['workflows'],
+        ];
+        $all = ['by_category' => [], 'total_files' => 0];
+        foreach ($dirs as $dir => $categories) {
+            $category = $categories[0];
+            if (!is_dir($dir)) continue;
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS));
+            foreach ($files as $file) {
+                if ($file->getExtension() !== 'md' && $file->getExtension() !== 'yaml' && $file->getExtension() !== 'yml') continue;
+                $content = file_get_contents($file->getPathname());
+                if (!str_starts_with($content, '---')) continue;
+                $closing = strpos($content, '---', 3);
+                if ($closing === false) continue;
+                $yaml = substr($content, 3, $closing - 3);
+                $meta = [];
+                foreach (explode("\n", $yaml) as $line) {
+                    if (preg_match('/^(\w+):\s*(.+)$/', $line, $m)) {
+                        $meta[$m[1]] = trim($m[2]);
+                    }
+                }
+                $relative = str_replace(app_path(''), '', $file->getPathname());
+                $entry = ['file' => $relative, 'meta' => $meta];
+                $all['by_category'][$category][] = $entry;
+                $all['total_files']++;
+            }
+        }
+        return $all;
     }
 
     private static function routeDesc(string $path, string $method = 'GET'): string {
@@ -406,6 +449,21 @@ final class ProjectMapService {
             $lines[] = '  subgraph ' . $key . '["' . $title . '"]';
             foreach ($items as $item) {
                 $lines[] = '    ' . self::{$method}($item) . '["' . self::label($item) . '"]:::' . $class;
+            }
+            $lines[] = '  end';
+            $lines[] = '';
+        }
+
+        $yamlContent = $scan['yaml_content'] ?? ['by_category' => [], 'total_files' => 0];
+        if ($yamlContent['total_files'] > 0) {
+            $yamlColors = ['content'=>'#e8f5e9','docs'=>'#fff3e0','skills'=>'#e3f2fd','workflows'=>'#fce4ec'];
+            $lines[] = '  subgraph YAML_CONTENT["YAML Frontmatter Content (' . $yamlContent['total_files'] . ' files)"]';
+            foreach ($yamlContent['by_category'] as $cat => $entries) {
+                foreach ($entries as $idx => $entry) {
+                    $title = $entry['meta']['title'] ?? $entry['meta']['name'] ?? $entry['meta']['id'] ?? basename($entry['file'], '.md');
+                    $id = 'yaml_' . $cat . '_' . $idx;
+                    $lines[] = '    ' . $id . '["' . self::label($cat . ': ' . $title) . '"]';
+                }
             }
             $lines[] = '  end';
             $lines[] = '';

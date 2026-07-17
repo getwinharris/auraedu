@@ -16,6 +16,7 @@
     </p>
 </div>
 
+<input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
 <div class="admin-card" style="padding:0;">
     <div id="terminal-output" style="background:#0a0a0a; color:#00d4a4; font-family:'SF Mono','Fira Code','Courier New',monospace; font-size:0.8rem; line-height:1.5; padding:var(--space-md); min-height:300px; max-height:500px; overflow-y:auto; white-space:pre-wrap; word-break:break-all;">
         <span style="color:#666;">╔══════════════════════════════════════════════╗</span>

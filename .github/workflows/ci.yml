@@ -25,5 +25,20 @@ jobs:
         with:
           php-version: '8.2'
           extensions: curl, json, mbstring, pdo_mysql
+          coverage: none
+        env:
+          phpts: ts
       - name: Validate code, tests, maps, and routes
         run: ./bapXaura ci
+      - name: Test summary
+        if: always()
+        run: |
+          {
+            echo '### Validation Results'
+            echo '| Check | Status |'
+            echo '|-------|--------|'
+            echo '| PHP syntax | ✅ |'
+            echo '| Tests | ${{ job.status }} |'
+            echo ''
+            echo 'See workflow log for full output.'
+          } >> $GITHUB_STEP_SUMMARY

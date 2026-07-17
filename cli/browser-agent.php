@@ -256,7 +256,6 @@ function api_request(string $base, string $cmd, array $args): void {
     
     $resp = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
     
     if ($resp === false) {
         fwrite(STDERR, "API request failed\n");

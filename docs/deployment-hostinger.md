@@ -45,11 +45,11 @@ bapXaura ci
 
 ## Repository Architecture
 
-This is a **white-label** product. The upstream source of truth is `getwinharris/bapXauraAiBackend`, forked to `bapxmediahub/bapXauraAiBackend` for customer deployment. Each customer gets their own fork with their branding, domain, and configuration. The product is not customer-specific — it's a reusable automation platform rebranded per client.
+This is a **white-label** product. The upstream source of truth is `bapXai/auraedu`, forked to customer repos for each deployment. Each customer gets their own fork with their branding, domain, and configuration. The product is not customer-specific — it's a reusable automation platform rebranded per client.
 
 ### Fork Synchronization
 
-`.github/workflows/sync-upstream.yml` on the deployment fork (`bapxmediahub/bapXauraAiBackend`) runs **hourly** via cron (`0 * * * *`) plus supports `workflow_dispatch` and `repository_dispatch` as fallbacks. It calls GitHub's `merge-upstream` API using `github.token` (no `FORK_SYNC_TOKEN` secret needed). The workflow is guarded by `if: github.repository == 'bapxmediahub/bapXauraAiBackend'` so it only runs on the deployment fork.
+`.github/workflows/sync-upstream.yml` on the deployment fork runs **hourly** via cron (`0 * * * *`) plus supports `workflow_dispatch` and `repository_dispatch` as fallbacks. It calls GitHub's `merge-upstream` API using `github.token` (no `FORK_SYNC_TOKEN` secret needed). The workflow is guarded by `if: github.repository != 'bapXai/auraedu'` so it only runs on customer deployment forks.
 
 ## Production Logs
 

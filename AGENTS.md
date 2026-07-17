@@ -64,7 +64,7 @@ Every handoff comment includes a machine-readable JSON block:
   "status": "changes_required",
   "blocking_findings": ["REV-12-4"],
   "owner": {
-    "github": "getwinharris",
+    "github": "bapXai",
     "notify": false,
     "reason": null
   }
@@ -78,7 +78,7 @@ Every handoff comment includes a machine-readable JSON block:
 
 The router (GitHub Actions workflow) reads the JSON block, not the prose.
 
-### When to Notify `@getwinharris`
+### When to Notify `@bapXai`
 
 Notify the owner only for meaningful events:
 - New issue plan ready
@@ -165,13 +165,83 @@ For meaningful code/schema/UI/doc/workflow changes, reproduce or inspect behavio
 - Blog posts in `content/blog/posts/` with YAML frontmatter. Help is blog `help` category.
 - Secrets are admin-editable via Admin → Integrations, stored in MySQL `secrets` table. Never in `.env`.
 - Before pushing to `main`: lint, tests, map generation/validation, smoke.
+- Branch only from a filed issue or feature. No ad-hoc branching.
+
+## Routing & Request Handling
+
+### Two routing paths
+
+`index.php` splits requests at the top:
+
+1. **`/api/*` paths** → `api/index.php`. JSON-only. CSRF is NOT enforced. `BaseController::validateCsrf()` skips because the URI starts with `/api/`. Controllers catch and return JSON errors.
+2. **Web routes** (`/admin/*`, public pages, account pages) → `app/bootstrap.php` → `Router` → controller. Session starts in bootstrap. CSRF IS enforced on POST.
+
+### CSRF Convention (Admin POST)
+
+- `AdminController::__construct()` calls `$this->validateCsrf()` on every POST.
+- `BaseController::validateCsrf()` checks `$_POST['_csrf']` against `$_SESSION['csrf_token']`.
+- **PHP does not parse JSON request bodies into `$_POST`**. If the frontend sends `Content-Type: application/json` with `_csrf` in the JSON body, the check fails because `$_POST['_csrf']` is empty.
+- When CSRF fails *and* the Content-Type is `application/json`, `validateCsrf()` returns `{"error":"Security token invalid."}` with HTTP 419.
+- When CSRF fails on form-urlencoded requests, it flashes an error and redirects (not JSON). This breaks AJAX calls that expect JSON — they get a 302 HTML page instead and the JS catch block shows "Network error. Check console."
+- **Fix pattern**: For JSON-receiving admin endpoints, parse the JSON body for `_csrf` before calling `validateCsrf()`, or bypass the constructor CSRF check and validate from parsed JSON in the method body.
+
+### Admin AJAX endpoints
+
+| Path | Content-Type | CSRF source | Controller method |
+|------|-------------|-------------|-------------------|
+| `POST /admin/agent/ask` | `application/x-www-form-urlencoded` | `$_POST['_csrf']` | `AdminController::agentAsk()` |
+| `POST /admin/terminal/run` | `application/json` | JSON body via `BaseController::parsedInput()` | `AdminController::terminalRun()` |
+
+### AI Model Configuration
+
+The AI agent and support bot use an OpenAI-compatible API. Config stored in `secrets` collection (remoteDB):
+
+| Secret key | Example value | Purpose |
+|-----------|---------------|---------|
+| `api_endpoint` | `https://generativelanguage.googleapis.com/v1beta/openai/` | Base URL (OpenAI, OpenRouter, Google Gemini) |
+| `agent_api_key` | `AIza...` | API key |
+| `agent_model` | `gemma-4-31b-it` | Model name |
+| `agent_name` | `Agent` | Display name (defaults to model) |
+
+Set via **Admin → Integrations**. The page template checks `$modelConfig['apiKey']` — the correct key from `SecretService::getModelConfig()` which returns camelCase keys.
+
+### Default admin dev credentials
+
+Email: `admin@auraedu.co.in`, Password: `admin123` (stored in remoteDB `settings` collection, bcrypt)
+
+### Session & Token lifecycle
+
+- `bootstrap.php:13` calls `session_start()` with SameSite=Lax, httponly, 30-day lifetime.
+- CSRF token is lazily initialized in layout files: `$_SESSION['csrf_token'] ??= bin2hex(random_bytes(16))`.
+- Admin layout (`views/layouts/admin.php:1`) sets `$csrf` from session. Admin templates reference `<?= e($csrf) ?>` in hidden inputs.
+- Terminal JS sends `_csrf` in JSON body; agent chat JS sends it in form-urlencoded body (reads from the hidden input).
+
+### Admin Credentials
+
+Admin login uses `EnvService::adminCredentials()` which checks in order:
+1. **MySQL `settings` table** (remote DB) — `admin_email` + `admin_password` (bcrypt)
+2. **`.env` file** — `ADMIN_EMAIL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` (bcrypt hash)
+
+Default dev credentials: email `admin@auraedu.co.in`, password `admin123`.
+Set custom credentials via Admin → Settings → Admin Credentials, or directly in `.env`.
+
+### remoteDB fallback chain
+
+`DatabaseService` tries in order:
+1. Connect to local MySQL via `config/database.php` credentials.
+2. If MySQL unreachable AND `remote_url` is set → switch to remote mode.
+3. In remote mode, every `read()`/`write()`/`upsert()`/`delete()` calls `{APP_URL}/remoteDB` with `REMOTE_DB_PASSWORD`.
+4. `remote_url` defaults to `https://auraedu.co.in/remoteDB`.
+5. If remote call fails (non-200), `read()` returns `[]`, mutations throw `RuntimeException`.
+
+This enables shared-hosting dev without local MySQL — the dev server proxies through production's remoteDB endpoint.
 
 ## Known Issues & Context
 
 - `.mobile-cart-tray` class is a misnomer — shows at all viewports.
 - `wallet_transactions` schema lacks `admin_managed` key.
-- `/admin/environment` GET route + controller method are commented out.
-- After build completion, the customer project will be unforked from `getwinharris` user. The `sync-upstream.yml` workflow with hourly schedule keeps the fork in sync until then. Fork sync becomes irrelevant after unfork.
+- `POST /admin/terminal/run` and `POST /admin/agent/ask` now both handle CSRF correctly (see Routing & Request Handling above).
+- After build completion, the customer project will be unforked from `bapXai` org. The `sync-upstream.yml` workflow with hourly schedule keeps the fork in sync until then. Fork sync becomes irrelevant after unfork.
 - `MayaController` renamed to `AgentController`, route `/api/maya` → `/api/agent`. The AI agent name is configurable via `config/agent.yml` and overridable in Admin → Integrations (`agent_name` secret).
 - Each `.agents/skills/<tool-name>/` directory contains a `SKILL.md` (≤1024 lines) as the tool index, plus a `references/` subdirectory where the actual skill docs live (playwright-cli model).
 
@@ -202,7 +272,7 @@ Forbidden from writing code or creating files upon receiving a new prompt. Must 
 
 1. **Investigate & Diagnose:** Trace code footprints. Identify exact file, page context, line numbers.
 2. **File the Issue:** Create the evidence-backed issue in GitHub. GitHub Actions creates and commits the handoff event; Hostinger does not need GitHub CLI.
-3. **Isolate and Execute:** Use plain `git` for branches, commits, fetch, pull, and push. Use `bapXaura` only for project-owned operations. Update durable docs and run `bapXaura update` + `bapXaura ci`.
+3. **Isolate and Execute:** Create a branch only after an issue or feature is filed. If none exists, create the evidence-backed issue first (step 2). Branch name must reference the issue/feature number (e.g. `issue-42-fix-checkout`). Never branch directly from a prompt without a filed issue. Use plain `git` for branches, commits, fetch, pull, and push. Use `bapXaura` only for project-owned operations. Update durable docs and run `bapXaura update` + `bapXaura ci`.
 4. **PR and Merge:** Push the feature/fix branch with `git push`. GitHub Actions and the GitHub web workflow own PR creation, handoff comments, review, and merge coordination.
 5. **Channel Communication:** All technical updates belong in GitHub issue comments, not terminal output.
 
@@ -215,3 +285,139 @@ Forbidden from writing code or creating files upon receiving a new prompt. Must 
 - GitHub issue conversations and handoff triggers run in `.github/workflows/`.
 - Repository enforcement hooks live only in `.agents/hooks/`; install them with `bapXaura hooks install`.
 - `.agents/workflows/` and `.agents/handoffs/` are canonical for every coding agent. Do not add `.claude/` or other duplicated role folders.
+
+## LSP & Editor Configuration
+
+- `.vscode/settings.json` — PHP Intelephense config, PSR12 coding standard, 120-char ruler
+- `.editorconfig` — Consistent indentation (4-space PHP, 2-space YAML/JSON)
+- `phpstan.neon` / `phpcs.xml` — Optional static analysis configs (install extensions as needed)
+- LSP auto-detects project root via `.git/` directory. Each `.git/` = one tracked project.
+
+## YAML Frontmatter as Source of Truth
+
+- Map generation (`bapXaura map`) now scans `content/`, `docs/`, `.agents/skills/`, `.agents/workflows/` for YAML frontmatter (`---` blocks).
+- YAML metadata (`title`, `description`, `category`, `type`) enriches the project map with content nodes and edges.
+- Always keep YAML headers current in blog posts, docs, skill files, and workflow definitions.
+- The `docs/systematic-map.mmd` includes YAML content nodes alongside code routes, controllers, services.
+
+## Browser Agent + TTS Autonomy
+
+- Chrome binary (`.bin/chrome-linux/chrome`) and KittenTTS model (`storage/kittentts/model_quantized.onnx`) are tracked by Git LFS — ensure `git lfs pull` after clone.
+- Browser agent CLI (`cli/browser-agent.php`) supports HTTP (cURL + DOMDocument) and CDP (Chrome DevTools Protocol) modes.
+- On shared hosting with Linux x86_64: use `cdp_launch` to start Chrome, then `cdp <method>` for JS-heavy sites.
+- On macOS/local dev: connect to a remote Linux Chrome via `config set cdp_ws ws://server:9222/...` or use HTTP mode.
+- TTS routes through `/api/tts/tokenize` (tokenizer) + ONNX Runtime Web in-browser for inference at 24kHz.
+- Admin agent workspace (`/admin/agent`) and terminal (`/admin/terminal`) both support voice synthesis via `KittenTTS`.
+
+## Support Agent Autonomous Operation
+
+- **SupportBotService** now operates autonomously: detects booking intent and auto-creates appointments via `ResourceService('appointments')`.
+- When a user asks to "book a consultation" or "schedule a session", the bot creates the booking directly — no human needed.
+- Escalation to human still happens for: complaints, refunds, cancellations, returns, or when the user explicitly asks to speak to someone.
+- **Browser actions** are detected: when a user asks to "search for" or "navigate to" something, the bot returns a `browser_action` in the response that the frontend can execute via `/api/browser/*` endpoints.
+- Support ticketing creates tickets in the `support_tickets` collection with full audit trail.
+
+## Map Generation from Folder + YAML
+
+- `ProjectMapService::scan()` now calls `scanYamlFrontmatter()` which walks `content/`, `docs/`, `.agents/skills/`, `.agents/workflows/`.
+- YAML content blocks render in the Mermaid output as a `YAML_CONTENT` subgraph — visible in `docs/systematic-map.mmd`.
+- Keep `.gitattributes` for LFS tracking of binary files (`.onnx`, `chrome-linux/`, `kittentts/`).
+
+## Undocumented Code Patterns
+
+### `.agents/roles/` — Role Definitions
+
+Five role files with YAML frontmatter defining tool access, skills, and hooks:
+
+| File | Role | Tools | Skills | Handoff |
+|------|------|-------|--------|---------|
+| `.agents/roles/cto.md` | CTO | map, schema, handoff, search, read | subagent-orchestration | → worker, blocked → owner |
+| `.agents/roles/worker.md` | Worker | map, schema, ci, db, search, read | backend-json, php-json-backend, bapxphp-cli | → reviewer, blocked → cto |
+| `.agents/roles/reviewer.md` | Reviewer | search, read, ci, test, map (read-only) | schema, docs | → documenter/fixer, blocked → cto |
+| `.agents/roles/_default.md` | Default | read, search | — | — |
+| `.agents/roles/support.md` | SupportBot | db_query, search, read | frontend-php | escalation → human |
+
+Each role file has YAML frontmatter (`---`) with `name`, `model`, `tools`, `skills`, `hooks` keys. The `AgentRuntimeService::buildRolePrompt()` loads these files, strips YAML frontmatter, and uses the body as the role system prompt. The YAML frontmatter is parsed by the Handoff system and routing engine for tool access control.
+
+Role-specific behavior:
+- **CTO** has `handoff_after: worker`, `handoff_blocked: owner` — plans issues and hands to workers
+- **Worker** has `handoff_after: reviewer`, `handoff_blocked: cto` — implements one objective at a time
+- **Reviewer** has `permissions: read-only`, `handoff_after: documenter`, `handoff_changes: fixer` — never writes
+- **SupportBot** has `handoff_after: human` — routes directly to human when complaints/refunds detected
+
+### `.agents/workflows/routing.yaml` — Event Routing Policy
+
+Defines which roles handle which GitHub events and what the next action is after each:
+
+```yaml
+roles:
+  cto:
+    handle: [issues.opened, issues.edited, owner_requirement_added]
+    next: {planned: worker, blocked: owner}
+  worker:
+    handle: [objective.ready, review.fix_requested, merge_conflict.detected]
+    next: {implemented: reviewer, blocked: cto}
+  reviewer:
+    handle: [pull_request.opened, pull_request.synchronize, fixer.completed]
+    next: {changes_required: fixer, approved: documenter, blocked: cto}
+  fixer:
+    handle: [review.changes_required]
+    next: {fixed: reviewer, blocked: cto}
+  documenter:
+    handle: [review.approved]
+    next: {completed: final_verifier, changes_required: worker}
+  final_verifier:
+    handle: [documentation.completed]
+    next: {approved: merge_bot, changes_required: worker}
+  deployment:
+    handle: [push.main, merge.completed]
+    next: {deployed: verify, failed: rollback}
+```
+
+Loaded by `AgentRuntimeService::loadRouting()` which parses YAML manually (no YAML extension dependency). The `routeEvent()` method matches incoming `event.action` strings against each role's `handle` list.
+
+### `.agents/hooks/` — Git & Tool Hooks
+
+- `pre-commit` / `pre-push`: Git hooks for commit validation
+- `schedule.yaml`: Cron-like scheduling for automated tasks
+- `tool-hooks.yaml`: Defines `before_tool` and `after_tool` hooks per role. Example from role files:
+  - **CTO**: `before_tool: validate_scope`, `after_tool: log_objective`
+  - **Worker**: `before_tool: validate_file_write`, `after_tool: record_evidence`
+  - **Reviewer**: `before_tool: deny_write`, `after_tool: log_finding`
+  - **SupportBot**: `before_tool: check_rate_limit`, `after_tool: log_conversation`
+
+### `.agents/handoffs/` — Handoff Event Store
+
+- `active/current.json`: Current active handoff in progress
+- `events/{n}.json`: Historical handoff events by issue number. Each file is a GitHub webhook event snapshot with workflow state (`from_role`, `to_role`, `objective_id`, `status`, `blocking_findings`).
+
+Loaded by `CloudAgentController::handoffs()` to list recent events. Written by `AgentRuntimeService::processWebhook()` when handoff JSON is detected in issue comments.
+
+### `.agents/.tool-rules.yaml` — Tool RAG Rules
+
+Per-skill tool selection preferences read before execution. Defines `preferred_tool_order`, patterns for matching specific search types, and `avoid` lists for skills like `admin-ui`, `schema`, `backend-routing`, and `frontend-templates`.
+
+### Channel Pattern (Flue-inspired)
+
+The `GitHubChannel` (`integrations/github/GitHubChannel.php`) is the PHP equivalent of Flue's `@flue/github` channel pattern:
+
+```
+GitHubChannel(webhookSecret, token, owner, repo)
+  → verifyWebhook(payload, signature)  # HMAC verification
+  → dispatch(payload, event)           # Route to AgentRuntimeService
+  → apiCall(method, endpoint, body)    # GitHub REST API v3 calls
+  → createIssue(title, body, labels)   # Convenience wrapper
+  → createComment(issueNum, body)      # Convenience wrapper
+  → updateIssue(issueNum, data)        # Convenience wrapper
+```
+
+Configured via Admin → Integrations → GitHub Integration. The webhook secret and token are stored encrypted in the `secrets` collection via `SecretService`. The `CloudAgentController::webhook()` uses `GitHubChannel` for signature verification and dispatch.
+
+## Agent Eval & Self-Evolution System
+
+- **`evals.json`** (`.agents/evals/`): Standardized eval registry with 6 dimensions (tool_selection, argument_extraction, result_utilization, error_recovery, plan_coherence, task_completion), threshold 0.85.
+- **Skill loading**: Load `.agents/skills/agent-evals/` when writing or modifying skills — it contains the self-evolving agent loop, crystallization patterns, Tool RAG, and multi-agent SDLC orchestration design.
+- **Crystallization**: After 3+ successful eval runs on a skill (score ≥ 0.85), extract the trace pattern and store in `.agents/skills/<domain>/references/`.
+- **CI gate**: `bapXaura eval` blocks merge if score < threshold. Do not override.
+- **Tool RAG**: `.agents/.tool-rules.yaml` defines per-skill tool preferences. Read before starting any task.
+- **Telemetry**: New fields documented in `agent-evals` skill — update `.agents/ops/telemetry.json` cycles with eval/crystallization/tool-rag metrics.

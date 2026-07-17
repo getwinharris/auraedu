@@ -47,6 +47,14 @@ jobs:
               ref: pr.head.sha
             });
             const checkRuns = checks.check_runs || [];
+            const REQUIRED_CHECKS = ['review', 'validate'];
+            const missingRequired = REQUIRED_CHECKS.filter(
+              name => !checkRuns.some(c => (c.name === name || c.name.startsWith(name)) && c.status === 'completed')
+            );
+            if (missingRequired.length > 0) {
+              console.log(`Waiting: required checks not yet completed: ${missingRequired.join(', ')}`);
+              return;
+            }
             const failed = checkRuns.filter(c => c.conclusion === 'failure' || c.conclusion === 'cancelled' || c.conclusion === 'timed_out');
             const pending = checkRuns.filter(c => c.status !== 'completed');
             const codeRabbit = checkRuns.filter(c => c.name === 'CodeRabbit' || c.app?.slug === 'coderabbit');
@@ -76,25 +84,27 @@ jobs:
               console.log(`Merge failed: ${e.message}`);
             }
 
-      - name: Update handoff to next role
-        run: |
-          ISSUE="${{ github.event.number || inputs.pr_number }}"
-          git clone "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" repo
-          cd repo
-          git config user.name "merge-bot"
-          git config user.email "merge-bot@auraedu.action"
-          git checkout main
-          ACTIVE=".agents/handoffs/active/current.json"
-          EVENTS=".agents/handoffs/events"
-          mkdir -p "$EVENTS"
-          if [ -f "$ACTIVE" ]; then
-            jq '.workflow.current_role = "merge_bot" | .workflow.next_role = "deployment"' "$ACTIVE" > "${ACTIVE}.tmp" && mv "${ACTIVE}.tmp" "$ACTIVE"
-          fi
-          git add .agents/handoffs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "auto: merge bot completed for issue/PR #${ISSUE}"
-          for i in 1 2 3; do
-            git pull --rebase origin main 2>/dev/null || true
-            if git push origin main 2>/dev/null; then exit 0; fi
-            sleep 2
-          done
-          git push --force-with-lease origin main
+      - name: Post merge handoff
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ github.event.number || inputs.pr_number }}
+        with:
+          script: |
+            const pr = parseInt(process.env.PR_NUMBER);
+            if (!pr) return;
+            const hdr = "<!-- bapx-handoff\n" + JSON.stringify({
+              schema_version: "1.0",
+              event_id: "EVT-MERGE-" + pr,
+              workflow_id: "WF-PR-" + pr,
+              pull_request: pr,
+              from_role: "merge_bot",
+              to_role: "deployment",
+              head_sha: "${{ github.sha }}",
+              status: "merged",
+              owner: { github: "bapXai", notify: false, reason: null }
+            }, null, 2) + "\n-->";
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pr,
+              body: hdr + "\n## Merge Bot: PR merged\n**Status:** Merged\n**Next:** Deployment\n\n*Auto-merge complete — next: deployment verification*"
+            });

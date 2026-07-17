@@ -1,4 +1,4 @@
-<div class="admin-card" style="border-left:4px solid var(--color-gold); margin-bottom:var(--space-lg);">
+<div class="admin-card" style="border-left:4px solid var(--color-primary); margin-bottom:var(--space-lg);">
     <h2 style="font-size:1rem; margin:0 0 var(--space-sm);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> API Setup</h2>
     <p style="margin:0; color:var(--color-text-muted); font-size:0.9rem;">These settings are for the website owner only. Customers will only see shop, booking, text session, and direct call session screens. All site secrets (payments, email, analytics, and AI) are stored encrypted in the project secret store and managed from this page &mdash; they are never kept in <code>.env</code>.</p>
 </div>
@@ -81,6 +81,23 @@
             Current model: <strong><?= e($secrets['agent_model'] ?? $secrets['support_bot_model'] ?? 'gemma-4-31b-it') ?></strong>.
             OpenRouter: endpoint <code>https://openrouter.ai/api/v1</code>.
             Google: endpoint <code>https://generativelanguage.googleapis.com/v1beta/models/</code>.
+        </p>
+
+        <h2 style="font-size:1rem; margin:var(--space-xl) 0 var(--space-sm);">GitHub Integration (Agent Orchestration)</h2>
+        <p style="margin:0 0 var(--space-md); color:var(--color-text-muted); font-size:0.85rem;">
+            Connect to GitHub for automated agent orchestration. The platform uses GitHub webhooks to receive issue/PR events and route them through the agent pipeline. Set the webhook URL to <code><?= e(((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'your-domain.com') . '/api/agent/webhook') ?></code> with <code>application/json</code> content type.
+            <a href="https://docs.github.com/en/webhooks" target="_blank" rel="noopener">GitHub Webhook docs</a>
+        </p>
+        <div class="admin-form__row">
+            <label>GitHub Webhook Secret<input type="password" name="github_webhook_secret" value="<?= e($secrets['github_webhook_secret']??'') ?>" placeholder="Webhook HMAC secret" autocomplete="new-password"></label>
+            <label>GitHub Token (optional)<input type="password" name="github_token" value="<?= e($secrets['github_token']??'') ?>" placeholder="ghp_xxx or github app token" autocomplete="new-password"></label>
+        </div>
+        <div class="admin-form__row">
+            <label>Owner / Org<input name="github_owner" value="<?= e($secrets['github_owner']??'bapXai') ?>" placeholder="bapXai"></label>
+            <label>Default Repo<input name="github_repo" value="<?= e($secrets['github_repo']??'') ?>" placeholder="auraedu"></label>
+        </div>
+        <p style="margin:var(--space-xs) 0 0; color:var(--color-text-muted); font-size:0.8rem;">
+            When configured, the platform automatically creates issues, comments on PRs, and manages the handoff workflow. The webhook secret must match what you set in the GitHub repo Settings → Webhooks.
         </p>
 
         <h2 style="font-size:1rem; margin:var(--space-xl) 0 var(--space-sm);">WebRTC TURN Server</h2>

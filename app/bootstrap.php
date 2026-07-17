@@ -21,6 +21,8 @@ spl_autoload_register(function (string $class): void {
     if (str_starts_with($relative, 'Integrations/GoogleOAuth/')) $paths[] = app_path('integrations/google-oauth/' . basename($relative));
     if (str_starts_with($relative, 'Integrations/MetaPixel/')) $paths[] = app_path('integrations/meta-pixel/' . basename($relative));
     if (str_starts_with($relative, 'Integrations/GoogleSiteKit/')) $paths[] = app_path('integrations/google-site-kit/' . basename($relative));
+    if (str_starts_with($relative, 'Integrations/Stripe/')) $paths[] = app_path('integrations/stripe/' . basename($relative));
+    if (str_starts_with($relative, 'Integrations/GitHub/')) $paths[] = app_path('integrations/github/' . basename($relative));
     foreach ($paths as $path) { if (is_file($path)) { require $path; return; } }
 });
 

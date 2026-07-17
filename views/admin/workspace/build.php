@@ -6,7 +6,7 @@
         </div>
         <?php $pct = $stats['completion_pct'] ?? 0; ?>
         <div style="height:6px; background:var(--color-border); border-radius:999px; overflow:hidden; margin-bottom:var(--space-sm);">
-            <div style="height:100%; width:<?= $pct ?>%; background:var(--color-gold); border-radius:999px; transition:width 0.3s;"></div>
+            <div style="height:100%; width:<?= $pct ?>%; background:var(--color-primary); border-radius:999px; transition:width 0.3s;"></div>
         </div>
         <div style="display:flex; gap:var(--space-sm); font-size:0.75rem;">
             <span style="display:flex; align-items:center; gap:3px;"><span style="width:8px; height:8px; border-radius:50%; background:#00D4A4;"></span> <?= $stats['done'] ?? 0 ?> done</span>
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="admin-card" style="flex:1; min-width:160px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;">
-        <div style="font-size:2rem; font-weight:700; color:var(--color-gold);"><?= $pct ?>%</div>
+        <div style="font-size:2rem; font-weight:700; color:var(--color-primary);"><?= $pct ?>%</div>
         <div style="font-size:0.7rem; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.05em;">Cycle Completion</div>
     </div>
 </div>
@@ -94,7 +94,7 @@
             <div style="font-size:0.7rem; padding:4px 8px; background:var(--color-surface); border-radius:var(--radius-sm); color:var(--color-text-muted);">search_code</div>
         </div>
         <div style="margin-top:var(--space-sm); font-size:0.75rem; color:var(--color-text-muted); border-top:1px solid var(--color-border); padding-top:var(--space-sm);">
-            <a href="/api/chat/tools" style="color:var(--color-gold);">View all 12 tools →</a>
+            <a href="/api/chat/tools" style="color:var(--color-primary);">View all 12 tools →</a>
         </div>
     </div>
 </div>

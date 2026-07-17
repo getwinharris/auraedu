@@ -43,7 +43,7 @@ Handoff to Documenter:
   "head_sha": "<sha>",
   "status": "approved",
   "owner": {
-    "github": "getwinharris",
+    "github": "bapXai",
     "notify": false,
     "reason": null
   }
@@ -74,7 +74,7 @@ Handoff to Fixer (fresh run):
   "status": "changes_required",
   "blocking_findings": ["file.php:42:Missing null check"],
   "owner": {
-    "github": "getwinharris",
+    "github": "bapXai",
     "notify": false,
     "reason": null
   }
@@ -104,14 +104,14 @@ If human input is needed on business/content truth, security, or schema changes:
   "head_sha": "<sha>",
   "status": "blocked",
   "owner": {
-    "github": "getwinharris",
+    "github": "bapXai",
     "notify": true,
     "reason": "Business wording cannot be verified from repository sources"
   }
 }
 -->
 ## Handoff: Reviewer → CTO (blocked)
-**Requires:** `@getwinharris`
+**Requires:** `@bapXai`
 **Reason:** (human-readable explanation)
 ```
 

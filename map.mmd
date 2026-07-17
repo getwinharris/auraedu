@@ -7,14 +7,14 @@ flowchart LR
   classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b
   classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12
 
-  subgraph ARCH["Architecture Overview — 139 routes, 17 controllers, 43 services, 59 views, 0 data files, 23 tools"]
-    arch_routes["> Routes: 139 (Public + Auth + Payment + Admin + Support)"]:::arch
-    arch_ctrl["> Controllers: 17"]:::arch
-    arch_svc["> Services: 43"]:::arch
+  subgraph ARCH["Architecture Overview — 144 routes, 18 controllers, 44 services, 59 views, 0 data files, 22 tools"]
+    arch_routes["> Routes: 144 (Public + Auth + Payment + Admin + Support)"]:::arch
+    arch_ctrl["> Controllers: 18"]:::arch
+    arch_svc["> Services: 44"]:::arch
     arch_views["> Views: 59"]:::arch
     arch_data["> Collections: 19 schema | 0 files"]:::arch
-    arch_tools["> Tools: 23"]:::arch
-    arch_gaps["> Gaps: 2"]:::arch
+    arch_tools["> Tools: 22"]:::arch
+    arch_gaps["> Gaps: 3"]:::arch
     arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data
     arch_ctrl -.-> arch_views
   end
@@ -64,9 +64,14 @@ flowchart LR
     route_get_blog_slug["GET /blog/{slug} — Blog post — rendered from GitHub-sourced markdown"]:::route
     route_get_blog_category_slug["GET /blog/category/{slug} — Blog listing filtered by category"]:::route
     route_post_api_agent["POST /api/agent"]:::route
+    route_post_agent_chat["POST /agent/chat"]:::route
     route_post_api_tts_tokenize["POST /api/tts/tokenize — TTS — tokenize text for KittenTTS ONNX model"]:::route
     route_post_chat_completions["POST /chat/completions"]:::route
     route_get_chat_tools["GET /chat/tools"]:::route
+    route_get_models["GET /models"]:::route
+    route_post_mcp["POST /mcp"]:::route
+    route_post_mcp_tools_list["POST /mcp/tools/list"]:::route
+    route_post_mcp_tools_call["POST /mcp/tools/call"]:::route
     route_post_agent_webhook["POST /agent/webhook"]:::route
     route_get_agent_status["GET /agent/status"]:::route
     route_get_agent_handoffs["GET /agent/handoffs"]:::route
@@ -194,6 +199,7 @@ flowchart LR
     controller_cloudagentcontroller["CloudAgentController"]:::code
     controller_commercecontroller["CommerceController"]:::code
     controller_consultationcontroller["ConsultationController"]:::code
+    controller_mcpcontroller["McpController"]:::code
     controller_publiccontroller["PublicController"]:::code
     controller_remotedbcontroller["RemoteDbController"]:::code
     controller_reviewcontroller["ReviewController"]:::code
@@ -204,7 +210,9 @@ flowchart LR
   subgraph SERVICES["Services"]
     service_addressservice["AddressService"]:::code
     service_agentcontextservice["AgentContextService"]:::code
+    service_agentorchestratorservice["AgentOrchestratorService"]:::code
     service_agentruntimeservice["AgentRuntimeService"]:::code
+    service_aiservice["AiService"]:::code
     service_appointmentservice["AppointmentService"]:::code
     service_auditlogservice["AuditLogService"]:::code
     service_authservice["AuthService"]:::code
@@ -221,7 +229,6 @@ flowchart LR
     service_envservice["EnvService"]:::code
     service_githubdocservice["GitHubDocService"]:::code
     service_imageoptimizerservice["ImageOptimizerService"]:::code
-    service_knowledgegraphservice["KnowledgeGraphService"]:::code
     service_mailqueueservice["MailQueueService"]:::code
     service_mailstorageservice["MailStorageService"]:::code
     service_markdownrenderer["MarkdownRenderer"]:::code
@@ -310,6 +317,7 @@ flowchart LR
   end
 
   subgraph INTEGRATIONS["Integrations"]
+    integration_githubchannel["GitHubChannel"]:::code
     integration_googleoauthclient["GoogleOAuthClient"]:::code
     integration_googlesitekitclient["GoogleSiteKitClient"]:::code
     integration_metapixelclient["MetaPixelClient"]:::code
@@ -348,7 +356,6 @@ flowchart LR
     tool_doc_write["doc-write"]:::tool
     tool_generate_code_map["generate-code-map"]:::tool
     tool_generate_docs_map["generate-docs-map"]:::tool
-    tool_generate_okf_bundle["generate-okf-bundle"]:::tool
     tool_generate_project_map["generate-project-map"]:::tool
     tool_handoff["handoff"]:::tool
     tool_import_product_images["import-product-images"]:::tool
@@ -365,7 +372,75 @@ flowchart LR
     tool_bapxaura["bapXaura"]:::tool
   end
 
+  subgraph YAML_CONTENT["YAML Frontmatter Content (64 files)"]
+    yaml_content_0["content: Payments and order confirmation"]
+    yaml_content_1["content: \"B.E.M.S. at Aura Medical: What the Electropathy Programme Covers\""]
+    yaml_content_2["content: Order products and choose a delivery address"]
+    yaml_content_3["content: \"Career Scope After Electropathy & Allied-Health Training\""]
+    yaml_content_4["content: Create and access your account"]
+    yaml_content_5["content: \"Aura Medical — July 2026 Update\""]
+    yaml_content_6["content: \"Acupuncture Training at Aura Medical: D.Acu and M.Acu\""]
+    yaml_content_7["content: \"Campus & Hospital: Student Life at Aura Medical\""]
+    yaml_content_8["content: \"How to Apply: Aura Medical Admissions Guide\""]
+    yaml_content_9["content: Privacy Policy"]
+    yaml_content_10["content: Terms & Conditions"]
+    yaml_docs_0["docs: Agentic Monorepo"]
+    yaml_docs_1["docs: Architecture"]
+    yaml_docs_2["docs: Admin Guide"]
+    yaml_docs_3["docs: Schema Registry"]
+    yaml_docs_4["docs: Deployment Hostinger"]
+    yaml_docs_5["docs: Product List"]
+    yaml_docs_6["docs: Engineering Guide"]
+    yaml_docs_7["docs: Admin Guide"]
+    yaml_docs_8["docs: Customer Guide"]
+    yaml_docs_9["docs: Consultant Guide"]
+    yaml_docs_10["docs: Competitor & Alternative-Medicine Landscape Review"]
+    yaml_docs_11["docs: Documentation Index"]
+    yaml_docs_12["docs: Institute Content Model"]
+    yaml_docs_13["docs: Route & View Audit — Institute Repositioning"]
+    yaml_docs_14["docs: PWA Support"]
+    yaml_docs_15["docs: Admin Module"]
+    yaml_docs_16["docs: GST Commerce"]
+    yaml_docs_17["docs: Auth Module"]
+    yaml_docs_18["docs: Catalog Module"]
+    yaml_docs_19["docs: Razorpay Module"]
+    yaml_docs_20["docs: Orders Module"]
+    yaml_docs_21["docs: Consultation Bookings"]
+    yaml_docs_22["docs: Remote Database Operations"]
+    yaml_docs_23["docs: Hospital Module"]
+    yaml_docs_24["docs: Admissions & Appointment Module"]
+    yaml_docs_25["docs: Google OAuth Module"]
+    yaml_docs_26["docs: Checkout Page"]
+    yaml_docs_27["docs: Shop Page"]
+    yaml_docs_28["docs: Integrations"]
+    yaml_docs_29["docs: Blog"]
+    yaml_docs_30["docs: Admin Dashboard"]
+    yaml_docs_31["docs: Home Page"]
+    yaml_docs_32["docs: Project Map"]
+    yaml_docs_33["docs: About Page"]
+    yaml_docs_34["docs: Temples Page"]
+    yaml_docs_35["docs: Consult Page"]
+    yaml_docs_36["docs: JSON Storage"]
+    yaml_skills_0["skills: frontend-php"]
+    yaml_skills_1["skills: agent-evals"]
+    yaml_skills_2["skills: docs"]
+    yaml_skills_3["skills: schema"]
+    yaml_skills_4["skills: deployment"]
+    yaml_skills_5["skills: admin-ui"]
+    yaml_skills_6["skills: php-json-backend"]
+    yaml_skills_7["skills: backend-json"]
+    yaml_skills_8["skills: git"]
+    yaml_skills_9["skills: subagent-orchestration"]
+    yaml_skills_10["skills: bapxaura-cli"]
+    yaml_workflows_0["workflows: reviewer"]
+    yaml_workflows_1["workflows: cto-workflow"]
+    yaml_workflows_2["workflows: documenter"]
+    yaml_workflows_3["workflows: worker"]
+    yaml_workflows_4["workflows: browser-tester"]
+  end
+
   subgraph GAPS["Gaps & Missing Links"]
+    gap_68077c3956["unwired_services: AiService"]:::gap
     gap_0c9217a9ce["POST /admin/workspace/create — missing AuditLogService"]:::gap
     gap_58c2afbd3c["POST /admin/terminal/run — missing AuditLogService"]:::gap
   end
@@ -834,6 +909,9 @@ flowchart LR
   controller_agentcontroller --> service_secretservice
   controller_agentcontroller --> service_databaseservice
   controller_agentcontroller -. renders .-> view_public_404
+  route_post_agent_chat --> controller_agentcontroller
+  controller_agentcontroller --> service_agentorchestratorservice
+  controller_agentcontroller -. renders .-> view_public_404
   route_post_api_tts_tokenize --> controller_ttscontroller
   controller_ttscontroller -. renders .-> view_public_404
   route_post_chat_completions --> controller_aichatcontroller
@@ -841,6 +919,14 @@ flowchart LR
   controller_aichatcontroller -. renders .-> view_public_404
   route_get_chat_tools --> controller_aichatcontroller
   controller_aichatcontroller -. renders .-> view_public_404
+  route_get_models --> controller_mcpcontroller
+  controller_mcpcontroller -. renders .-> view_public_404
+  route_post_mcp --> controller_mcpcontroller
+  controller_mcpcontroller -. renders .-> view_public_404
+  route_post_mcp_tools_list --> controller_mcpcontroller
+  controller_mcpcontroller -. renders .-> view_public_404
+  route_post_mcp_tools_call --> controller_mcpcontroller
+  controller_mcpcontroller -. renders .-> view_public_404
   route_post_agent_webhook --> controller_cloudagentcontroller
   controller_cloudagentcontroller --> service_agentruntimeservice
   controller_cloudagentcontroller -. renders .-> view_public_404
@@ -894,6 +980,7 @@ flowchart LR
   controller_cloudagentcontroller --> controller_basecontroller
   controller_commercecontroller --> controller_basecontroller
   controller_consultationcontroller --> controller_basecontroller
+  controller_mcpcontroller --> controller_basecontroller
   controller_publiccontroller --> controller_basecontroller
   controller_remotedbcontroller --> controller_basecontroller
   controller_reviewcontroller --> controller_basecontroller
@@ -958,5 +1045,6 @@ flowchart LR
   tool_validate_project_map --> systematic_map
   tool_smoke_local --> ROUTES_PUBLIC
   tool_smoke_local --> ROUTES_ADMIN
+  gap_68077c3956 -. missing .-> service_aiservice
   gap_0c9217a9ce -. missing .-> controller_admincontroller
   gap_58c2afbd3c -. missing .-> controller_admincontroller

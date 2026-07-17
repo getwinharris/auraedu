@@ -688,10 +688,9 @@ cmd_update() {
   php "$ROOT/cli/generate-project-map.php"
   php "$ROOT/cli/generate-docs-map.php" "$ROOT" "$ROOT/docs/map.mmd"
   php "$ROOT/cli/generate-code-map.php" "$ROOT" "$ROOT/map.mmd"
-  php "$ROOT/cli/generate-okf-bundle.php" "$ROOT"
   php "$ROOT/cli/validate-project-map.php"
   php "$ROOT/cli/validate-docs-map.php" "$ROOT"
-  ok "MAPS AND KNOWLEDGE BUNDLE UPDATED"
+  ok "MAPS UPDATED"
 }
 
 cmd_serve() {
@@ -1624,12 +1623,11 @@ cmd_codemap() {
   echo "Done. → map.mmd"
 }
 
-# ── okfgen — Generate OKF knowledge bundle + knowledge graph ──
+# ── okfgen — Generate OKF knowledge bundle + knowledge graph (removed) ──
 cmd_okfgen() {
-  require_php
-  echo "Generating OKF knowledge bundle..."
-  php "$ROOT/cli/generate-okf-bundle.php" "$ROOT"
-  echo "Done. → .okf/"
+  echo "okfgen: This command has been removed. Knowledge graph functionality was deprecated."
+  echo "Use 'bapXaura map' for project mapping instead."
+  exit 1
 }
 
 # ── bloggen — Regenerate blog cache from GitHub ──────────────
