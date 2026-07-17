@@ -1,5 +1,7 @@
 # AuraEdu — Aura Medical Institute of Electropathy and Hospital
 
+> **White-label platform by bapXai** — reusable automation framework for medical, educational, and service websites.
+
 A PHP full-stack monorepo for the Aura Medical Institute website — admissions, hospital facilities, therapy consultations, and product shop.
 
 - **Stack:** PHP 8.3 templates, MySQL, Hostinger shared hosting
