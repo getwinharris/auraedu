@@ -388,197 +388,174 @@ final class ProjectMapService {
     public static function renderSystematicMermaid(): string {
         $scan = self::scan();
         $lines = [
-            'flowchart LR',
+            'flowchart TB',
             '  classDef gap fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d',
-            '  classDef route fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e',
-            '  classDef code fill:#ecfdf5,stroke:#047857,color:#064e3b',
-            '  classDef data fill:#fef3c7,stroke:#b45309,color:#78350f',
-            '  classDef tool fill:#ede9fe,stroke:#6d28d9,color:#3b0764',
-            '  classDef arch fill:#f1f5f9,stroke:#475569,color:#1e293b',
+            '  classDef route fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a',
+            '  classDef code fill:#dcfce7,stroke:#16a34a,color:#166534',
+            '  classDef data fill:#fef3c7,stroke:#d97706,color:#78350f',
+            '  classDef tool fill:#ede9fe,stroke:#7c3aed,color:#4c1d95',
+            '  classDef doc fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e',
+            '  classDef content fill:#ecfccb,stroke:#65a30d,color:#365314',
+            '  classDef domain fill:#f5f3ff,stroke:#8b5cf6,color:#5b21b6',
+            '  classDef arch fill:#f8fafc,stroke:#64748b,color:#334155',
             '  classDef nav fill:#fff7ed,stroke:#c2410c,color:#7c2d12',
             '',
         ];
 
         $summary = $scan['summary'];
-        $lines[] = '  subgraph ARCH["Architecture Overview — ' . $summary['routes'] . ' routes, ' . $summary['controllers'] . ' controllers, ' . $summary['services'] . ' services, ' . $summary['views'] . ' views, ' . $summary['storage_files'] . ' data files, ' . $summary['tools'] . ' tools"]';
-        $lines[] = '    arch_routes["> Routes: ' . $summary['routes'] . ' (Public + Auth + Payment + Admin + Support)"]:::arch';
-        $lines[] = '    arch_ctrl["> Controllers: ' . $summary['controllers'] . '"]:::arch';
-        $lines[] = '    arch_svc["> Services: ' . $summary['services'] . '"]:::arch';
-        $lines[] = '    arch_views["> Views: ' . $summary['views'] . '"]:::arch';
-        $lines[] = '    arch_data["> Collections: ' . $summary['schema_collections'] . ' schema | ' . $summary['storage_files'] . ' files"]:::arch';
-        $lines[] = '    arch_tools["> Tools: ' . $summary['tools'] . '"]:::arch';
-        $lines[] = '    arch_gaps["> Gaps: ' . $summary['gaps'] . '"]:::arch';
-        $lines[] = '    arch_routes -.-> arch_ctrl -.-> arch_svc -.-> arch_data';
-        $lines[] = '    arch_ctrl -.-> arch_views';
+        $lines[] = '  subgraph ARCH["AuraEdu product map — ' . $summary['routes'] . ' routes, ' . $summary['controllers'] . ' controllers, ' . $summary['services'] . ' services, ' . $summary['views'] . ' views, ' . $summary['storage_files'] . ' data files, ' . $summary['tools'] . ' tools"]';
+        $lines[] = '    arch_overview["> Public + Auth + Commerce + Admin + Agent + Support"]:::arch';
+        $lines[] = '    arch_knowledge["> Knowledge & content: docs, blogs, legal, skills, YAML headers"]:::arch';
+        $lines[] = '    arch_code["> Code surface: controllers, services, tools, integrations, schemas"]:::arch';
+        $lines[] = '    arch_gaps["> Gaps: ' . $summary['gaps'] . ' open issues"]:::arch';
         $lines[] = '  end';
         $lines[] = '';
 
-        foreach (['PUBLIC', 'AUTH', 'PAYMENT', 'SUPPORT', 'ADMIN'] as $domain) {
-            $routes = array_values(array_filter($scan['routes'], fn($route) => self::routeDomain($route) === $domain));
-            $lines[] = '  subgraph ROUTES_' . $domain . '["' . $domain . ' Routes"]';
-            foreach ($routes as $route) {
-                $id = self::routeId($route);
-                $mp = ($route['method'] ?? 'GET') . ' ' . ($route['path'] ?? '');
-                $desc = self::routeDesc($route['path'] ?? '', $route['method'] ?? 'GET');
-                $label = $desc ? $mp . ' — ' . $desc : $mp;
-                $lines[] = '    ' . $id . '["' . self::label($label) . '"]:::route';
-            }
-            $lines[] = '  end';
-            $lines[] = '';
-        }
-
-        $lines[] = '  subgraph NAVIGATION["Navigation Paths"]';
-        foreach ($scan['navigation'] as $path) {
-            $lines[] = '    ' . self::navId($path) . '["' . self::label($path) . '"]:::nav';
-        }
-        $lines[] = '  end';
-        $lines[] = '';
-
-        $groups = [
-            'CONTROLLERS' => ['Controllers', $scan['controllers'], 'controllerId', 'code'],
-            'SERVICES' => ['Services', $scan['services'], 'serviceId', 'code'],
-            'VIEWS' => ['Views', $scan['views'], 'viewId', 'code'],
-            'INTEGRATIONS' => ['Integrations', $scan['integrations'], 'integrationId', 'code'],
-            'SCHEMA' => ['Schema Collections', $scan['schema_collections'], 'collectionId', 'data'],
-            'STORAGE' => ['Storage Data Files', $scan['storage_files'], 'storageId', 'data'],
-            'TOOLS' => ['Tools', $scan['tools'], 'toolId', 'tool'],
+        $knowledgeDocs = array_values(array_filter(array_map(function (string $path): string {
+            return self::relPath($path);
+        }, glob(app_path('docs/*.md')) ?: []), fn($path) => $path !== 'docs/README.md'));
+        $knowledgeDocs = array_merge(['docs/README.md'], $knowledgeDocs);
+        $blogPosts = array_values(array_map(function (string $path): string {
+            return self::relPath($path);
+        }, glob(app_path('content/blog/posts/*.md')) ?: []));
+        $legalDocs = array_values(array_map(function (string $path): string {
+            return self::relPath($path);
+        }, glob(app_path('content/legal/*.md')) ?: []));
+        $roleFiles = array_values(array_map(function (string $path): string {
+            return self::relPath($path);
+        }, glob(app_path('.agents/roles/*.md')) ?: []));
+        $yamlFiles = [
+            'content/blog/categories.yaml',
+            'content/support-navigation.yaml',
         ];
 
-        foreach ($groups as $key => [$title, $items, $method, $class]) {
-            if (empty($items)) continue;
-            $lines[] = '  subgraph ' . $key . '["' . $title . '"]';
-            foreach ($items as $item) {
-                $lines[] = '    ' . self::{$method}($item) . '["' . self::label($item) . '"]:::' . $class;
-            }
-            $lines[] = '  end';
-            $lines[] = '';
+        $lines[] = '  subgraph KNOWLEDGE["Knowledge & Content"]';
+        foreach ($knowledgeDocs as $doc) {
+            $lines[] = '    ' . self::nodeId('doc', $doc) . '["' . self::label($doc) . '"]:::doc';
         }
-
-        $yamlContent = $scan['yaml_content'] ?? ['by_category' => [], 'total_files' => 0];
-        if ($yamlContent['total_files'] > 0) {
-            $yamlColors = ['content'=>'#e8f5e9','docs'=>'#fff3e0','skills'=>'#e3f2fd','workflows'=>'#fce4ec'];
-            $lines[] = '  subgraph YAML_CONTENT["YAML Frontmatter Content (' . $yamlContent['total_files'] . ' files)"]';
-            foreach ($yamlContent['by_category'] as $cat => $entries) {
-                foreach ($entries as $idx => $entry) {
-                    $title = $entry['meta']['title'] ?? $entry['meta']['name'] ?? $entry['meta']['id'] ?? basename($entry['file'], '.md');
-                    $id = 'yaml_' . $cat . '_' . $idx;
-                    $lines[] = '    ' . $id . '["' . self::label($cat . ': ' . $title) . '"]';
-                }
-            }
-            $lines[] = '  end';
-            $lines[] = '';
+        foreach ($blogPosts as $post) {
+            $lines[] = '    ' . self::nodeId('post', $post) . '["' . self::label($post) . '"]:::content';
         }
-
-        $gapNodes = [];
-        $lines[] = '  subgraph GAPS["Gaps & Missing Links"]';
-        foreach ($scan['gaps'] as $kind => $items) {
-            foreach ($items as $index => $item) {
-                if ($kind === 'admin_mutations_without_audit' && is_array($item)) {
-                    $label = (($item['method'] ?? '') . ' ' . ($item['path'] ?? '') . ' — missing AuditLogService');
-                } elseif (is_array($item)) {
-                    $label = (($item['method'] ?? '') . ' ' . ($item['path'] ?? '') . ' missing mapping');
-                } else {
-                    $label = ($kind . ': ' . $item);
-                }
-                $id = 'gap_' . substr(md5($kind . $index . $label), 0, 10);
-                $gapNodes[] = [$kind, $item, $id];
-                $lines[] = '    ' . $id . '["' . self::label($label) . '"]:::gap';
-            }
+        foreach ($legalDocs as $doc) {
+            $lines[] = '    ' . self::nodeId('legal', $doc) . '["' . self::label($doc) . '"]:::content';
         }
-        if ($gapNodes === []) {
-            $lines[] = '    no_gaps["No detected gaps"]:::data';
+        foreach ($roleFiles as $role) {
+            $lines[] = '    ' . self::nodeId('role', $role) . '["' . self::label($role) . '"]:::content';
+        }
+        foreach ($yamlFiles as $yaml) {
+            $lines[] = '    ' . self::nodeId('yaml', $yaml) . '["' . self::label($yaml) . '"]:::content';
         }
         $lines[] = '  end';
         $lines[] = '';
+
+        $lines[] = '  subgraph CODE["Code Files & Functions"]';
+        $lines[] = '    route_registry["app/routes.php"]:::code';
+        $lines[] = '    public_controller["PublicController — home/about/contact/docs"]:::code';
+        $lines[] = '    auth_controller["AuthController — login/register/password flows"]:::code';
+        $lines[] = '    commerce_controller["CommerceController — cart/checkout/payment"]:::code';
+        $lines[] = '    admin_controller["AdminController — products/orders/integrations/workspace"]:::code';
+        $lines[] = '    agent_controller["AgentController / CloudAgentController — chat/webhook/status"]:::code';
+        $lines[] = '    support_controller["SupportController — support page and bot"]:::code';
+        $lines[] = '    blog_controller["BlogController — index/show/category"]:::code';
+        $lines[] = '    product_service["ProductService / CategoryService / TempleService"]:::code';
+        $lines[] = '    auth_service["AuthService / PasswordResetService"]:::code';
+        $lines[] = '    payment_service["PaymentService / OrderService / CartService"]:::code';
+        $lines[] = '    agent_runtime["AgentRuntimeService / AgentOrchestratorService / SupportBotService"]:::code';
+        $lines[] = '    blog_service["BlogService / BlogDraftService / MarkdownRenderer"]:::code';
+        $lines[] = '    cli_tools["CLI tools — blog-write/blog-read/blog-image + generate-project-map"]:::tool';
+        $lines[] = '    integrations["Integrations — GitHub / Google OAuth / Stripe / Razorpay / Meta Pixel"]:::tool';
+        $lines[] = '    schema_collections["Schema collections — users, products, orders, appointments, secrets, support_tickets"]:::data';
+        $lines[] = '  end';
+        $lines[] = '';
+
+        $lines[] = '  subgraph DOMAINS["Product Domains"]';
+        $lines[] = '    public_domain["Public experience — home, courses, hospitals, blog, docs"]:::domain';
+        $lines[] = '    auth_domain["Authentication & accounts — login, register, password reset"]:::domain';
+        $lines[] = '    commerce_domain["Commerce — shop, cart, checkout, payments"]:::domain';
+        $lines[] = '    admin_domain["Administration — products, orders, settings, integrations, workspace"]:::domain';
+        $lines[] = '    agent_domain["AI agents — chat, webhook, handoffs, support"]:::domain';
+        $lines[] = '    content_domain["Content layer — blogs, docs, support, legal"]:::domain';
+        $lines[] = '  end';
+        $lines[] = '';
+
+        $lines[] = '  arch_overview --> public_domain';
+        $lines[] = '  arch_overview --> auth_domain';
+        $lines[] = '  arch_overview --> commerce_domain';
+        $lines[] = '  arch_overview --> admin_domain';
+        $lines[] = '  arch_overview --> agent_domain';
+        $lines[] = '  arch_overview --> content_domain';
+        $lines[] = '  arch_knowledge --> KNOWLEDGE';
+        $lines[] = '  arch_code --> CODE';
+        $lines[] = '';
+
+        foreach ($knowledgeDocs as $doc) {
+            $lines[] = '  ' . self::nodeId('doc', $doc) . ' --> content_domain';
+        }
+        foreach ($blogPosts as $post) {
+            $lines[] = '  ' . self::nodeId('post', $post) . ' --> public_domain';
+            $lines[] = '  ' . self::nodeId('post', $post) . ' --> content_domain';
+        }
+        foreach ($legalDocs as $doc) {
+            $lines[] = '  ' . self::nodeId('legal', $doc) . ' --> content_domain';
+        }
+        foreach ($roleFiles as $role) {
+            $lines[] = '  ' . self::nodeId('role', $role) . ' --> agent_domain';
+        }
+        foreach ($yamlFiles as $yaml) {
+            $lines[] = '  ' . self::nodeId('yaml', $yaml) . ' --> content_domain';
+        }
+
+        $lines[] = '  route_registry --> public_controller';
+        $lines[] = '  route_registry --> auth_controller';
+        $lines[] = '  route_registry --> commerce_controller';
+        $lines[] = '  route_registry --> admin_controller';
+        $lines[] = '  route_registry --> agent_controller';
+        $lines[] = '  route_registry --> blog_controller';
+        $lines[] = '  route_registry --> support_controller';
+        $lines[] = '  public_controller --> public_domain';
+        $lines[] = '  auth_controller --> auth_domain';
+        $lines[] = '  commerce_controller --> commerce_domain';
+        $lines[] = '  admin_controller --> admin_domain';
+        $lines[] = '  agent_controller --> agent_domain';
+        $lines[] = '  blog_controller --> content_domain';
+        $lines[] = '  support_controller --> agent_domain';
+        $lines[] = '  public_controller --> product_service';
+        $lines[] = '  auth_controller --> auth_service';
+        $lines[] = '  commerce_controller --> payment_service';
+        $lines[] = '  admin_controller --> agent_runtime';
+        $lines[] = '  agent_controller --> agent_runtime';
+        $lines[] = '  blog_controller --> blog_service';
+        $lines[] = '  support_controller --> agent_runtime';
+        $lines[] = '  product_service --> schema_collections';
+        $lines[] = '  auth_service --> schema_collections';
+        $lines[] = '  payment_service --> schema_collections';
+        $lines[] = '  agent_runtime --> schema_collections';
+        $lines[] = '  blog_service --> schema_collections';
+        $lines[] = '  cli_tools --> route_registry';
+        $lines[] = '  cli_tools --> blog_service';
+        $lines[] = '  integrations --> payment_service';
+        $lines[] = '  integrations --> auth_service';
+        $lines[] = '  integrations --> agent_runtime';
+        $lines[] = '  schema_collections --> secrets';
+        $lines[] = '';
+
+        if (in_array('generate-project-map', $scan['tools'], true)) {
+            $lines[] = '  cli_tools --> map_output["docs/systematic-map.mmd / docs/map.mmd / map.mmd"]:::data';
+        }
 
         foreach ($scan['routes'] as $route) {
             $routeId = self::routeId($route);
             $controller = (string)($route['controller'] ?? '');
             [$controllerClass] = array_pad(explode('@', $controller), 2, '');
             if ($controllerClass !== '') {
-                $lines[] = '  ' . $routeId . ' --> ' . self::controllerId($controllerClass);
-            }
-            foreach ($route['services'] ?? [] as $service) {
-                $lines[] = '  ' . self::controllerId($controllerClass) . ' --> ' . self::serviceId($service);
-            }
-            if (!empty($route['page'])) {
-                $lines[] = '  ' . self::controllerId($controllerClass) . ' -. renders .-> ' . self::viewId((string)$route['page']);
+                $lines[] = '  ' . $routeId . '["' . self::label(($route['method'] ?? 'GET') . ' ' . ($route['path'] ?? '')) . '"]:::route --> ' . self::controllerId($controllerClass);
             }
         }
 
-        $routeByGetPath = [];
-        foreach ($scan['routes'] as $route) {
-            if (($route['method'] ?? 'GET') === 'GET') $routeByGetPath[(string)$route['path']] = $route;
-        }
-        foreach ($scan['navigation'] as $path) {
-            if (isset($routeByGetPath[$path])) {
-                $lines[] = '  ' . self::navId($path) . ' --> ' . self::routeId($routeByGetPath[$path]);
-            }
-        }
-
-        foreach ($scan['controllers'] as $controller) {
-            if ($controller !== 'BaseController') $lines[] = '  ' . self::controllerId($controller) . ' --> ' . self::controllerId('BaseController');
-        }
         $lines[] = '  ' . self::controllerId('BaseController') . ' --> ' . self::serviceId('SeoService');
-        $lines[] = '  ' . self::toolId('process-mail-queue') . ' --> ' . self::serviceId('SmtpMailer');
-        if (in_array('import-product-images', $scan['tools'], true)) {
-            $lines[] = '  ' . self::toolId('import-product-images') . ' --> ' . self::serviceId('ImageOptimizerService');
-            $lines[] = '  ' . self::toolId('import-product-images') . ' --> ' . self::serviceId('DatabaseService');
-            $lines[] = '  ' . self::toolId('import-product-images') . ' --> ' . self::collectionId('products');
-        }
-
-        foreach (self::serviceCollections() as $service => $collections) {
-            foreach ($collections as $collection) {
-                $lines[] = '  ' . self::serviceId($service) . ' --> ' . self::collectionId($collection);
-            }
-        }
-        foreach ($scan['schema_collections'] as $collection) {
-            if (in_array($collection, $scan['storage_files'], true)) {
-                $lines[] = '  ' . self::collectionId($collection) . ' --> ' . self::storageId($collection);
-            }
-        }
-        foreach ($scan['routes'] as $route) {
-            $controller = (string)($route['controller'] ?? '');
-            [$controllerClass] = array_pad(explode('@', $controller), 2, '');
-            $path = (string)($route['path'] ?? '');
-            if (str_contains($path, 'auth/google')) {
-                $lines[] = '  ' . self::controllerId($controllerClass) . ' --> ' . self::integrationId('GoogleOAuthClient');
-            }
-            if (str_contains($path, 'payment') || str_contains($path, 'checkout') || str_contains($path, 'recharge')) {
-                $lines[] = '  ' . self::serviceId('PaymentService') . ' --> ' . self::integrationId('RazorpayClient');
-                $lines[] = '  ' . self::serviceId('PaymentService') . ' --> ' . self::integrationId('StripeClient');
-            }
-        }
         $lines[] = '  ' . self::serviceId('SupportBotService') . ' --> ' . self::integrationId('GoogleSiteKitClient');
-        if (in_array('generate-project-map', $scan['tools'], true)) {
-            $lines[] = '  ' . self::toolId('generate-project-map') . ' --> systematic_map["docs/systematic-map.mmd"]:::data';
-        }
-        if (in_array('validate-project-map', $scan['tools'], true)) {
-            $lines[] = '  ' . self::toolId('validate-project-map') . ' --> systematic_map';
-        }
-        if (in_array('smoke-local', $scan['tools'], true)) {
-            $lines[] = '  ' . self::toolId('smoke-local') . ' --> ROUTES_PUBLIC';
-            $lines[] = '  ' . self::toolId('smoke-local') . ' --> ROUTES_ADMIN';
-        }
-
-        foreach ($gapNodes as [$kind, $item, $id]) {
-            if (is_string($item)) {
-                if (str_contains($kind, 'service')) {
-                    $lines[] = '  ' . $id . ' -. missing .-> ' . self::serviceId($item);
-                } elseif (str_contains($kind, 'view')) {
-                    $lines[] = '  ' . $id . ' -. missing .-> ' . self::viewId($item);
-                } elseif (str_contains($kind, 'controller')) {
-                    $lines[] = '  ' . $id . ' -. missing .-> ' . self::controllerId($item);
-                } elseif (str_contains($kind, 'schema') || str_contains($kind, 'collection')) {
-                    $lines[] = '  ' . $id . ' -. missing .-> ' . self::collectionId($item);
-                }
-            } elseif (is_array($item) && !empty($item['controller'])) {
-                [$ctrlClass] = array_pad(explode('@', (string)$item['controller']), 2, '');
-                if ($ctrlClass !== '') {
-                    $lines[] = '  ' . $id . ' -. missing .-> ' . self::controllerId($ctrlClass);
-                }
-            }
-        }
+        $lines[] = '  ' . self::serviceId('DatabaseService') . ' --> ' . self::collectionId('secrets');
+        $lines[] = '  ' . self::serviceId('DatabaseService') . ' --> ' . self::collectionId('products');
 
         return implode("\n", $lines) . "\n";
     }

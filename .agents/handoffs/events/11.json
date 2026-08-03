@@ -1,0 +1,39 @@
+{
+  "event_type": "issues.opened",
+  "issue": 11,
+  "actor": "healeraboobakkar",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
+  },
+  "payload": {
+    "title": "Simplify repository automation to Support and Admin Blog agents",
+    "body": "## Scope\n\nRemove the multi-agent orchestration, unused CLI surface, recurring fork synchronization, and related noisy GitHub workflows. Retain only:\n\n- Customer Support agent\n- Admin Blog agent\n- A concise AGENTS.md contract\n- Standard GitHub issue, pull-request, and PHP CI workflows\n\n## Evidence\n\nThe scheduled `Sync upstream main` workflow repeatedly fails with HTTP 422 and an invalid hard-coded upstream fallback. The repository currently carries many unused roles, handoffs, skills, tool definitions, and CLI commands, making maintenance and agent discovery difficult.\n\n## Acceptance checks\n\n- No scheduled upstream-sync workflow remains.\n- Only Support and Admin Blog agent definitions remain.\n- Unneeded project CLI scripts and agent artifacts are removed.\n- CI runs PHP syntax checks and tests on pull requests and main.\n- A simple issue/PR workflow is documented and works without autonomous subagent routing.\n- Documentation and maps describe the reduced setup.",
+    "labels": []
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
+  },
+  "objectives": [
+    {
+      "id": "OBJ-11-1",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
+      "unresolved": [
+        "Handoff created - awaiting CTO"
+      ]
+    }
+  ],
+  "telemetry": {
+    "started_at": "2026-08-03T12:06:48.386Z",
+    "handoffs_completed": 0
+  }
+}

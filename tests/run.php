@@ -293,6 +293,8 @@ $tests['systematic map artifacts exist'] = function (): void {
     foreach (['ADMIN Routes', 'Controllers', 'Services', 'Schema Collections', 'Gaps & Missing Links'] as $needle) {
         assertTrue(str_contains($sys, $needle), "Systematic map should include {$needle}");
     }
+    assertTrue(str_contains($sys, 'Knowledge & Content'), 'Systematic map should include knowledge and content sections');
+    assertTrue(str_contains($sys, 'Code Files & Functions'), 'Systematic map should include code files and functions sections');
 };
 
 $tests['env file defines required keys'] = function (): void {
