@@ -1,59 +1,39 @@
 {
-  "schema_version": "1.0",
-  "event_id": "EVT-CURRENT",
-  "workflow_id": "WF-ISSUE-2",
-  "issue": 2,
-  "from_role": "final_verifier",
-  "to_role": "merge_bot",
-  "status": "completed",
-  "owner": {
-    "github": "bapXai",
-    "notify": false,
-    "reason": null
+  "event_type": "issues.opened",
+  "issue": 10,
+  "actor": "healeraboobakkar",
+  "workflow": {
+    "current_role": "cto",
+    "next_role": "worker",
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
+  },
+  "payload": {
+    "title": "Production outage: auraedu.co.in ports 80 and 443 time out",
+    "body": "## Reproduction (2026-08-03)\n\n- `auraedu.co.in` resolves to `156.67.222.8`.\n- TCP connections to both port 80 and port 443 time out from an independent network probe.\n- Browser result: `ERR_CONNECTION_TIMED_OUT`.\n- The timeout occurs before PHP, routing, or application code can execute.\n\n## Investigation\n\n- The repository has validation, PR, merge, and upstream-sync workflows, but no production deployment/recovery workflow and no GitHub deployment records.\n- Production is documented as Hostinger shared hosting with `/public_html` and hPanel Git auto-deploy.\n\n## Required recovery\n\n1. In Hostinger hPanel, verify the hosting account is active and the domain is attached to the correct website.\n2. Restore/restart Hostinger web service or remove the infrastructure firewall/WAF block on ports 80 and 443.\n3. Confirm the site root points to `/public_html` and the deployed revision is `main`.\n4. Verify externally with `curl -I https://auraedu.co.in/` returning an HTTP response.\n\n## Acceptance checks\n\n- Ports 80 and 443 accept TCP connections.\n- `https://auraedu.co.in/` returns HTTP 200/30x instead of timing out.\n- Hostinger deployment state and deployed SHA are recorded in the issue.",
+    "labels": []
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
   },
   "objectives": [
     {
-      "id": "OBJ-CLEANUP-1",
-      "status": "pass",
-      "evidence": [
-        "Deleted ConsultationController, AstrologerService, astrologer views, admin forms",
-        "Removed all astrologer routes from ProjectMapService and index.php",
-        "756 lines of astrologer CSS removed",
-        "68 astrologer image files deleted"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "OBJ-CLEANUP-2",
-      "status": "pass",
-      "evidence": [
-        "Temple→Hospital labels in admin nav",
-        "Temple schema preserved for backward compat",
-        "Route descriptions updated"
-      ],
+      "id": "OBJ-10-1",
+      "status": "gap",
+      "evidence": [],
+      "browser_evidence": [],
       "unresolved": [
-        "Temple→Hospital views/content rewrite deferred to content migration"
+        "Handoff created - awaiting CTO"
       ]
     }
   ],
-  "files_changed": [
-    "AGENTS.md",
-    ".agents/workflows/routing.yaml",
-    ".agents/workflows/cto-workflow.md",
-    ".agents/workflows/worker.md",
-    ".agents/workflows/reviewer.md",
-    ".agents/workflows/documenter.md",
-    ".agents/workflows/handoff.schema.json"
-  ],
-  "commands_run": [
-    "bapXaura update",
-    "bapXaura ci"
-  ],
-  "risks": [
-    "MySQL 'temples' table still uses old name — rename blocked until remote DB access"
-  ],
-  "workflow": {
-    "current_role": "merge_bot",
-    "next_role": "deployment"
+  "telemetry": {
+    "started_at": "2026-08-03T11:58:37.357Z",
+    "handoffs_completed": 0
   }
 }

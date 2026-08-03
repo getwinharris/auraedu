@@ -1,37 +1,39 @@
 {
   "event_type": "issues.opened",
   "issue": 10,
-  "actor": "bapXai",
+  "actor": "healeraboobakkar",
   "workflow": {
     "current_role": "cto",
     "next_role": "worker",
-    "sequence": ["cto", "worker", "reviewer", "cto"]
+    "sequence": [
+      "cto",
+      "worker",
+      "reviewer",
+      "cto"
+    ]
   },
   "payload": {
-    "title": "fix: update admin labels from 'Temples' to 'Hospital Facilities'",
-    "body": "Admin panel still shows 'Temples' in dashboard card and media context dropdown. Update labels to 'Hospital Facilities'. Admin URL path /admin/temples kept for backward compat with MySQL table name.",
-    "labels": ["admin", "ui"],
-    "repository": {
-      "owner": "bapXai",
-      "name": "auraedu"
-    }
+    "title": "Production outage: auraedu.co.in ports 80 and 443 time out",
+    "body": "## Reproduction (2026-08-03)\n\n- `auraedu.co.in` resolves to `156.67.222.8`.\n- TCP connections to both port 80 and port 443 time out from an independent network probe.\n- Browser result: `ERR_CONNECTION_TIMED_OUT`.\n- The timeout occurs before PHP, routing, or application code can execute.\n\n## Investigation\n\n- The repository has validation, PR, merge, and upstream-sync workflows, but no production deployment/recovery workflow and no GitHub deployment records.\n- Production is documented as Hostinger shared hosting with `/public_html` and hPanel Git auto-deploy.\n\n## Required recovery\n\n1. In Hostinger hPanel, verify the hosting account is active and the domain is attached to the correct website.\n2. Restore/restart Hostinger web service or remove the infrastructure firewall/WAF block on ports 80 and 443.\n3. Confirm the site root points to `/public_html` and the deployed revision is `main`.\n4. Verify externally with `curl -I https://auraedu.co.in/` returning an HTTP response.\n\n## Acceptance checks\n\n- Ports 80 and 443 accept TCP connections.\n- `https://auraedu.co.in/` returns HTTP 200/30x instead of timing out.\n- Hostinger deployment state and deployed SHA are recorded in the issue.",
+    "labels": []
+  },
+  "repository": {
+    "owner": "getwinharris",
+    "name": "auraedu"
   },
   "objectives": [
     {
-      "id": "OBJ-ADMIN-LABEL-1",
-      "status": "pass",
-      "evidence": [
-        "views/admin/dashboard.php: 'Manage astrologers, remote session requests, and temples'→'Manage sessions, hospital facilities, and appointments'",
-        "views/admin/dashboard.php: removed Astrologers link, Temples→Hospital Facilities link",
-        "views/admin/media.php: 'Temples'→'Hospital Facilities', removed 'Astrologers' option",
-        "views/admin/resource.php: collection check removed astrologers, data-field ternary simplified"
-      ],
+      "id": "OBJ-10-1",
+      "status": "gap",
+      "evidence": [],
       "browser_evidence": [],
-      "unresolved": []
+      "unresolved": [
+        "Handoff created - awaiting CTO"
+      ]
     }
   ],
   "telemetry": {
-    "started_at": "2026-07-17T00:00:00Z",
+    "started_at": "2026-08-03T11:58:37.357Z",
     "handoffs_completed": 0
   }
 }
