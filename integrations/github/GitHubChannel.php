@@ -8,7 +8,7 @@ final class GitHubChannel {
     private string $owner;
     private string $repo;
 
-    public function __construct(string $webhookSecret = '', string $token = '', string $owner = 'bapXai', string $repo = '') {
+    public function __construct(string $webhookSecret = '', string $token = '', string $owner = 'getwinharris', string $repo = '') {
         $this->webhookSecret = $webhookSecret;
         $this->token = $token;
         $this->owner = $owner;

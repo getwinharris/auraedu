@@ -1,4 +1,4 @@
-name: Validate application
+name: PHP CI
 
 on:
   pull_request:
@@ -9,36 +9,21 @@ permissions:
   contents: read
 
 concurrency:
-  group: validate-${{ github.workflow }}-${{ github.ref }}
+  group: php-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
-    if: github.actor != 'ci-ai-bot' && endsWith(github.repository, 'auraedu')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           extensions: curl, json, mbstring, pdo_mysql
           coverage: none
-        env:
-          phpts: ts
-      - name: Validate code, tests, maps, and routes
-        run: ./bapXaura ci
-      - name: Test summary
-        if: always()
-        run: |
-          {
-            echo '### Validation Results'
-            echo '| Check | Status |'
-            echo '|-------|--------|'
-            echo '| PHP syntax | ✅ |'
-            echo '| Tests | ${{ job.status }} |'
-            echo ''
-            echo 'See workflow log for full output.'
-          } >> $GITHUB_STEP_SUMMARY
+      - name: Lint PHP
+        run: find . -path './.git' -prune -o -path './vendor' -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Run tests
+        run: php tests/run.php

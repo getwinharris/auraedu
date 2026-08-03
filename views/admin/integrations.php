@@ -93,7 +93,7 @@
             <label>GitHub Token (optional)<input type="password" name="github_token" value="<?= e($secrets['github_token']??'') ?>" placeholder="ghp_xxx or github app token" autocomplete="new-password"></label>
         </div>
         <div class="admin-form__row">
-            <label>Owner / Org<input name="github_owner" value="<?= e($secrets['github_owner']??'bapXai') ?>" placeholder="bapXai"></label>
+            <label>Owner / Org<input name="github_owner" value="<?= e($secrets['github_owner']??'getwinharris') ?>" placeholder="getwinharris"></label>
             <label>Default Repo<input name="github_repo" value="<?= e($secrets['github_repo']??'') ?>" placeholder="auraedu"></label>
         </div>
         <p style="margin:var(--space-xs) 0 0; color:var(--color-text-muted); font-size:0.8rem;">

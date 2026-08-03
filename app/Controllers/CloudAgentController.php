@@ -19,7 +19,7 @@ final class CloudAgentController extends BaseController {
         $channel = new GitHubChannel(
             $secrets['github_webhook_secret'] ?? '',
             $secrets['github_token'] ?? '',
-            $secrets['github_owner'] ?: 'bapXai',
+            $secrets['github_owner'] ?: 'getwinharris',
             $secrets['github_repo'] ?? ''
         );
 
@@ -37,7 +37,7 @@ final class CloudAgentController extends BaseController {
     }
 
     public function status(): void {
-        $owner = getenv('OWNER_GITHUB') ?: 'bapXai';
+        $owner = getenv('OWNER_GITHUB') ?: 'getwinharris';
         $runtime = new AgentRuntimeService();
         $handoffEvents = glob(app_path('.agents/handoffs/events/*.json')) ?: [];
 

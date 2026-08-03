@@ -481,7 +481,7 @@ final class AdminController extends BaseController {
             'build' => $totalCount - $doneCount,
         ];
 
-        $owner = getenv('OWNER_GITHUB') ?: 'bapXai';
+        $owner = getenv('OWNER_GITHUB') ?: 'getwinharris';
         $secrets = new SecretService();
         $modelConfig = $secrets->getModelConfig();
 
