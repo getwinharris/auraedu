@@ -1,46 +1,37 @@
 ---
-description: Operating guide for the AuraEdu PHP/MySQL application.
-globs: *
+description: Working contract for AuraEdu contributors and coding agents.
+globs: '*'
 alwaysApply: true
 ---
 
-# AuraEdu Agent Guide
+# AuraEdu
 
-## Application
+## Architecture
 
-- PHP templates in `views/`; customer UI follows `Design.md`.
-- Route → controller → service → `DatabaseService` in `app/`.
-- Remote MySQL is runtime storage; declare persisted fields in `storage/schema/collections.php`.
-- Blog and help content is Markdown with YAML frontmatter in `content/blog/posts/`.
-- Secrets belong in Admin → Integrations / MySQL `secrets`, never in Git.
+- PHP templates live in `views/`; use `Design.md` for customer-facing UI.
+- Keep backend changes on the route → controller → service → `DatabaseService` path in `app/`.
+- `storage/schema/collections.php` declares persisted data. Remote MySQL is runtime storage; `storage/data/` is import-only.
+- Blog/help content is Markdown with YAML frontmatter in `content/blog/posts/`.
+- Secrets are managed through Admin → Integrations and must never be committed.
 
-## Retained agent roles
+## Map and tests
 
-Only two application roles are supported:
-
-- `.agents/roles/support.md` for customer support, booking, and escalation.
-- `.agents/roles/admin-blog.md` for drafting and publishing admin blog/help content.
-
-Do not add subagent handoffs, scheduled agent jobs, role routers, tool registries, or evaluation loops.
+- `map.mmd` is the repository-wide file index. Regenerate it with `php cli/generate-code-map.php` after adding, moving, or removing files.
+- Use `php cli/generate-code-map.php --check`, PHP lint, and `php tests/run.php` before opening a pull request.
+- Inspect the source path that owns a behaviour before changing it; do not create parallel controllers, services, or templates.
 
 ## GitHub workflow
 
-1. Reproduce the problem and open an evidence-backed issue with `gh issue create`.
-2. Branch from `main` as `issue-<number>-<summary>`.
-3. Make the smallest safe change and update directly affected documentation.
-4. Run PHP lint and `php tests/run.php`.
-5. Push and open a pull request with `gh pr create`.
-6. Merge after the PHP CI workflow passes.
+1. Reproduce meaningful defects and open an evidence-backed issue with `gh issue create`.
+2. Create `issue-<number>-<summary>` from `main`.
+3. Implement the smallest complete change, regenerate `map.mmd`, and update durable docs.
+4. Run validation, push, and open a PR with `gh pr create`.
+5. Merge after PHP CI passes.
 
-For owner-approved urgent production changes, a direct commit to `main` is allowed after the same validation.
+## Agent scope
+
+The project has two product agents only: Support and Admin Blog. Do not introduce autonomous handoff chains, scheduled agent workflows, or duplicate task runners.
 
 ## Hosting
 
-Hostinger controls public ports, TLS, and the `/public_html` document root. GitHub Actions validates code but cannot restart shared hosting. Verify live behaviour after Hostinger deploys `main`.
-
-## Safety
-
-- Never commit credentials or customer data.
-- Preserve CSRF protection for web POST routes.
-- Audit admin mutations.
-- Keep changes within this repository unless the owner explicitly expands scope.
+Hostinger controls public ports, TLS, and `/public_html`. A browser timeout before an HTTP response is hosting/network infrastructure, not a PHP routing error. GitHub CI validates source only; verify the deployed `main` revision and live response after a Hostinger deploy.
