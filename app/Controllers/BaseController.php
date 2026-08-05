@@ -75,6 +75,11 @@ abstract class BaseController {
     
     protected function renderNotFound(): void {
         http_response_code(404);
+        if ($this->isApiRequest || strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') === 0) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Not found']);
+            exit;
+        }
         $secrets = (new \App\Services\SecretService())->all();
         $seo = (new \App\Services\SeoService($secrets))->page('404', [
             'title' => 'Page not found',
