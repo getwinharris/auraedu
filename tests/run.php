@@ -487,6 +487,17 @@ $tests['password reset link is emailed not shown, with a branded CTA'] = functio
 };
 
 
+$tests['admin failures surface the real error instead of a generic flash'] = function (): void {
+    $src = file_get_contents(app_path('app/Controllers/AdminController.php'));
+    assertTrue(str_contains($src, "Admin order status update failed for order"), 'Order status failures must be logged with the order id and real message');
+    assertTrue(str_contains($src, "getTraceAsString()"), 'Logged failures must include a stack trace');
+    assertTrue(str_contains($src, "'Unable to update order status: ' . \$e->getMessage()"), 'Order status failures must surface the real message, not a generic flash');
+    assertTrue(!str_contains($src, "'Unable to update order status.'"), 'The generic order-status swallow must be gone');
+    assertTrue(str_contains($src, "'Unable to save reply: ' . \$e->getMessage()"), 'Reply save failures must surface the real message too');
+    assertTrue(str_contains($src, "Admin reply save failed for ticket"), 'Reply save failures must log the ticket id');
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();
