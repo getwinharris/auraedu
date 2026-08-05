@@ -434,6 +434,15 @@ $tests['courier tracking uses the seven fixed courier links and requires a couri
 };
 
 
+$tests['admin failures surface the real error instead of a generic flash'] = function (): void {
+    $src = file_get_contents(app_path('app/Controllers/AdminController.php'));
+    assertTrue(str_contains($src, "error_log('Admin order status update failed: ' . \$e->getMessage())"), 'Order status failures must be logged with the real message');
+    assertTrue(str_contains($src, "'Unable to update order status: ' . \$e->getMessage()"), 'Order status failures must surface the real message, not a generic flash');
+    assertTrue(!str_contains($src, "'Unable to update order status.'"), 'The generic order-status swallow must be gone');
+    assertTrue(str_contains($src, "'Unable to save reply: ' . \$e->getMessage()"), 'Reply save failures must surface the real message too');
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();

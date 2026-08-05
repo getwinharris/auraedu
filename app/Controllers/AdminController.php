@@ -49,8 +49,11 @@ final class AdminController extends BaseController {
             // Surface the real reason — a missing courier/tracking ID used to read as a
             // generic "Unable to update", leaving the owner guessing.
             $this->flash($e->getMessage(),'error');
-        } catch (\Throwable) {
-            $this->flash('Unable to update order status.','error');
+        } catch (\Throwable $e) {
+            // Never swallow the real cause. A generic flash left the owner guessing and
+            // gave no log trail when a save failed for a reason other than validation.
+            error_log('Admin order status update failed: ' . $e->getMessage());
+            $this->flash('Unable to update order status: ' . $e->getMessage(),'error');
         }
         $this->redirect('/admin/orders/'.$id);
     }
@@ -171,7 +174,8 @@ final class AdminController extends BaseController {
                 (new \App\Services\SupportTicketService())->reply($id, $reply);
                 $this->flash('Reply saved.','success');
             } catch (\Throwable $e) {
-                $this->flash('Unable to save reply.','error');
+                error_log('Admin reply save failed: ' . $e->getMessage());
+                $this->flash('Unable to save reply: ' . $e->getMessage(),'error');
             }
         }
         $this->redirect('/admin/support-tickets');
