@@ -1,6 +1,6 @@
 <?php
 namespace App\Controllers;
-use App\Services\{EnvService,SecretService,DatabaseService,PasswordResetService,AddressService};
+use App\Services\{EnvService,SecretService,DatabaseService,PasswordResetService,AddressService,MailQueueService};
 use App\Integrations\GoogleOAuth\GoogleOAuthClient;
 final class AuthController extends BaseController {
   public function googleRedirect(): void {
@@ -105,6 +105,7 @@ private function get(string $url,string $token): array { $ch=curl_init($url); cu
         if ($matches && !empty($u['password_hash']) && password_verify($password,$u['password_hash'])) {
             session_regenerate_id(true);
             $_SESSION['user'] = ['sub'=>$u['id'],'email'=>$u['email'] ?? '','username'=>$u['username'] ?? '','name'=>$u['name'] ?? '','role'=>$u['role'] ?? (!empty($u['is_admin']) ? 'admin' : 'customer'),'must_change_password'=>(bool)($u['must_change_password'] ?? false)];
+            try { (new MailQueueService())->enqueueLoginNotification((string)($u['email'] ?? ''), (string)($u['name'] ?? ''), (string)($u['role'] ?? 'customer')); } catch (\Throwable) {}
             $this->flash('Signed in.','success');
             session_write_close();
             $this->redirect(($u['role'] ?? '') === 'customer' ? '/account/dashboard' : '/');
@@ -125,13 +126,17 @@ private function get(string $url,string $token): array { $ch=curl_init($url); cu
     if ($email !== '') {
         $token = (new PasswordResetService())->createToken($email);
         if ($token) {
-            $link = rtrim((string)(getenv('APP_URL') ?: ''), '/') . '/reset-password?token=' . urlencode($token);
-            $_SESSION['last_reset_link'] = $link;
-            $this->flash('Password reset link: ' . $link, 'info');
+            // The link is emailed, never rendered on screen — showing it would hand any
+            // visitor a working reset for an address they do not control.
+            $link = rtrim((string)(getenv('APP_URL') ?: 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')), '/') . '/reset-password?token=' . urlencode($token);
+            try {
+                (new MailQueueService())->enqueuePasswordReset($email, $link);
+            } catch (\Throwable) {}
         }
-    } else {
-        $this->flash('If this email is registered, a reset link will be sent.','info');
     }
+    // Identical response either way, so the form cannot be used to discover which
+    // addresses are registered.
+    $this->flash('If this email is registered, a reset link has been sent.','info');
     $this->redirect('/forgot-password');
   }
   public function resetPassword(): void {

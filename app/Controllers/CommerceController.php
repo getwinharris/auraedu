@@ -232,6 +232,7 @@ final class CommerceController extends BaseController {
         try {
             $payment = $razorpay->fetchPayment($paymentId);
         } catch (\RuntimeException $e) {
+            try { (new MailQueueService())->enqueuePaymentFailure($pendingOrder, $e->getMessage()); } catch (\Throwable) {}
             $this->jsonResponse(['verified' => false, 'error' => 'Failed to verify payment with gateway.'], 502);
         }
         $expectedPaise = (int)round(((float)($pendingOrder['total'] ?? 0)) * 100);

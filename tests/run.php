@@ -460,6 +460,33 @@ $tests['remote database failures are loud, cached and never recurse into self'] 
 };
 
 
+$tests['password reset link is emailed not shown, with a branded CTA'] = function (): void {
+    // Runtime: a reset mail row is queued with the reset link embedded.
+    $mail = new \App\Services\MailQueueService();
+    $record = $mail->enqueuePasswordReset('customer@example.com', 'https://auraedu.co.in/reset-password?token=abc123');
+    assertTrue(is_array($record) && ($record['type'] ?? '') === 'password_reset', 'A password-reset mail row must be queued');
+    assertTrue(str_contains((string)($record['to'] ?? ''), 'customer@example.com'), 'Reset mail must target the submitted address');
+    assertTrue(str_contains((string)($record['html'] ?? ''), 'https://auraedu.co.in/reset-password?token=abc123'), 'The reset link must be embedded in the email');
+    assertTrue(str_contains((string)($record['html'] ?? ''), 'Reset your password'), 'The email must contain a branded CTA button');
+
+    // The link must not be rendered to the visitor who types an email address.
+    $auth = file_get_contents(app_path('app/Controllers/AuthController.php'));
+    assertTrue(!str_contains($auth, 'Password reset link:'), 'The reset link must not be flashed on screen');
+    assertTrue(str_contains($auth, 'enqueuePasswordReset'), 'forgotPassword must email the reset link');
+    assertTrue(str_contains($auth, 'enqueueLoginNotification'), 'A password login must trigger a security notice');
+
+    $commerce = file_get_contents(app_path('app/Controllers/CommerceController.php'));
+    assertTrue(str_contains($commerce, 'enqueuePaymentFailure'), 'A failed payment must notify the customer');
+
+    $mq = file_get_contents(app_path('app/Services/MailQueueService.php'));
+    assertTrue(str_contains($mq, 'public static function button(') && str_contains($mq, 'public static function heading('), 'Branded CTA button + heading helpers must exist');
+    assertTrue(
+        str_contains($mq, 'enqueuePasswordReset') && str_contains($mq, 'enqueuePaymentFailure') && str_contains($mq, 'enqueueLoginNotification'),
+        'Reset/failure/login mail events must exist'
+    );
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();
