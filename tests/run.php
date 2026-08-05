@@ -433,6 +433,32 @@ $tests['courier tracking uses the seven fixed courier links and requires a couri
     assertTrue(str_contains($accountView, 'Track parcel'), 'Customer orders view must expose the courier track link');
 };
 
+$tests['remote database failures are loud, cached and never recurse into self'] = function (): void {
+    $service = file_get_contents(app_path('app/Services/DatabaseService.php'));
+    $controller = file_get_contents(app_path('app/Controllers/RemoteDbController.php'));
+
+    // A DB outage must not read as "empty tables". The old code returned [] on a
+    // non-200, silently dropping every order/product/user on the page.
+    assertTrue(str_contains($service, 'Remote database transport failed'), 'Transport errors must throw, not return []');
+    assertTrue(str_contains($service, 'Remote database request failed with HTTP'), 'Non-200 remote responses must throw with the status');
+    assertTrue(str_contains($service, 'Remote database returned an invalid response.'), 'Malformed remote responses must throw instead of becoming empty data');
+    assertTrue(!str_contains($service, "if (\$body === false || \$code !== 200) {\n            return [];"), 'The silent return- [] on failure path must be gone');
+
+    // Request-level read cache shared across instances, invalidated by writes.
+    assertTrue(str_contains($service, 'private static array $remoteQueryCache'), 'Remote reads should use a request-level cache shared across service instances');
+    assertTrue(str_contains($service, 'array_key_exists($cacheKey, self::$remoteQueryCache)'), 'Remote reads should be cached by SQL + params');
+    assertTrue(substr_count($service, 'self::$remoteQueryCache = []') >= 2, 'Remote mutations and direct writes should invalidate remote read caches');
+
+    // The bridge must never bridge to itself (infinite HTTP recursion) and the remote
+    // endpoint must terminate at direct hosted MySQL.
+    assertTrue(str_contains($service, 'remoteUrlIsSelf'), 'A remote_url pointing at the host serving the request must not be taken');
+    assertTrue(str_contains($service, 'private bool $forceDirect = false'), 'The service must support bypassing the bridge');
+    assertTrue(str_contains($controller, 'new DatabaseService(true)'), 'The remote DB endpoint must terminate at direct hosted MySQL instead of recursively calling itself');
+
+    // TRUNCATE is DDL and stops the transaction; DELETE keeps the atomic write intact.
+    assertTrue(!str_contains($service, 'TRUNCATE'), 'Writes must DELETE then INSERT within the transaction, never TRUNCATE');
+};
+
 
 foreach ($tests as $name => $test) {
     try {
