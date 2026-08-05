@@ -25,7 +25,21 @@
                                     <?= e($order['shipping_city'] ?? '') ?> <?= e($order['shipping_pincode'] ?? '') ?>
                                 </td>
                                 <td style="font-size:0.85rem; color:var(--color-text-muted);">
-                                    <?= !empty($order['shipped_at']) ? e($order['shipped_at']) : e(ucfirst(str_replace('_', ' ', (string)($order['status'] ?? 'processing')))) ?>
+                                    <?php if (!empty($order['shipped_at'])): ?>
+                                        <?= e(date('d M Y', strtotime((string)$order['shipped_at']))) ?>
+                                        <?php if (!empty($order['courier_name'])): ?>
+                                            <br><?= e($order['courier_name']) ?>
+                                        <?php endif; ?>
+                                        <?php if (!empty($order['tracking_id'])): ?>
+                                            <br><span style="font-size:0.78rem;">Tracking: <code><?= e((string)$order['tracking_id']) ?></code></span>
+                                        <?php endif; ?>
+                                        <?php if (!empty($order['tracking_url'])): ?>
+                                            <br><a href="<?= e((string)$order['tracking_url']) ?>" target="_blank" rel="noopener noreferrer"
+                                                   style="font-size:0.78rem; font-weight:600;">Track parcel &rarr;</a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span style="font-size:0.85rem;">Not shipped yet</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if (!empty($order['invoice_number'])): ?>
