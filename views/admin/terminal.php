@@ -4,10 +4,6 @@
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="font-size:0.8rem; color:var(--color-text-muted);" id="ai-status">AI: <?= empty($modelConfig['api_key']) ? 'not configured' : 'ready' ?></span>
             <button class="btn btn-sm" onclick="clearTerminal()" style="font-size:0.8rem;">Clear</button>
-            <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; cursor:pointer;">
-                <input type="checkbox" id="tts-mute-toggle" onchange="ttsMuted = this.checked" style="width:16px;height:16px;">
-                Mute TTS
-            </label>
         </div>
     </div>
     <p style="margin:0 0 var(--space-md); color:var(--color-text-muted); font-size:0.85rem;">
@@ -35,7 +31,6 @@
 <script>
 let commandHistory = [];
 let historyIndex = -1;
-let ttsMuted = false;
 let isRunning = false;
 
 function escapeHtml(s) {

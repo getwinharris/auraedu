@@ -60,7 +60,7 @@ commerce or spiritual consultation. Architecture is preserved — we repurpose, 
 |-------|-------|--------|
 | `/api/shop`, `/api/categories`, `/api/product/{slug}`, `/api/consult` | Retain | Commerce/therapy APIs. |
 | `/api/agent` | Retain | AI agent. |
-| `/api/agent` family, `/api/browser/*`, `/api/tts/*`, `/api/support/latest-message`, `/api/consultations/{id}/status` | Retain | Agent/browser/support tooling. |
+| `/api/agent`, `/api/support/latest-message`, `/api/consultations/{id}/status` | Retain | Agent/support tooling. |
 | `/remoteDB` | Retain | DB proxy (set password). |
 | `/api/temples` | Repurpose | → hospital/facility API. |
 

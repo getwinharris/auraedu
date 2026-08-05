@@ -93,23 +93,6 @@ bapXaura run ls .agents/temp/         # list attachments
 bapXaura read file .agents/temp/<file> # read an attachment
 ```
 
-## Browser Agent (headless browser automation)
-
-```bash
-bapXaura browser-agent open <url>              # fetch page, YAML snapshot
-bapXaura browser-agent click <selector>         # click element
-bapXaura browser-agent fill <selector> <value>  # fill form input
-bapXaura browser-agent submit [selector]        # submit form
-bapXaura browser-agent snapshot                 # YAML page snapshot
-bapXaura browser-agent smoke <url>              # health check
-bapXaura browser-agent screenshot [file]        # YAML output
-bapXaura browser-agent config set <k> <v>       # runtime config
-bapXaura browser-agent log                      # audit trail
-bapXaura browser-agent count <tag>              # count DOM tags
-bapXaura browser-agent close                    # clean session
-bapXaura browser-agent --pw <command>           # forward to Playwright
-```
-
 ## Missing Commands
 
 If a required operation is missing or unsafe, enhance the nearest existing `bapXaura` command before performing the operation. Never use raw bash/write/edit/find tools for operations that have a `bapXaura` equivalent.

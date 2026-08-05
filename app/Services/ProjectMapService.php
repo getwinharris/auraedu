@@ -6,7 +6,7 @@ final class ProjectMapService {
     ];
 
     public const SHARED_CONTROLLERS = ['BaseController'];
-    public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter', 'BrowserSession'];
+    public const SHARED_SERVICES = ['SeoService', 'SmtpMailer', 'ImageOptimizerService', 'DocsMapService', 'GitHubDocService', 'RateLimiter'];
     public const SHARED_VIEWS = ['account/_nav', 'layouts/admin', 'layouts/app', 'public/404', 'admin/environment', 'admin/workspace/_nav', 'admin/workspace/intake', 'admin/workspace/plan', 'admin/workspace/build', 'admin/workspace/monitor'];
     public const KNOWN_UNWIRED_COLLECTIONS = ['wallet_transactions', 'media_files'];
 
@@ -133,30 +133,12 @@ final class ProjectMapService {
             ['method'=>'POST','path'=>'/admin/blog/preview','name'=>'admin.blog.preview','page'=>'admin/blog','controller'=>'AdminController@previewBlog','services'=>['BlogService','MarkdownRenderer']],
             ['method'=>'POST','path'=>'/admin/blog/ai-draft','name'=>'admin.blog.ai-draft','page'=>'admin/blog','controller'=>'AdminController@aiDraftBlog','services'=>['BlogService','BlogDraftService']],
             ['method'=>'POST','path'=>'/api/agent','name'=>'api.agent','page'=>'public/404','controller'=>'AgentController@ask','services'=>['SecretService','DatabaseService']],
-            ['method'=>'POST','path'=>'/agent/chat','name'=>'api.agent.chat','page'=>'public/404','controller'=>'AgentController@chat','services'=>['AgentOrchestratorService']],
-            ['method'=>'POST','path'=>'/api/tts/tokenize','name'=>'api.tts.tokenize','page'=>'public/404','controller'=>'TtsController@tokenize','services'=>[]],
             ['method'=>'POST','path'=>'/chat/completions','name'=>'api.chat.completions','page'=>'public/404','controller'=>'AiChatController@chat','services'=>['SecretService']],
             ['method'=>'GET','path'=>'/chat/tools','name'=>'api.chat.tools','page'=>'public/404','controller'=>'AiChatController@tools','services'=>[]],
             ['method'=>'GET','path'=>'/models','name'=>'api.models.list','page'=>'public/404','controller'=>'McpController@models','services'=>[]],
             ['method'=>'POST','path'=>'/mcp','name'=>'api.mcp','page'=>'public/404','controller'=>'McpController@handle','services'=>[]],
             ['method'=>'POST','path'=>'/mcp/tools/list','name'=>'api.mcp.tools.list','page'=>'public/404','controller'=>'McpController@listTools','services'=>[]],
-            ['method'=>'POST','path'=>'/mcp/tools/call','name'=>'api.mcp.tools.call','page'=>'public/404','controller'=>'McpController@callTool','services'=>[]],
-            ['method'=>'POST','path'=>'/agent/webhook','name'=>'api.agent.webhook','page'=>'public/404','controller'=>'CloudAgentController@webhook','services'=>['AgentRuntimeService']],
-            ['method'=>'GET','path'=>'/agent/status','name'=>'api.agent.status','page'=>'public/404','controller'=>'CloudAgentController@status','services'=>[]],
-            ['method'=>'GET','path'=>'/agent/handoffs','name'=>'api.agent.handoffs','page'=>'public/404','controller'=>'CloudAgentController@handoffs','services'=>[]],
-            ['method'=>'POST','path'=>'/agent/prompt','name'=>'api.agent.prompt','page'=>'public/404','controller'=>'CloudAgentController@prompt','services'=>['AgentRuntimeService']],
-            ['method'=>'POST','path'=>'/api/browser/search','name'=>'api.browser.search','page'=>'public/404','controller'=>'BrowserAgentController@search','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/open','name'=>'api.browser.open','page'=>'public/404','controller'=>'BrowserAgentController@open','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/click','name'=>'api.browser.click','page'=>'public/404','controller'=>'BrowserAgentController@click','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/fill','name'=>'api.browser.fill','page'=>'public/404','controller'=>'BrowserAgentController@fill','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/snapshot','name'=>'api.browser.snapshot','page'=>'public/404','controller'=>'BrowserAgentController@snapshot','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/links','name'=>'api.browser.links','page'=>'public/404','controller'=>'BrowserAgentController@links','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/forms','name'=>'api.browser.forms','page'=>'public/404','controller'=>'BrowserAgentController@forms','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/captcha','name'=>'api.browser.captcha','page'=>'public/404','controller'=>'BrowserAgentController@captcha','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/smoke','name'=>'api.browser.smoke','page'=>'public/404','controller'=>'BrowserAgentController@smoke','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/cdp','name'=>'api.browser.cdp','page'=>'public/404','controller'=>'BrowserAgentController@cdp','services'=>[]],
-            ['method'=>'POST','path'=>'/api/browser/cdp_launch','name'=>'api.browser.cdp_launch','page'=>'public/404','controller'=>'BrowserAgentController@cdpLaunch','services'=>[]],
-            ['method'=>'GET','path'=>'/api/browser/status','name'=>'api.browser.status','page'=>'public/404','controller'=>'BrowserAgentController@status','services'=>[]],
+['method'=>'POST','path'=>'/mcp/tools/call','name'=>'api.mcp.tools.call','page'=>'public/404','controller'=>'McpController@callTool','services'=>[]],
             ['method'=>'GET','path'=>'/api/support/latest-message','name'=>'api.support.latest','page'=>'public/404','controller'=>'SupportController@latestMessage','services'=>['DatabaseService']],
         ];
         foreach ($routes as &$route) {
@@ -337,8 +319,7 @@ final class ProjectMapService {
             '/reviews/product|POST'    => 'Submit product review',
             '/reviews/product|POST'    => 'Submit product review',
             '/support/ask|POST' => 'Support bot — AI-powered Q&A',
-            '/api/support/latest-message|GET' => 'Support — latest ticket message for TTS polling',
-            '/api/tts/tokenize|POST' => 'TTS — tokenize text for KittenTTS ONNX model',
+            '/api/support/latest-message|GET' => 'Support — latest ticket message polling',
             '/admin'            => 'Admin dashboard — counts overview',
             '/admin/products'   => 'Admin — manage products',
             '/admin/categories' => 'Admin — manage categories',

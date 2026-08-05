@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Services\{AiService, SecretService, DatabaseService, AgentOrchestratorService};
+use App\Services\{AiService, SecretService, DatabaseService};
 
 class AgentController extends BaseController {
     private function loadAgentConfig(): array {
@@ -18,27 +18,6 @@ class AgentController extends BaseController {
             }
         }
         return $config;
-    }
-
-    public function chat(): void {
-        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-        $message = trim((string)($input['message'] ?? ''));
-        $role = trim((string)($input['role'] ?? 'cto'));
-        $channel = trim((string)($input['channel'] ?? 'api'));
-        $showThinking = !empty($input['show_thinking'] ?? true);
-
-        if ($message === '') {
-            $this->jsonResponse(['error' => 'Message is required'], 400);
-            return;
-        }
-
-        try {
-            $orch = new AgentOrchestratorService();
-            $result = $orch->handle($message, $role, $channel, $showThinking);
-            $this->jsonResponse($result);
-        } catch (\Throwable $e) {
-            $this->jsonResponse(['error' => 'Agent error: ' . $e->getMessage()], 500);
-        }
     }
 
     public function ask(): void {

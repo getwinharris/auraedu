@@ -245,14 +245,12 @@ $tests['MCP tool endpoint exists'] = function (): void {
     assertTrue(str_contains($controller, 'schema_list'), 'MCP tools should include schema_list');
 };
 
-$tests['cloud agent runtime exists'] = function (): void {
-    $controller = file_get_contents(app_path('app/Controllers/CloudAgentController.php'));
-    assertTrue(str_contains($controller, 'function webhook():'), 'Cloud agent should have webhook');
-    assertTrue(str_contains($controller, 'function prompt():'), 'Cloud agent should have prompt');
-    assertTrue(str_contains($controller, 'function status():'), 'Cloud agent should have status');
-    assertTrue(str_contains($controller, 'function handoffs():'), 'Cloud agent should have handoffs');
-    $service = file_get_contents(app_path('app/Services/AgentRuntimeService.php'));
-    assertTrue(str_contains($service, 'class AgentRuntimeService'), 'AgentRuntimeService should exist');
+$tests['admin + support agents exist'] = function (): void {
+    $controller = file_get_contents(app_path('app/Controllers/AgentController.php'));
+    assertTrue(str_contains($controller, 'function ask():'), 'Admin agent should have ask()');
+    assertTrue(!str_contains($controller, 'AgentOrchestratorService'), 'AgentController must not depend on orchestrator');
+    $support = file_get_contents(app_path('app/Services/SupportBotService.php'));
+    assertTrue(str_contains($support, 'class SupportBotService'), 'SupportBotService should exist');
 };
 
 $tests['project map shared views includes workspace sub-views'] = function (): void {

@@ -144,6 +144,39 @@ For meaningful code/schema/UI/doc/workflow changes, reproduce or inspect behavio
 7. Read `storage/schema/collections.php` for schema + `Design.md` for UI.
 8. Inspect existing implementations before creating any file, route, service, view, collection, or navigation item.
 
+## Engineering Principles: Lazy Developer
+
+Be a lazy senior developer — lazy means efficient, not careless. The best code is the code never written.
+
+**Climb the Ladder (only after you understand the problem, not instead of it):** read the task and the code it touches, trace the real flow end to end, then stop at the first rung that holds:
+
+1. Does this need to be built at all? (YAGNI)
+2. Does it already exist here? Reuse the helper, util, or pattern already in this codebase.
+3. Does the standard library already do this? Use it.
+4. Does a native platform feature cover it? Use it.
+5. Does an already-installed dependency solve it? Use it.
+6. Can this be one line? Make it one line.
+7. Only then: write the minimum code that works.
+
+**Bug fix = root cause, not symptom:** a report names a symptom. Grep every caller of the function you touch and fix the shared function once — one guard there is a smaller diff than one per caller, and patching only the path the ticket names leaves a sibling caller still broken.
+
+**Rules:**
+
+- No abstractions that weren't explicitly requested.
+- No new dependency if it can be avoided.
+- No boilerplate nobody asked for.
+- Deletion over addition. Boring over clever. Fewest files possible.
+- Shortest working diff wins, but only once you understand the problem. The smallest change in the wrong place isn't lazy, it's a second bug.
+- Question complex requests: "Do you actually need X, or does Y cover it?"
+- Pick the edge-case-correct option when two stdlib approaches are the same size — lazy means less code, not the flimsier algorithm.
+- Mark deliberate simplifications that cut a real corner with a known ceiling (global lock, O(n²) scan, naive heuristic) with a comment naming the ceiling and upgrade path.
+
+**Not lazy about:** understanding the problem (a small diff you don't understand is laziness dressed up as efficiency), input validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs (the platform is never the spec ideal — a clock drifts, a sensor reads off), anything explicitly requested.
+
+**Lazy code without its check is unfinished:** non-trivial logic leaves ONE runnable check behind — the smallest thing that fails if the logic breaks (an assert-based demo/self-check or one small test, no frameworks, no fixtures). Trivial one-liners need no test.
+
+> "I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it." — Bill Gates
+
 ## Project Map
 
 - `docs/systematic-map.mmd` = single project-map artifact (routes/controllers/services wiring).
@@ -245,15 +278,6 @@ This enables shared-hosting dev without local MySQL — the dev server proxies t
 - `MayaController` renamed to `AgentController`, route `/api/maya` → `/api/agent`. The AI agent name is configurable via `config/agent.yml` and overridable in Admin → Integrations (`agent_name` secret).
 - Each `.agents/skills/<tool-name>/` directory contains a `SKILL.md` (≤1024 lines) as the tool index, plus a `references/` subdirectory where the actual skill docs live (playwright-cli model).
 
-## Browser Agent & CDP
-
-- **Browser Agent CLI:** `cli/browser-agent.php` — pure PHP HTTP mode (cURL + DOMDocument) for shared hosting. Commands: `open`, `click`, `fill`, `search`, `snapshot`, `links`, `forms`, `captcha`, `smoke`, `config`, `log`, `cookies`.
-- **CDP Mode:** Remote Chrome via DevTools Protocol. Set `config set cdp_ws ws://host:9222/devtools/browser/xxx` then use `cdp <method> [params]`. For JS-heavy sites (YouTube, SPAs).
-- **Local Chrome (cPanel):** `browser-agent cdp_launch --port=9222` starts bundled Chrome from `.bin/chrome-linux/chrome` (Linux x86_64). Download: `php .bin/download-chrome.php`.
-- **Remote Chrome (Mac/local dev):** Run `./bin/launch-chrome.sh --port=9222` on Linux server, then `browser-agent config set cdp_ws ws://your-server:9222/devtools/browser/...`.
-- **API Endpoints:** `/api/browser/*` — search, open, click, fill, snapshot, links, forms, captcha, smoke, cdp, cdp_launch, status.
-- **TTS:** `storage/kittentts/model_quantized.onnx` (KittenTTS ONNX). Download manually from Hugging Face (requires auth). Served at `/storage/kittentts/`. Frontend uses onnxruntime-web.
-
 ## Skill Ownership
 
 - `.agents/skills/subagent-orchestration/` is owned by the **CEO** (repository architect), not the CTO agent. It contains research on agent orchestration patterns, telemetry design, and implementation reference. CTO agents should not load this skill — it is outside their execution scope.
@@ -300,28 +324,17 @@ Forbidden from writing code or creating files upon receiving a new prompt. Must 
 - Always keep YAML headers current in blog posts, docs, skill files, and workflow definitions.
 - The `docs/systematic-map.mmd` includes YAML content nodes alongside code routes, controllers, services.
 
-## Browser Agent + TTS Autonomy
-
-- Chrome binary (`.bin/chrome-linux/chrome`) and KittenTTS model (`storage/kittentts/model_quantized.onnx`) are tracked by Git LFS — ensure `git lfs pull` after clone.
-- Browser agent CLI (`cli/browser-agent.php`) supports HTTP (cURL + DOMDocument) and CDP (Chrome DevTools Protocol) modes.
-- On shared hosting with Linux x86_64: use `cdp_launch` to start Chrome, then `cdp <method>` for JS-heavy sites.
-- On macOS/local dev: connect to a remote Linux Chrome via `config set cdp_ws ws://server:9222/...` or use HTTP mode.
-- TTS routes through `/api/tts/tokenize` (tokenizer) + ONNX Runtime Web in-browser for inference at 24kHz.
-- Admin agent workspace (`/admin/agent`) and terminal (`/admin/terminal`) both support voice synthesis via `KittenTTS`.
-
 ## Support Agent Autonomous Operation
 
 - **SupportBotService** now operates autonomously: detects booking intent and auto-creates appointments via `ResourceService('appointments')`.
 - When a user asks to "book a consultation" or "schedule a session", the bot creates the booking directly — no human needed.
 - Escalation to human still happens for: complaints, refunds, cancellations, returns, or when the user explicitly asks to speak to someone.
-- **Browser actions** are detected: when a user asks to "search for" or "navigate to" something, the bot returns a `browser_action` in the response that the frontend can execute via `/api/browser/*` endpoints.
 - Support ticketing creates tickets in the `support_tickets` collection with full audit trail.
 
 ## Map Generation from Folder + YAML
 
 - `ProjectMapService::scan()` now calls `scanYamlFrontmatter()` which walks `content/`, `docs/`, `.agents/skills/`, `.agents/workflows/`.
 - YAML content blocks render in the Mermaid output as a `YAML_CONTENT` subgraph — visible in `docs/systematic-map.mmd`.
-- Keep `.gitattributes` for LFS tracking of binary files (`.onnx`, `chrome-linux/`, `kittentts/`).
 
 ## Undocumented Code Patterns
 

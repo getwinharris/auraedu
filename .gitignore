@@ -20,7 +20,7 @@ tmp/
 null
 homepage.yml
 
-# Runtime browser session state — never commit
+# Runtime temp state — never commit
 /.agents/temp/
 /.okf/
 .tmp/
