@@ -1,6 +1,15 @@
 <?php
 namespace App\Services;
 final class DatabaseService {
+    /**
+     * One PDO per request, shared by every DatabaseService instance. Several services and
+     * controllers construct their own DatabaseService and each used to open its own MySQL
+     * connection plus a TCP socket probe, so a single page render could open a dozen
+     * sockets. On shared hosting that exhausts the per-user connection limit and PDO fails
+     * with "Operation not permitted" — a common cause of intermittent 503s. PHP tears the
+     * connection down at the end of the request, so this never spans requests.
+     */
+    private static ?\PDO $sharedPdo = null;
     private ?\PDO $pdo = null;
     private ?bool $remoteOnly = null;
     private array $cfg = [];
@@ -51,16 +60,19 @@ final class DatabaseService {
 
     private function db(): \PDO {
         if ($this->pdo === null) {
+            if (self::$sharedPdo !== null) return $this->pdo = self::$sharedPdo;
             $this->cfg = require app_path('config/database.php');
-            $errno = 0; $errstr = '';
-            $fp = @fsockopen($this->cfg['host'], (int)$this->cfg['port'], $errno, $errstr, 3);
-            if (!$fp) {
-                throw new \RuntimeException("MySQL unavailable at {$this->cfg['host']}:{$this->cfg['port']}");
+            foreach (['host', 'dbname', 'user', 'pass'] as $required) {
+                if (trim((string)($this->cfg[$required] ?? '')) === '') {
+                    throw new \RuntimeException('Direct MySQL is not configured; missing ' . $required . '.');
+                }
             }
-            fclose($fp);
             $dsn = 'mysql:host=' . $this->cfg['host'] . ';port=' . $this->cfg['port'] . ';dbname=' . $this->cfg['dbname'] . ';charset=utf8mb4';
-            $this->pdo = new \PDO($dsn, $this->cfg['user'], $this->cfg['pass'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, \PDO::ATTR_TIMEOUT => 5]);
-            if (!$this->pdo) throw new \RuntimeException('Cannot connect to MySQL.');
+            $this->pdo = self::$sharedPdo = new \PDO($dsn, $this->cfg['user'], $this->cfg['pass'], [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_TIMEOUT => 5,
+                \PDO::ATTR_PERSISTENT => false,
+            ]);
         }
         return $this->pdo;
     }

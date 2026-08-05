@@ -371,6 +371,19 @@ $tests['admin sidebar uses SVG icons instead of Unicode text replacements'] = fu
 };
 
 
+$tests['one MySQL connection is shared and no socket probe remains'] = function (): void {
+    $src = file_get_contents(app_path('app/Services/DatabaseService.php'));
+    assertTrue(str_contains($src, 'private static ?\PDO $sharedPdo'), 'DatabaseService should share one PDO across instances via a static handle');
+    assertTrue(str_contains($src, 'self::$sharedPdo = new \PDO'), 'DatabaseService should assign the connection to the shared static handle');
+    assertTrue(str_contains($src, 'if (self::$sharedPdo !== null) return $this->pdo = self::$sharedPdo'), 'Reusing an open shared PDO should skip a fresh connection');
+    assertTrue(str_contains($src, '\PDO::ATTR_PERSISTENT => false'), 'Shared connection must not persist across requests');
+    assertTrue(!str_contains($src, 'fsockopen'), 'No fsockopen TCP probe should precede PDO on shared hosting');
+
+    $controller = file_get_contents(app_path('app/Controllers/BaseController.php'));
+    assertTrue(str_contains($controller, "['error' => 'Not found']"), 'API 404s must return JSON, not an HTML page');
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();
