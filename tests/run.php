@@ -371,6 +371,37 @@ $tests['admin sidebar uses SVG icons instead of Unicode text replacements'] = fu
 };
 
 
+$tests['shipping an order requires courier tracking'] = function (): void {
+    // OrderService validates the tracking rule before it reads any data, so this
+    // fails deterministically without a database connection.
+    $service = new \App\Services\OrderService();
+    $askedTracking = false;
+    foreach ([
+        [[], 'A courier tracking ID is required to mark an order shipped.'],
+        [['tracking_id' => 'AB123', 'tracking_url' => 'not a url'], 'The courier tracking link must be a valid URL.'],
+    ] as $case) {
+        [$tracking, $expected] = $case;
+        try {
+            $service->updateStatus('order-none', 'shipped', null, $tracking);
+            throw new \RuntimeException('Expected validation to reject, but it passed');
+        } catch (\InvalidArgumentException $e) {
+            if ($e->getMessage() !== $expected) throw new \RuntimeException('Wrong validation message: ' . $e->getMessage());
+        }
+        $askedTracking = true;
+    }
+    assertTrue($askedTracking, 'The tracking rule must be enforced when shipping');
+
+    $controller = file_get_contents(app_path('app/Controllers/AdminController.php'));
+    assertTrue(str_contains($controller, "'tracking_id'") && str_contains($controller, "'tracking_url'") && str_contains($controller, "'courier_name'"), 'Admin status save must pass courier tracking to the service');
+
+    $adminView = file_get_contents(app_path('views/admin/detail.php'));
+    assertTrue(str_contains($adminView, "name=\"courier_name\"") && str_contains($adminView, "name=\"tracking_id\"") && str_contains($adminView, "name=\"tracking_url\""), 'Admin order view must collect courier + tracking fields');
+
+    $accountView = file_get_contents(app_path('views/account/orders.php'));
+    assertTrue(str_contains($accountView, 'Track parcel'), 'Customer orders view must expose the courier track link');
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();
