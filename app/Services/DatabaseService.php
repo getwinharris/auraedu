@@ -66,7 +66,9 @@ final class DatabaseService {
             }
             return self::$remoteQueryCache[$cacheKey] = $result['data'];
         } finally {
-            if (isset($ch)) curl_close($ch);
+            // curl_close() has had no effect since PHP 8.0 and is deprecated in 8.5; the
+            // handle is released when the resource is destroyed, so only close it pre-8.0.
+            if (isset($ch) && \PHP_VERSION_ID < 80000) curl_close($ch);
         }
     }
 
@@ -90,7 +92,7 @@ final class DatabaseService {
             self::$remoteQueryCache = [];
             return $result;
         } finally {
-            if (isset($ch)) curl_close($ch);
+            if (isset($ch) && \PHP_VERSION_ID < 80000) curl_close($ch);
         }
     }
 
