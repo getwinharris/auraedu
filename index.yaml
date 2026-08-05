@@ -1,0 +1,1834 @@
+# AuraEdu — project knowledge index (Open Knowledge Framework).
+# Queryable map of repo structure and content declared in each file's YAML frontmatter. Live record values come from the remote bridge, not this file.
+format: auraedu-knowledge-index
+version: "1.0"
+generated_by: cli/generate-okf-index.php
+authoritative_sources:
+  routes: app/routes.php
+  services: "app/Services/*.php"
+  schema: storage/schema/collections.php
+  blog: "content/blog/posts/*.md"
+  docs: "docs/**/*.md"
+  skills: ".agents/skills/*/SKILL.md"
+  images: "assets/images/**/*"
+discovery:
+  - question: "Does a route/controller/service/view/collection exist and how do they connect?"
+    use: map.mmd
+  - question: "What is a live product/category/consultant/admin-editable value?"
+    use: remote_url via /remotedb
+  - question: "What does a blog article / doc declare in its frontmatter?"
+    use: concepts filtered by type
+  - question: "What repository instructions or skill apply?"
+    use: AGENTS.md then concepts by type skill
+query_examples:
+  - "sed -n '1,80p' index.yaml"
+  - "rg -n -A12 'id: \"doc:' index.yaml"
+  - "rg -n -A14 'type: \"blog\"' index.yaml"
+  - "rg -n -A12 'type: \"skill\"' index.yaml"
+summary:
+  doc: 35
+  blog: 9
+  legal: 2
+  route: 126
+  service: 42
+  controller: 15
+  schema: 19
+  skill: 1
+  image: 15
+concepts:
+  - id: doc:docs-README
+    type: doc
+    title: Documentation Index
+    description: "Connected documentation for developers, maintainers, and coding agents building on AuraEdu."
+    resource: docs/README.md
+    tags: docs
+
+  - id: doc:docs-admin-guide
+    type: doc
+    title: Admin Guide
+    description: "Use the dashboard to manage products, categories, coupons, orders, consultant profiles, scheduled appointments, and more."
+    resource: docs/admin-guide.md
+    tags: docs
+
+  - id: doc:docs-architecture
+    type: doc
+    title: Architecture
+    description: "PHP-rendered public, account, and admin templates in views/ with shared CSS and small inline enhancement scripts."
+    resource: docs/architecture.md
+    tags: docs
+
+  - id: doc:docs-competitor-review
+    type: doc
+    title: "Competitor & Alternative-Medicine Landscape Review"
+    description: "Research on electropathy / B.E.M.S. institutes, allied-health and acupuncture training competitors relevant to Aura Medical Institute of Electropathy and Hospital."
+    resource: docs/competitor-review.md
+    tags: docs
+
+  - id: doc:docs-deployment-hostinger
+    type: doc
+    title: Deployment Hostinger
+    description: Guide for Hostinger Git auto-deploy setup and production configuration.
+    resource: docs/deployment-hostinger.md
+    tags: docs
+
+  - id: doc:docs-institute-content-model
+    type: doc
+    title: Institute Content Model
+    description: "Verified content model for Aura Medical Institute of Electropathy and Hospital — B.E.M.S., admissions, faculty, hospital, facilities, hostel, placements, approvals, gallery, news, contact."
+    resource: docs/institute-content-model.md
+    tags: docs
+
+  - id: doc:docs-json-storage
+    type: doc
+    title: JSON Storage
+    description: "All runtime data is stored in MySQL tables, accessed through DatabaseService. The schema contract lives in storage/schema/collections.php."
+    resource: docs/json-storage.md
+    tags: docs
+
+  - id: doc:docs-modules-admin
+    type: doc
+    title: Admin Module
+    description: Owns owner-only pages under /admin.
+    resource: docs/modules/admin.md
+    tags: module
+
+  - id: doc:docs-modules-auth
+    type: doc
+    title: Auth Module
+    description: "Owns login, registration, logout, Google OAuth, password reset, and admin session handling."
+    resource: docs/modules/auth.md
+    tags: module
+
+  - id: doc:docs-modules-booking
+    type: doc
+    title: "Admissions & Appointment Module"
+    description: Owns admission enquiries and hospital appointment requests.
+    resource: docs/modules/booking.md
+    tags: module
+
+  - id: doc:docs-modules-catalog
+    type: doc
+    title: Catalog Module
+    description: "Owns product, category, temple, and astrologer catalog reads from MySQL via DatabaseService."
+    resource: docs/modules/catalog.md
+    tags: module
+
+  - id: doc:docs-modules-consultations
+    type: doc
+    title: Consultation Bookings
+    description: "Customers browse /consult, open a consultant profile, and submit a preferred date, time, phone number, and guidance notes."
+    resource: docs/modules/consultations.md
+    tags: module
+
+  - id: doc:docs-modules-google-oauth
+    type: doc
+    title: Google OAuth Module
+    description: Owns optional customer sign-in through Google.
+    resource: docs/modules/google-oauth.md
+    tags: module
+
+  - id: doc:docs-modules-gst-commerce
+    type: doc
+    title: GST Commerce
+    description: GST Product Billing and Growth Tracking workflow for paid ecommerce product orders.
+    resource: docs/modules/gst-commerce.md
+    tags: module
+
+  - id: doc:docs-modules-orders
+    type: doc
+    title: Orders Module
+    description: "Owns cart checkout, payment verification, order storage, shipping status, customer order history, and product review timing."
+    resource: docs/modules/orders.md
+    tags: module
+
+  - id: doc:docs-modules-pwa
+    type: doc
+    title: PWA Support
+    description: The public customer app and admin dashboard expose PWA metadata.
+    resource: docs/modules/pwa.md
+    tags: module
+
+  - id: doc:docs-modules-razorpay
+    type: doc
+    title: Razorpay Module
+    description: Owns payment order creation and signature verification.
+    resource: docs/modules/razorpay.md
+    tags: module
+
+  - id: doc:docs-modules-remote-db
+    type: doc
+    title: Remote Database Operations
+    description: "The application connects directly to hosted MySQL with the BAPX_MYSQL_* values in .env."
+    resource: docs/modules/remote-db.md
+    tags: module
+
+  - id: doc:docs-modules-temples
+    type: doc
+    title: Hospital Module
+    description: Owns hospital/campus pages repurposed from the legacy temples module.
+    resource: docs/modules/temples.md
+    tags: module
+
+  - id: doc:docs-pages-about
+    type: doc
+    title: About Page
+    description: "Route /about - describe Aura Medical Institute, its mission, electropathy education, hospital care, and allied-health training."
+    resource: docs/pages/about.md
+    tags: page
+
+  - id: doc:docs-pages-admin-dashboard
+    type: doc
+    title: Admin Dashboard
+    description: "Route /admin - owner dashboard for product, order, and astrology session counts."
+    resource: docs/pages/admin-dashboard.md
+    tags: page
+
+  - id: doc:docs-pages-blog
+    type: doc
+    title: Blog
+    description: Blog listing page with pagination and single blog post routes.
+    resource: docs/pages/blog.md
+    tags: page
+
+  - id: doc:docs-pages-checkout
+    type: doc
+    title: Checkout Page
+    description: Route /checkout - collect shipping contact details and start Razorpay checkout when payment keys are configured.
+    resource: docs/pages/checkout.md
+    tags: page
+
+  - id: doc:docs-pages-consult
+    type: doc
+    title: Consult Page
+    description: "Route /consult - show remote consultant profiles with search, language filtering, and one scheduled-booking path."
+    resource: docs/pages/consult.md
+    tags: page
+
+  - id: doc:docs-pages-home
+    type: doc
+    title: Home Page
+    description: "Route / - institute landing page with course highlights, therapy products, admissions steps, and hospital/therapy sections."
+    resource: docs/pages/home.md
+    tags: page
+
+  - id: doc:docs-pages-integrations
+    type: doc
+    title: Integrations
+    description: "Route /admin/integrations - configure Razorpay, Stripe, Google OAuth, SMTP, Meta Pixel, Google Site Kit, Support Bot, and SEO defaults."
+    resource: docs/pages/integrations.md
+    tags: page
+
+  - id: doc:docs-pages-project-map
+    type: doc
+    title: Project Map
+    description: "Route /admin/developer/project-map - owner/developer visibility into routes, controllers, services, views, and more."
+    resource: docs/pages/project-map.md
+    tags: page
+
+  - id: doc:docs-pages-shop
+    type: doc
+    title: Shop Page
+    description: "Route /shop - list JSON-backed products, category filters, prices, stock status, product detail links, and add-to-cart forms."
+    resource: docs/pages/shop.md
+    tags: page
+
+  - id: doc:docs-pages-temples
+    type: doc
+    title: Temples Page
+    description: "Route /temples - show JSON-backed temple entries with image, address, pooja details, and detail links."
+    resource: docs/pages/temples.md
+    tags: page
+
+  - id: doc:docs-product-list
+    type: doc
+    title: Product List
+    description: Illustrative therapy-product catalog for the Aura Medical shop (acupuncture and electropathy therapy products).
+    resource: docs/product-list.md
+    tags: docs
+
+  - id: doc:docs-roles-admin
+    type: doc
+    title: Admin Guide
+    description: "Use the admin panel to manage catalog content, media, astrologer accounts, orders, payments, support, and more."
+    resource: docs/roles/admin.md
+    tags: role
+
+  - id: doc:docs-roles-consultant
+    type: doc
+    title: Consultant Guide
+    description: Consultants do not receive application login credentials. The site administrator maintains consultant profiles.
+    resource: docs/roles/consultant.md
+    tags: role
+
+  - id: doc:docs-roles-customer
+    type: doc
+    title: Customer Guide
+    description: "Use the customer account to browse products, manage saved addresses, request consultant appointments, and review orders."
+    resource: docs/roles/customer.md
+    tags: role
+
+  - id: doc:docs-route-audit
+    type: doc
+    title: "Route & View Audit — Institute Repositioning"
+    description: "Classification of every route/view as retain, repurpose, hide, or remove-later for the Aura Medical institute repositioning."
+    resource: docs/route-audit.md
+    tags: docs
+
+  - id: doc:docs-schema
+    type: doc
+    title: Schema Registry
+    description: storage/schema/collections.php is the database schema for this PHP/MySQL backend.
+    resource: docs/schema.md
+    tags: docs
+
+  - id: blog:acupuncture-training
+    type: blog
+    title: "Acupuncture Training at Aura Medical: D.Acu and M.Acu"
+    description: ""
+    category: acupuncture
+    published: true
+    resource: content/blog/posts/acupuncture-training.md
+
+  - id: blog:admissions-guide
+    type: blog
+    title: "How to Apply: Aura Medical Admissions Guide"
+    description: ""
+    category: admissions
+    published: true
+    resource: content/blog/posts/admissions-guide.md
+
+  - id: blog:career-scope-electropathy
+    type: blog
+    title: "Career Scope After Electropathy & Allied-Health Training"
+    description: ""
+    category: electropathy
+    published: true
+    resource: content/blog/posts/career-scope-electropathy.md
+
+  - id: blog:create-account
+    type: blog
+    title: Create and access your account
+    description: ""
+    category: help
+    published: true
+    resource: content/blog/posts/create-account.md
+
+  - id: blog:new-features-july-2026
+    type: blog
+    title: "Aura Medical — July 2026 Update"
+    description: ""
+    category: news
+    published: true
+    resource: content/blog/posts/new-features-july-2026.md
+
+  - id: blog:order-products
+    type: blog
+    title: Order products and choose a delivery address
+    description: ""
+    category: help
+    published: true
+    resource: content/blog/posts/order-products.md
+
+  - id: blog:payments-and-orders
+    type: blog
+    title: Payments and order confirmation
+    description: ""
+    category: help
+    published: true
+    resource: content/blog/posts/payments-and-orders.md
+
+  - id: blog:student-life-campus
+    type: blog
+    title: "Campus & Hospital: Student Life at Aura Medical"
+    description: ""
+    category: student-life
+    published: true
+    resource: content/blog/posts/student-life-campus.md
+
+  - id: blog:what-is-electropathy
+    type: blog
+    title: "B.E.M.S. at Aura Medical: What the Electropathy Programme Covers"
+    description: ""
+    category: electropathy
+    published: true
+    resource: content/blog/posts/what-is-electropathy.md
+
+  - id: legal:content/legal/privacy
+    type: legal
+    title: Privacy Policy
+    resource: content/legal/privacy.md
+
+  - id: legal:content/legal/terms
+    type: legal
+    title: "Terms & Conditions"
+    resource: content/legal/terms.md
+
+  - id: route:_
+    type: route
+    method: GET
+    path: "/"
+    action: PublicController@home
+    name: home
+    page: public/home
+
+  - id: route:_about
+    type: route
+    method: GET
+    path: "/about"
+    action: PublicController@about
+    name: about
+    page: public/about
+
+  - id: route:_sri-panchami-education
+    type: route
+    method: GET
+    path: "/sri-panchami-education"
+    action: PublicController@education
+    name: education
+    page: public/education
+
+  - id: route:_education
+    type: route
+    method: GET
+    path: "/education"
+    action: PublicController@education
+    name: education.short
+    page: public/education
+
+  - id: route:_courses
+    type: route
+    method: GET
+    path: "/courses"
+    action: PublicController@courses
+    name: courses
+    page: public/courses
+
+  - id: route:_courses_{slug}
+    type: route
+    method: GET
+    path: "/courses/{slug}"
+    action: PublicController@course
+    name: courses.show
+    page: public/course
+
+  - id: route:_eligibility
+    type: route
+    method: GET
+    path: "/eligibility"
+    action: PublicController@eligibility
+    name: eligibility
+    page: public/eligibility
+
+  - id: route:_scope
+    type: route
+    method: GET
+    path: "/scope"
+    action: PublicController@scope
+    name: scope
+    page: public/scope
+
+  - id: route:_gallery
+    type: route
+    method: GET
+    path: "/gallery"
+    action: PublicController@gallery
+    name: gallery
+    page: public/gallery
+
+  - id: route:_faculty
+    type: route
+    method: GET
+    path: "/faculty"
+    action: PublicController@faculty
+    name: faculty
+    page: public/faculty
+
+  - id: route:_terms
+    type: route
+    method: GET
+    path: "/terms"
+    action: PublicController@terms
+    name: terms
+    page: public/terms
+
+  - id: route:_privacy
+    type: route
+    method: GET
+    path: "/privacy"
+    action: PublicController@privacy
+    name: privacy
+    page: public/privacy
+
+  - id: route:_consult
+    type: route
+    method: GET
+    path: "/consult"
+    action: PublicController@therapies
+    name: therapies
+    page: public/consult
+
+  - id: route:_consultation_initiate
+    type: route
+    method: POST
+    path: "/consultation/initiate"
+    action: ConsultationController@initiate
+    name: consultation.initiate
+    page: public/consult
+
+  - id: route:_api_consultations_{id}_status
+    type: route
+    method: POST
+    path: "/api/consultations/{id}/status"
+    action: ConsultationController@status
+    name: consultation.status
+    page: public/404
+
+  - id: route:_hospitals
+    type: route
+    method: GET
+    path: "/hospitals"
+    action: PublicController@hospitals
+    name: hospitals
+    page: public/hospitals
+
+  - id: route:_hospitals_{slug}
+    type: route
+    method: GET
+    path: "/hospitals/{slug}"
+    action: PublicController@hospital
+    name: hospital.show
+    page: public/hospital
+
+  - id: route:_shop
+    type: route
+    method: GET
+    path: "/shop"
+    action: PublicController@shop
+    name: shop
+    page: public/shop
+
+  - id: route:_categories
+    type: route
+    method: GET
+    path: "/categories"
+    action: PublicController@categories
+    name: categories
+    page: public/categories
+
+  - id: route:_product_{slug}
+    type: route
+    method: GET
+    path: "/product/{slug}"
+    action: PublicController@product
+    name: product.show
+    page: public/product
+
+  - id: route:_api
+    type: route
+    method: GET
+    path: "/api"
+    action: ApiController@index
+    name: api.index
+    page: public/404
+
+  - id: route:_api_shop
+    type: route
+    method: GET
+    path: "/api/shop"
+    action: ApiController@shop
+    name: api.shop
+    page: public/404
+
+  - id: route:_api_categories
+    type: route
+    method: GET
+    path: "/api/categories"
+    action: ApiController@categories
+    name: api.categories
+    page: public/404
+
+  - id: route:_api_product_{slug}
+    type: route
+    method: GET
+    path: "/api/product/{slug}"
+    action: ApiController@product
+    name: api.product
+    page: public/404
+
+  - id: route:_api_consult
+    type: route
+    method: GET
+    path: "/api/consult"
+    action: ApiController@consult
+    name: api.consult
+    page: public/404
+
+  - id: route:_api_hospitals
+    type: route
+    method: GET
+    path: "/api/hospitals"
+    action: ApiController@hospitals
+    name: api.hospitals
+    page: public/404
+
+  - id: route:_cart
+    type: route
+    method: GET
+    path: "/cart"
+    action: PublicController@cart
+    name: cart
+    page: public/cart
+
+  - id: route:_checkout
+    type: route
+    method: GET
+    path: "/checkout"
+    action: PublicController@checkout
+    name: checkout
+    page: public/checkout
+
+  - id: route:_sitemap.xml
+    type: route
+    method: GET
+    path: "/sitemap.xml"
+    action: PublicController@sitemap
+    name: sitemap
+    page: public/sitemap
+
+  - id: route:_contact
+    type: route
+    method: GET
+    path: "/contact"
+    action: PublicController@contact
+    name: contact
+    page: public/contact
+
+  - id: route:_contact
+    type: route
+    method: POST
+    path: "/contact"
+    action: PublicController@contact
+    name: contact.post
+    page: public/contact
+
+  - id: route:_login
+    type: route
+    method: GET
+    path: "/login"
+    action: PublicController@login
+    name: login
+    page: public/login
+
+  - id: route:_forgot-password
+    type: route
+    method: GET
+    path: "/forgot-password"
+    action: AuthController@forgotPassword
+    name: forgot-password
+    page: public/forgot-password
+
+  - id: route:_forgot-password
+    type: route
+    method: POST
+    path: "/forgot-password"
+    action: AuthController@forgotPasswordPost
+    name: forgot-password.post
+    page: public/forgot-password
+
+  - id: route:_reset-password
+    type: route
+    method: GET
+    path: "/reset-password"
+    action: AuthController@resetPassword
+    name: reset-password
+    page: public/reset-password
+
+  - id: route:_reset-password
+    type: route
+    method: POST
+    path: "/reset-password"
+    action: AuthController@resetPasswordPost
+    name: reset-password.post
+    page: public/reset-password
+
+  - id: route:_auth_google
+    type: route
+    method: GET
+    path: "/auth/google"
+    action: AuthController@googleRedirect
+    name: auth.google
+    page: public/login
+
+  - id: route:_auth_google_callback
+    type: route
+    method: GET
+    path: "/auth/google/callback"
+    action: AuthController@callback
+    name: auth.google.callback
+    page: public/login
+
+  - id: route:_register
+    type: route
+    method: GET
+    path: "/register"
+    action: AuthController@register
+    name: register
+    page: public/register
+
+  - id: route:_register
+    type: route
+    method: POST
+    path: "/register"
+    action: AuthController@registerPost
+    name: register.post
+    page: public/register
+
+  - id: route:_login
+    type: route
+    method: POST
+    path: "/login"
+    action: AuthController@loginPost
+    name: login.post
+    page: public/login
+
+  - id: route:_logout
+    type: route
+    method: GET
+    path: "/logout"
+    action: AuthController@logout
+    name: logout
+    page: public/login
+
+  - id: route:_account_dashboard
+    type: route
+    method: GET
+    path: "/account/dashboard"
+    action: AccountController@dashboard
+    name: account.dashboard
+    page: account/orders
+
+  - id: route:_account_dashboard_orders
+    type: route
+    method: GET
+    path: "/account/dashboard/orders"
+    action: AccountController@orders
+    name: account.dashboard.orders
+    page: account/orders
+
+  - id: route:_account_dashboard_sessions
+    type: route
+    method: GET
+    path: "/account/dashboard/sessions"
+    action: AccountController@bookings
+    name: account.dashboard.sessions
+    page: account/bookings
+
+  - id: route:_account_dashboard_install
+    type: route
+    method: GET
+    path: "/account/dashboard/install"
+    action: AccountController@install
+    name: account.dashboard.install
+    page: account/install
+
+  - id: route:_account_orders
+    type: route
+    method: GET
+    path: "/account/orders"
+    action: AccountController@legacyOrders
+    name: account.orders.legacy
+    page: account/orders
+
+  - id: route:_account_orders_{orderId}_invoice
+    type: route
+    method: GET
+    path: "/account/orders/{orderId}/invoice"
+    action: AccountController@invoice
+    name: account.invoice
+    page: account/invoice
+
+  - id: route:_account_bookings
+    type: route
+    method: GET
+    path: "/account/bookings"
+    action: AccountController@legacyBookings
+    name: account.bookings.legacy
+    page: account/bookings
+
+  - id: route:_admin_workspace
+    type: route
+    method: GET
+    path: "/admin/workspace"
+    action: AdminController@workspace
+    name: admin.workspace
+    page: admin/workspace
+
+  - id: route:_admin_workspace_create
+    type: route
+    method: POST
+    path: "/admin/workspace/create"
+    action: AdminController@workspaceCreate
+    name: admin.workspace.create
+    page: admin/workspace
+
+  - id: route:_admin
+    type: route
+    method: GET
+    path: "/admin"
+    action: AdminController@dashboard
+    name: admin.dashboard
+    page: admin/dashboard
+
+  - id: route:_admin_products
+    type: route
+    method: GET
+    path: "/admin/products"
+    action: AdminController@products
+    name: admin.products
+    page: admin/product-form
+
+  - id: route:_admin_categories
+    type: route
+    method: GET
+    path: "/admin/categories"
+    action: AdminController@categories
+    name: admin.categories
+    page: admin/resource
+
+  - id: route:_admin_coupons
+    type: route
+    method: GET
+    path: "/admin/coupons"
+    action: AdminController@coupons
+    name: admin.coupons
+    page: admin/resource
+
+  - id: route:_admin_orders
+    type: route
+    method: GET
+    path: "/admin/orders"
+    action: AdminController@orders
+    name: admin.orders
+    page: admin/list
+
+  - id: route:_admin_orders_{id}
+    type: route
+    method: GET
+    path: "/admin/orders/{id}"
+    action: AdminController@order
+    name: admin.order.show
+    page: admin/detail
+
+  - id: route:_admin_orders_{id}_status
+    type: route
+    method: POST
+    path: "/admin/orders/{id}/status"
+    action: AdminController@saveOrderStatus
+    name: admin.order.status
+    page: admin/detail
+
+  - id: route:_admin_shipping
+    type: route
+    method: GET
+    path: "/admin/shipping"
+    action: AdminController@shipping
+    name: admin.shipping
+    page: admin/settings
+
+  - id: route:_admin_appointments
+    type: route
+    method: GET
+    path: "/admin/appointments"
+    action: AdminController@appointments
+    name: admin.appointments
+    page: admin/list
+
+  - id: route:_admin_tax-report
+    type: route
+    method: GET
+    path: "/admin/tax-report"
+    action: AdminController@taxReport
+    name: admin.tax-report
+    page: admin/tax-report
+
+  - id: route:_admin_temples
+    type: route
+    method: GET
+    path: "/admin/temples"
+    action: AdminController@temples
+    name: admin.temples
+    page: admin/resource
+
+  - id: route:_admin_settings
+    type: route
+    method: GET
+    path: "/admin/settings"
+    action: AdminController@settings
+    name: admin.settings
+    page: admin/settings
+
+  - id: route:_admin_settings_save
+    type: route
+    method: POST
+    path: "/admin/settings/save"
+    action: AdminController@saveSettings
+    name: admin.settings.save
+    page: admin/settings
+
+  - id: route:_admin_settings_admin-credentials
+    type: route
+    method: POST
+    path: "/admin/settings/admin-credentials"
+    action: AdminController@saveAdminCredentials
+    name: admin.settings.admin-credentials
+    page: admin/settings
+
+  - id: route:_admin_integrations
+    type: route
+    method: GET
+    path: "/admin/integrations"
+    action: AdminController@integrations
+    name: admin.integrations
+    page: admin/integrations
+
+  - id: route:_admin_agent
+    type: route
+    method: GET
+    path: "/admin/agent"
+    action: AdminController@agent
+    name: admin.agent
+    page: admin/agent
+
+  - id: route:_admin_agent_ask
+    type: route
+    method: POST
+    path: "/admin/agent/ask"
+    action: AdminController@agentAsk
+    name: admin.agent.ask
+    page: admin/agent
+
+  - id: route:_admin_terminal
+    type: route
+    method: GET
+    path: "/admin/terminal"
+    action: AdminController@terminal
+    name: admin.terminal
+    page: admin/terminal
+
+  - id: route:_admin_terminal_run
+    type: route
+    method: POST
+    path: "/admin/terminal/run"
+    action: AdminController@terminalRun
+    name: admin.terminal.run
+    page: admin/terminal
+
+  - id: route:_admin_backups
+    type: route
+    method: GET
+    path: "/admin/backups"
+    action: AdminController@backups
+    name: admin.backups
+    page: admin/list
+
+  - id: route:_admin_audit-log
+    type: route
+    method: GET
+    path: "/admin/audit-log"
+    action: AdminController@audit
+    name: admin.audit
+    page: admin/list
+
+  - id: route:_admin_contact-submissions
+    type: route
+    method: GET
+    path: "/admin/contact-submissions"
+    action: AdminController@contactSubmissions
+    name: admin.contact-submissions
+    page: admin/resource
+
+  - id: route:_admin_contact_submissions_save
+    type: route
+    method: POST
+    path: "/admin/contact_submissions/save"
+    action: AdminController@saveContactSubmission
+    name: admin.contact-submissions.save
+    page: admin/resource
+
+  - id: route:_admin_contact_submissions_delete
+    type: route
+    method: POST
+    path: "/admin/contact_submissions/delete"
+    action: AdminController@deleteContactSubmission
+    name: admin.contact-submissions.delete
+    page: admin/resource
+
+  - id: route:_admin_email-inbox
+    type: route
+    method: GET
+    path: "/admin/email-inbox"
+    action: AdminController@emailInbox
+    name: admin.email-inbox
+    page: admin/mailbox
+
+  - id: route:_admin_email-outbox
+    type: route
+    method: GET
+    path: "/admin/email-outbox"
+    action: AdminController@emailOutbox
+    name: admin.email-outbox
+    page: admin/mailbox
+
+  - id: route:_admin_support-tickets
+    type: route
+    method: GET
+    path: "/admin/support-tickets"
+    action: AdminController@supportTickets
+    name: admin.support-tickets
+    page: admin/list
+
+  - id: route:_admin_support-tickets_save
+    type: route
+    method: POST
+    path: "/admin/support-tickets/save"
+    action: AdminController@saveSupportTicket
+    name: admin.support-tickets.save
+    page: admin/list
+
+  - id: route:_admin_appearance
+    type: route
+    method: GET
+    path: "/admin/appearance"
+    action: AdminController@appearance
+    name: admin.appearance
+    page: admin/appearance
+
+  - id: route:_admin_appearance_save
+    type: route
+    method: POST
+    path: "/admin/appearance/save"
+    action: AdminController@saveAppearance
+    name: admin.appearance.save
+    page: admin/appearance
+
+  - id: route:_admin_media
+    type: route
+    method: GET
+    path: "/admin/media"
+    action: AdminController@media
+    name: admin.media
+    page: admin/media
+
+  - id: route:_admin_media_upload
+    type: route
+    method: POST
+    path: "/admin/media/upload"
+    action: AdminController@uploadMedia
+    name: admin.media.upload
+    page: admin/media
+
+  - id: route:_admin_environment
+    type: route
+    method: GET
+    path: "/admin/environment"
+    action: AdminController@environment
+    name: admin.environment
+    page: admin/environment
+
+  - id: route:_admin_environment_save
+    type: route
+    method: POST
+    path: "/admin/environment/save"
+    action: AdminController@saveEnvironment
+    name: admin.environment.save
+    page: admin/environment
+
+  - id: route:_admin_environment_fix-permissions
+    type: route
+    method: POST
+    path: "/admin/environment/fix-permissions"
+    action: AdminController@fixPermissions
+    name: admin.environment.fix-permissions
+    page: admin/environment
+
+  - id: route:_admin_developer_project-map
+    type: route
+    method: GET
+    path: "/admin/developer/project-map"
+    action: AdminController@projectMap
+    name: admin.project-map
+    page: admin/project-map
+
+  - id: route:_admin_developer_workflow
+    type: route
+    method: GET
+    path: "/admin/developer/workflow"
+    action: AdminController@workflow
+    name: admin.workflow
+    page: admin/workflow
+
+  - id: route:_admin_products_save
+    type: route
+    method: POST
+    path: "/admin/products/save"
+    action: AdminController@saveProduct
+    name: admin.products.save
+    page: admin/product-form
+
+  - id: route:_admin_products_delete
+    type: route
+    method: POST
+    path: "/admin/products/delete"
+    action: AdminController@deleteProduct
+    name: admin.products.delete
+    page: admin/product-form
+
+  - id: route:_admin_categories_save
+    type: route
+    method: POST
+    path: "/admin/categories/save"
+    action: AdminController@saveCategory
+    name: admin.categories.save
+    page: admin/resource
+
+  - id: route:_admin_categories_delete
+    type: route
+    method: POST
+    path: "/admin/categories/delete"
+    action: AdminController@deleteCategory
+    name: admin.categories.delete
+    page: admin/resource
+
+  - id: route:_admin_coupons_save
+    type: route
+    method: POST
+    path: "/admin/coupons/save"
+    action: AdminController@saveCoupon
+    name: admin.coupons.save
+    page: admin/resource
+
+  - id: route:_admin_coupons_delete
+    type: route
+    method: POST
+    path: "/admin/coupons/delete"
+    action: AdminController@deleteCoupon
+    name: admin.coupons.delete
+    page: admin/resource
+
+  - id: route:_admin_temples_save
+    type: route
+    method: POST
+    path: "/admin/temples/save"
+    action: AdminController@saveTemple
+    name: admin.temples.save
+    page: admin/resource
+
+  - id: route:_admin_temples_delete
+    type: route
+    method: POST
+    path: "/admin/temples/delete"
+    action: AdminController@deleteTemple
+    name: admin.temples.delete
+    page: admin/resource
+
+  - id: route:_admin_integrations_save
+    type: route
+    method: POST
+    path: "/admin/integrations/save"
+    action: AdminController@saveIntegrations
+    name: admin.integrations.save
+    page: admin/integrations
+
+  - id: route:_cart_add
+    type: route
+    method: POST
+    path: "/cart/add"
+    action: CommerceController@addToCart
+    name: cart.add
+    page: public/cart
+
+  - id: route:_cart_remove
+    type: route
+    method: POST
+    path: "/cart/remove"
+    action: CommerceController@removeFromCart
+    name: cart.remove
+    page: public/cart
+
+  - id: route:_cart_update
+    type: route
+    method: POST
+    path: "/cart/update"
+    action: CommerceController@updateCart
+    name: cart.update
+    page: public/cart
+
+  - id: route:_checkout_create-order
+    type: route
+    method: POST
+    path: "/checkout/create-order"
+    action: CommerceController@createOrder
+    name: checkout.create-order
+    page: public/checkout
+
+  - id: route:_payment_verify
+    type: route
+    method: POST
+    path: "/payment/verify"
+    action: CommerceController@verifyPayment
+    name: payment.verify
+    page: public/checkout
+
+  - id: route:_create-order
+    type: route
+    method: POST
+    path: "/create-order"
+    action: CommerceController@createOrder
+    name: api.checkout.create-order
+    page: public/checkout
+
+  - id: route:_verify-payment
+    type: route
+    method: POST
+    path: "/verify-payment"
+    action: CommerceController@verifyPayment
+    name: api.payment.verify
+    page: public/checkout
+
+  - id: route:_reviews_product
+    type: route
+    method: POST
+    path: "/reviews/product"
+    action: ReviewController@saveProduct
+    name: reviews.product
+    page: account/orders
+
+  - id: route:_support
+    type: route
+    method: GET
+    path: "/support"
+    action: SupportController@page
+    name: support.page
+    page: public/support
+
+  - id: route:_support_ask
+    type: route
+    method: POST
+    path: "/support/ask"
+    action: SupportController@ask
+    name: support.ask
+    page: public/support
+
+  - id: route:_docs
+    type: route
+    method: GET
+    path: "/docs"
+    action: PublicController@docs
+    name: docs.index
+    page: public/blog
+
+  - id: route:_help_{slug}
+    type: route
+    method: GET
+    path: "/help/{slug}"
+    action: PublicController@doc
+    name: help.show
+    page: public/blog-post
+
+  - id: route:_remoteDB
+    type: route
+    method: POST
+    path: "/remoteDB"
+    action: RemoteDbController@__invoke
+    name: api.remotedb
+    page: public/404
+
+  - id: route:_blog
+    type: route
+    method: GET
+    path: "/blog"
+    action: BlogController@index
+    name: blog.index
+    page: public/blog
+
+  - id: route:_blog_{slug}
+    type: route
+    method: GET
+    path: "/blog/{slug}"
+    action: BlogController@show
+    name: blog.show
+    page: public/blog-post
+
+  - id: route:_blog_category_{slug}
+    type: route
+    method: GET
+    path: "/blog/category/{slug}"
+    action: BlogController@category
+    name: blog.category
+    page: public/blog
+
+  - id: route:_admin_blog
+    type: route
+    method: GET
+    path: "/admin/blog"
+    action: AdminController@blog
+    name: admin.blog
+    page: admin/blog
+
+  - id: route:_admin_blog_save
+    type: route
+    method: POST
+    path: "/admin/blog/save"
+    action: AdminController@saveBlog
+    name: admin.blog.save
+    page: admin/blog
+
+  - id: route:_admin_blog_delete
+    type: route
+    method: POST
+    path: "/admin/blog/delete"
+    action: AdminController@deleteBlog
+    name: admin.blog.delete
+    page: admin/blog
+
+  - id: route:_admin_blog_preview
+    type: route
+    method: POST
+    path: "/admin/blog/preview"
+    action: AdminController@previewBlog
+    name: admin.blog.preview
+    page: admin/blog
+
+  - id: route:_admin_blog_ai-draft
+    type: route
+    method: POST
+    path: "/admin/blog/ai-draft"
+    action: AdminController@aiDraftBlog
+    name: admin.blog.ai-draft
+    page: admin/blog
+
+  - id: route:_api_agent
+    type: route
+    method: POST
+    path: "/api/agent"
+    action: AgentController@ask
+    name: api.agent
+    page: public/404
+
+  - id: route:_chat_completions
+    type: route
+    method: POST
+    path: "/chat/completions"
+    action: AiChatController@chat
+    name: api.chat.completions
+    page: public/404
+
+  - id: route:_chat_tools
+    type: route
+    method: GET
+    path: "/chat/tools"
+    action: AiChatController@tools
+    name: api.chat.tools
+    page: public/404
+
+  - id: route:_models
+    type: route
+    method: GET
+    path: "/models"
+    action: McpController@models
+    name: api.models.list
+    page: public/404
+
+  - id: route:_mcp
+    type: route
+    method: POST
+    path: "/mcp"
+    action: McpController@handle
+    name: api.mcp
+    page: public/404
+
+  - id: route:_mcp_tools_list
+    type: route
+    method: POST
+    path: "/mcp/tools/list"
+    action: McpController@listTools
+    name: api.mcp.tools.list
+    page: public/404
+
+  - id: route:_mcp_tools_call
+    type: route
+    method: POST
+    path: "/mcp/tools/call"
+    action: McpController@callTool
+    name: api.mcp.tools.call
+    page: public/404
+
+  - id: route:_api_support_latest-message
+    type: route
+    method: GET
+    path: "/api/support/latest-message"
+    action: SupportController@latestMessage
+    name: api.support.latest
+    page: public/404
+
+  - id: service:AddressService
+    type: service
+    title: AddressService
+    resource: app/Services/AddressService.php
+
+  - id: service:AgentContextService
+    type: service
+    title: AgentContextService
+    resource: app/Services/AgentContextService.php
+
+  - id: service:AiService
+    type: service
+    title: AiService
+    resource: app/Services/AiService.php
+
+  - id: service:AppointmentService
+    type: service
+    title: AppointmentService
+    resource: app/Services/AppointmentService.php
+
+  - id: service:AuditLogService
+    type: service
+    title: AuditLogService
+    resource: app/Services/AuditLogService.php
+
+  - id: service:AuthService
+    type: service
+    title: AuthService
+    resource: app/Services/AuthService.php
+
+  - id: service:BlogDraftService
+    type: service
+    title: BlogDraftService
+    resource: app/Services/BlogDraftService.php
+
+  - id: service:BlogService
+    type: service
+    title: BlogService
+    resource: app/Services/BlogService.php
+
+  - id: service:CartService
+    type: service
+    title: CartService
+    resource: app/Services/CartService.php
+
+  - id: service:CategoryService
+    type: service
+    title: CategoryService
+    resource: app/Services/CategoryService.php
+
+  - id: service:ConsultationService
+    type: service
+    title: ConsultationService
+    resource: app/Services/ConsultationService.php
+
+  - id: service:ContactService
+    type: service
+    title: ContactService
+    resource: app/Services/ContactService.php
+
+  - id: service:CouponService
+    type: service
+    title: CouponService
+    resource: app/Services/CouponService.php
+
+  - id: service:CourseService
+    type: service
+    title: CourseService
+    resource: app/Services/CourseService.php
+
+  - id: service:DatabaseService
+    type: service
+    title: DatabaseService
+    resource: app/Services/DatabaseService.php
+
+  - id: service:DocsMapService
+    type: service
+    title: DocsMapService
+    resource: app/Services/DocsMapService.php
+
+  - id: service:EnvService
+    type: service
+    title: EnvService
+    resource: app/Services/EnvService.php
+
+  - id: service:GitHubDocService
+    type: service
+    title: GitHubDocService
+    resource: app/Services/GitHubDocService.php
+
+  - id: service:ImageOptimizerService
+    type: service
+    title: ImageOptimizerService
+    resource: app/Services/ImageOptimizerService.php
+
+  - id: service:MailQueueService
+    type: service
+    title: MailQueueService
+    resource: app/Services/MailQueueService.php
+
+  - id: service:MailStorageService
+    type: service
+    title: MailStorageService
+    resource: app/Services/MailStorageService.php
+
+  - id: service:MarkdownRenderer
+    type: service
+    title: MarkdownRenderer
+    resource: app/Services/MarkdownRenderer.php
+
+  - id: service:MediaService
+    type: service
+    title: MediaService
+    resource: app/Services/MediaService.php
+
+  - id: service:OrderService
+    type: service
+    title: OrderService
+    resource: app/Services/OrderService.php
+
+  - id: service:PasswordResetService
+    type: service
+    title: PasswordResetService
+    resource: app/Services/PasswordResetService.php
+
+  - id: service:PaymentService
+    type: service
+    title: PaymentService
+    resource: app/Services/PaymentService.php
+
+  - id: service:ProductService
+    type: service
+    title: ProductService
+    resource: app/Services/ProductService.php
+
+  - id: service:ProjectMapService
+    type: service
+    title: ProjectMapService
+    resource: app/Services/ProjectMapService.php
+
+  - id: service:RateLimiter
+    type: service
+    title: RateLimiter
+    resource: app/Services/RateLimiter.php
+
+  - id: service:ResourceService
+    type: service
+    title: ResourceService
+    resource: app/Services/ResourceService.php
+
+  - id: service:ReviewService
+    type: service
+    title: ReviewService
+    resource: app/Services/ReviewService.php
+
+  - id: service:SchemaService
+    type: service
+    title: SchemaService
+    resource: app/Services/SchemaService.php
+
+  - id: service:SecretService
+    type: service
+    title: SecretService
+    resource: app/Services/SecretService.php
+
+  - id: service:SeoService
+    type: service
+    title: SeoService
+    resource: app/Services/SeoService.php
+
+  - id: service:SettingsService
+    type: service
+    title: SettingsService
+    resource: app/Services/SettingsService.php
+
+  - id: service:ShippingService
+    type: service
+    title: ShippingService
+    resource: app/Services/ShippingService.php
+
+  - id: service:SmtpMailer
+    type: service
+    title: SmtpMailer
+    resource: app/Services/SmtpMailer.php
+
+  - id: service:StoragePermissionService
+    type: service
+    title: StoragePermissionService
+    resource: app/Services/StoragePermissionService.php
+
+  - id: service:SupportBotService
+    type: service
+    title: SupportBotService
+    resource: app/Services/SupportBotService.php
+
+  - id: service:SupportTicketService
+    type: service
+    title: SupportTicketService
+    resource: app/Services/SupportTicketService.php
+
+  - id: service:TaxService
+    type: service
+    title: TaxService
+    resource: app/Services/TaxService.php
+
+  - id: service:TempleService
+    type: service
+    title: TempleService
+    resource: app/Services/TempleService.php
+
+  - id: controller:AccountController
+    type: controller
+    title: AccountController
+    resource: app/Controllers/AccountController.php
+
+  - id: controller:AdminController
+    type: controller
+    title: AdminController
+    resource: app/Controllers/AdminController.php
+
+  - id: controller:AgentController
+    type: controller
+    title: AgentController
+    resource: app/Controllers/AgentController.php
+
+  - id: controller:AiChatController
+    type: controller
+    title: AiChatController
+    resource: app/Controllers/AiChatController.php
+
+  - id: controller:ApiController
+    type: controller
+    title: ApiController
+    resource: app/Controllers/ApiController.php
+
+  - id: controller:AuthController
+    type: controller
+    title: AuthController
+    resource: app/Controllers/AuthController.php
+
+  - id: controller:BaseController
+    type: controller
+    title: BaseController
+    resource: app/Controllers/BaseController.php
+
+  - id: controller:BlogController
+    type: controller
+    title: BlogController
+    resource: app/Controllers/BlogController.php
+
+  - id: controller:CommerceController
+    type: controller
+    title: CommerceController
+    resource: app/Controllers/CommerceController.php
+
+  - id: controller:ConsultationController
+    type: controller
+    title: ConsultationController
+    resource: app/Controllers/ConsultationController.php
+
+  - id: controller:McpController
+    type: controller
+    title: McpController
+    resource: app/Controllers/McpController.php
+
+  - id: controller:PublicController
+    type: controller
+    title: PublicController
+    resource: app/Controllers/PublicController.php
+
+  - id: controller:RemoteDbController
+    type: controller
+    title: RemoteDbController
+    resource: app/Controllers/RemoteDbController.php
+
+  - id: controller:ReviewController
+    type: controller
+    title: ReviewController
+    resource: app/Controllers/ReviewController.php
+
+  - id: controller:SupportController
+    type: controller
+    title: SupportController
+    resource: app/Controllers/SupportController.php
+
+  - id: schema:users
+    type: schema
+    title: users
+    resource: storage/schema/collections.php
+
+  - id: schema:addresses
+    type: schema
+    title: addresses
+    resource: storage/schema/collections.php
+
+  - id: schema:products
+    type: schema
+    title: products
+    resource: storage/schema/collections.php
+
+  - id: schema:temples
+    type: schema
+    title: temples
+    resource: storage/schema/collections.php
+
+  - id: schema:orders
+    type: schema
+    title: orders
+    resource: storage/schema/collections.php
+
+  - id: schema:appointments
+    type: schema
+    title: appointments
+    resource: storage/schema/collections.php
+
+  - id: schema:wallet_transactions
+    type: schema
+    title: wallet_transactions
+    resource: storage/schema/collections.php
+
+  - id: schema:support_tickets
+    type: schema
+    title: support_tickets
+    resource: storage/schema/collections.php
+
+  - id: schema:categories
+    type: schema
+    title: categories
+    resource: storage/schema/collections.php
+
+  - id: schema:coupons
+    type: schema
+    title: coupons
+    resource: storage/schema/collections.php
+
+  - id: schema:audit_events
+    type: schema
+    title: audit_events
+    resource: storage/schema/collections.php
+
+  - id: schema:mail_queue
+    type: schema
+    title: mail_queue
+    resource: storage/schema/collections.php
+
+  - id: schema:mail_inbox
+    type: schema
+    title: mail_inbox
+    resource: storage/schema/collections.php
+
+  - id: schema:mail_outbox
+    type: schema
+    title: mail_outbox
+    resource: storage/schema/collections.php
+
+  - id: schema:reviews
+    type: schema
+    title: reviews
+    resource: storage/schema/collections.php
+
+  - id: schema:settings
+    type: schema
+    title: settings
+    resource: storage/schema/collections.php
+
+  - id: schema:contact_submissions
+    type: schema
+    title: contact_submissions
+    resource: storage/schema/collections.php
+
+  - id: schema:media_files
+    type: schema
+    title: media_files
+    resource: storage/schema/collections.php
+
+  - id: schema:secrets
+    type: schema
+    title: secrets
+    resource: storage/schema/collections.php
+
+  - id: skill:bapxphp-cli
+    type: skill
+    title: bapxphp-cli
+    description: Use bapXaura CLI for ALL file/content/db operations. Never use raw shell/edit/write/find/grep tools directly.
+    resource: ".agents/skills/bapxphp-cli/SKILL.md"
+
+  - id: image:assets_images_auraedu-favicon_svg
+    type: image
+    title: auraedu-favicon.svg
+    resource: assets/images/auraedu-favicon.svg
+
+  - id: image:assets_images_bapXfavicon_png
+    type: image
+    title: bapXfavicon.png
+    resource: assets/images/bapXfavicon.png
+
+  - id: image:assets_images_brand_favicon_png
+    type: image
+    title: favicon.png
+    resource: assets/images/brand/favicon.png
+
+  - id: image:assets_images_brand_logo_png
+    type: image
+    title: logo.png
+    resource: assets/images/brand/logo.png
+
+  - id: image:assets_images_current-header_png
+    type: image
+    title: current-header.png
+    resource: assets/images/current-header.png
+
+  - id: image:assets_images_institute_esic-students_jpg
+    type: image
+    title: esic-students.jpg
+    resource: assets/images/institute/esic-students.jpg
+
+  - id: image:assets_images_institute_free-medical-camp_jpg
+    type: image
+    title: free-medical-camp.jpg
+    resource: assets/images/institute/free-medical-camp.jpg
+
+  - id: image:assets_images_institute_lab-students_jpg
+    type: image
+    title: lab-students.jpg
+    resource: assets/images/institute/lab-students.jpg
+
+  - id: image:assets_images_institute_maps-campus-building_jpg
+    type: image
+    title: maps-campus-building.jpg
+    resource: assets/images/institute/maps-campus-building.jpg
+
+  - id: image:assets_images_institute_maps-hospital-front_jpg
+    type: image
+    title: maps-hospital-front.jpg
+    resource: assets/images/institute/maps-hospital-front.jpg
+
+  - id: image:assets_images_institute_maps-hospital-interior_jpg
+    type: image
+    title: maps-hospital-interior.jpg
+    resource: assets/images/institute/maps-hospital-interior.jpg
+
+  - id: image:assets_images_institute_medical-students_jpg
+    type: image
+    title: medical-students.jpg
+    resource: assets/images/institute/medical-students.jpg
+
+  - id: image:assets_images_institute_student-group_jpg
+    type: image
+    title: student-group.jpg
+    resource: assets/images/institute/student-group.jpg
+
+  - id: image:assets_images_institute_students-campus_jpg
+    type: image
+    title: students-campus.jpg
+    resource: assets/images/institute/students-campus.jpg
+
+  - id: image:assets_images_og-image_jpg
+    type: image
+    title: og-image.jpg
+    resource: assets/images/og-image.jpg
+

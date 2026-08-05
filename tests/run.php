@@ -434,6 +434,40 @@ $tests['courier tracking uses the seven fixed courier links and requires a couri
 };
 
 
+$tests['md files carry yaml frontmatter and a queryable okf index.yaml exists'] = function (): void {
+    $root = app_path();
+
+    $missing = [];
+    $mdIt = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/docs', FilesystemIterator::SKIP_DOTS));
+    foreach ($mdIt as $f) {
+        if ($f->getExtension() !== 'md') continue;
+        $first = trim((string)file_get_contents($f->getPathname(), false, null, 0, 4));
+        if (!str_starts_with($first, '---')) $missing[] = $f->getFilename();
+    }
+    foreach (glob($root . '/content/**/*.md') ?: [] as $md) {
+        if (!str_starts_with(trim((string)file_get_contents($md, false, null, 0, 4)), '---')) $missing[] = str_replace($root . '/', '', $md);
+    }
+    foreach (['README.md', 'assets/images/institute/ATTRIBUTION.md'] as $md) {
+        if (!str_starts_with(trim((string)file_get_contents($root . '/' . $md, false, null, 0, 4)), '---')) $missing[] = $md;
+    }
+    assertSame([], $missing, 'Every md file under docs/, content/ and the root/asset READMEs must start with a yaml frontmatter block');
+
+    $index = file_get_contents($root . '/index.yaml');
+    assertTrue(str_contains($index, 'format: auraedu-knowledge-index'), 'index.yaml must declare its format');
+    assertTrue(str_contains($index, 'type: route'), 'index.yaml must index routes');
+    assertTrue(str_contains($index, 'type: blog'), 'index.yaml must index blog posts');
+    assertTrue(str_contains($index, 'type: schema'), 'index.yaml must index schema collections');
+    assertTrue(str_contains($index, 'summary:'), 'index.yaml must carry a summary');
+
+    foreach (['docs', 'content/blog/posts', 'content/legal'] as $dir) {
+        assertTrue(is_file($root . '/' . $dir . '/index.yaml'), $dir . '/index.yaml must exist');
+    }
+
+    exec('php ' . escapeshellarg($root . '/cli/generate-okf-index.php') . ' write 2>&1', $sql2);
+    assertSame(file_get_contents($root . '/index.yaml'), $index, 'index.yaml must be regenerated idempotently');
+};
+
+
 $tests['admin failures surface the real error instead of a generic flash'] = function (): void {
     $src = file_get_contents(app_path('app/Controllers/AdminController.php'));
     assertTrue(str_contains($src, "error_log('Admin order status update failed: ' . \$e->getMessage())"), 'Order status failures must be logged with the real message');

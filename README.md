@@ -1,3 +1,9 @@
+---
+type: readme
+title: AuraEdu
+description: PHP 8.3 and MySQL application for Aura Medical Institute of Electropathy and Hospital.
+category: root
+---
 # AuraEdu
 
 PHP 8.3 and MySQL application for Aura Medical Institute of Electropathy and Hospital.
