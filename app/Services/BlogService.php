@@ -9,11 +9,14 @@ final class BlogService {
         $this->categoriesFile = app_path('content/blog/categories.yaml');
         if (!is_dir($this->postsDir)) mkdir($this->postsDir, 0775, true);
     }
-    public function all(): array {
+    /** @param bool $all true for the admin, which must see hidden posts to unhide them. */
+    public function all(bool $all = false): array {
         $posts = [];
         foreach (glob($this->postsDir . '/*.md') ?: [] as $file) {
             $post = $this->parseFile($file);
-            if ($post) $posts[] = $post;
+            if (!$post) continue;
+            if (!$all && empty($post['published'])) continue;
+            $posts[] = $post;
         }
         usort($posts, fn($a, $b) => strcmp($b['published_at'] ?? '', $a['published_at'] ?? ''));
         return $posts;

@@ -56,6 +56,19 @@
         <td><?= e($post['published_at'] ?? '') ?></td>
         <td>
             <button class="btn btn-sm btn-ghost" onclick="editPost(<?= e(json_encode($post)) ?>)">Edit</button>
+            <?php $__live = !empty($post['published']); ?>
+            <form method="post" action="/admin/blog/toggle" style="display:inline">
+                <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                <input type="hidden" name="slug" value="<?= e($post['slug'] ?? '') ?>">
+                <button class="btn btn-sm btn-ghost" title="<?= $__live ? 'Hide from the site' : 'Publish to the site' ?>"
+                        aria-label="<?= $__live ? 'Hide post' : 'Publish post' ?>">
+                    <?php if ($__live): ?>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <?php else: ?>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    <?php endif; ?>
+                </button>
+            </form>
             <form method="post" action="/admin/blog/delete" style="display:inline" onsubmit="return confirm('Delete this post?')">
                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                 <input type="hidden" name="slug" value="<?= e($post['slug'] ?? '') ?>">
@@ -69,7 +82,7 @@
 
 <script>
 function toggleForm(){var f=document.getElementById('blog-form');f.hidden=!f.hidden;if(f.hidden)f.reset();}
-function editPost(post){document.getElementById('edit-slug').value=post.slug||'';document.getElementById('edit-slug-display').value=post.slug||'';document.getElementById('edit-type').value=post.type||'blog';document.getElementById('edit-title').value=post.title||'';document.getElementById('edit-category').value=post.category||'';document.getElementById('edit-template').value=post.template||'editorial';document.getElementById('edit-image').value=post.og_image||post.image||'';document.getElementById('edit-image-alt').value=post.image_alt||'';document.getElementById('edit-source-url').value=post.source_url||'';document.getElementById('edit-summary').value=post.summary||post.excerpt||'';document.getElementById('edit-order').value=post.order||'';document.getElementById('edit-excerpt').value=post.excerpt||'';document.getElementById('edit-date').value=post.published_at||'';document.getElementById('edit-author').value=post.author||'Admin';document.getElementById('edit-content').value=post.content||'';document.getElementById('blog-form').hidden=false;}
+function editPost(post){document.getElementById('edit-slug').value=post.slug||'';document.getElementById('edit-slug-display').value=post.slug||'';document.getElementById('edit-type').value=post.type||'blog';document.getElementById('edit-title').value=post.title||'';document.getElementById('edit-category').value=post.category||'';document.getElementById('edit-template').value=post.template||'editorial';document.getElementById('edit-image').value=post.og_image||post.image||'';document.getElementById('edit-image-alt').value=post.image_alt||'';document.getElementById('edit-source-url').value=post.source_url||'';document.getElementById('edit-summary').value=post.summary||post.excerpt||'';document.getElementById('edit-order').value=post.order||'';document.getElementById('edit-excerpt').value=post.excerpt||'';document.getElementById('edit-date').value=post.published_at||'';document.getElementById('edit-author').value=post.author||'Admin';document.getElementById('edit-content').value=post.content||'';document.getElementById('blog-form').hidden=false;document.getElementById('blog-form').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('edit-title').focus();}
 document.getElementById('edit-title').addEventListener('input',function(){var slug=this.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');document.getElementById('edit-slug').value=slug;document.getElementById('edit-slug-display').value=slug;});
 function previewArticle(){var f=document.getElementById('blog-form');var fd=new FormData(f);fetch('/admin/blog/preview',{method:'POST',body:fd}).then(function(r){return r.text();}).then(function(html){var w=window.open('','_blank');w.document.write(html);w.document.close();});}
 function generateDraft(){var f=document.getElementById('blog-form');var fd=new FormData(f);fd.set('content','');fetch('/admin/blog/ai-draft',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){if(d.content)document.getElementById('edit-content').value=d.content;});}

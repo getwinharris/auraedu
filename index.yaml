@@ -29,8 +29,8 @@ summary:
   doc: 35
   blog: 9
   legal: 2
-  route: 126
-  service: 42
+  route: 127
+  service: 43
   controller: 15
   schema: 19
   skill: 9
@@ -1283,6 +1283,14 @@ concepts:
     name: admin.blog.save
     page: admin/blog
 
+  - id: route:_admin_blog_toggle
+    type: route
+    method: POST
+    path: "/admin/blog/toggle"
+    action: AdminController@toggleBlog
+    name: admin.blog.toggle
+    page: admin/blog
+
   - id: route:_admin_blog_delete
     type: route
     method: POST
@@ -1380,6 +1388,11 @@ concepts:
     type: service
     title: AgentContextService
     resource: app/Services/AgentContextService.php
+
+  - id: service:AiReplyCleaner
+    type: service
+    title: AiReplyCleaner
+    resource: app/Services/AiReplyCleaner.php
 
   - id: service:AiService
     type: service

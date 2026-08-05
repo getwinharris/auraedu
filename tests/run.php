@@ -433,6 +433,38 @@ $tests['courier tracking uses the seven fixed courier links and requires a couri
     assertTrue(str_contains($accountView, 'Track parcel'), 'Customer orders view must expose the courier track link');
 };
 
+$tests['agent replies never expose the model reasoning scaffold'] = function (): void {
+    $cleaner = new \App\Services\AiReplyCleaner();
+
+    $leaked = "* Role: AI assistant for the site (admin AI assistant).\n"
+        . "* Context: Provided site data (users, orders, products, etc.).\n"
+        . "* Constraint: Answer concisely in Markdown.\n"
+        . "* Question: \"are you a LLM?\"\n\n"
+        . "* The user is asking about my nature/identity.\n"
+        . "* I am indeed a Large Language Model (LLM).\n\n"
+        . "* Concise.\n* Markdown.\n";
+    $clean = $cleaner->clean($leaked, '');
+    foreach (['Role:', 'Context:', 'Constraint:', 'Question:', 'The user is asking', 'Concise'] as $scaffold) {
+        assertTrue(!str_contains($clean, $scaffold), "Scaffold must be removed: {$scaffold}");
+    }
+    assertTrue(str_contains($clean, 'Large Language Model'), 'The actual answer must survive');
+
+    // "Direct answer: X" wraps a real answer — keep X.
+    assertTrue(str_contains($cleaner->clean("* Direct answer: Revenue is Rs 5,489.", ''), 'Revenue is Rs 5,489.'),
+        'A labelled direct answer must be unwrapped, not dropped');
+
+    // Ordinary prose that merely contains a label word must survive.
+    $prose = 'The role of a consultant here is separate from products.';
+    assertTrue(str_contains($cleaner->clean($prose, ''), 'role of a consultant'),
+        'Prose containing a label word must not be treated as scaffold');
+
+    // Both agents must share this one implementation.
+    assertTrue(str_contains(file_get_contents(app_path('app/Services/SupportBotService.php')), 'AiReplyCleaner'),
+        'Support bot should delegate to the shared cleaner');
+    assertTrue(str_contains(file_get_contents(app_path('app/Controllers/AdminController.php')), 'AiReplyCleaner'),
+        'Admin agent should delegate to the shared cleaner');
+};
+
 $tests['remote database failures are loud, cached and never recurse into self'] = function (): void {
     $service = file_get_contents(app_path('app/Services/DatabaseService.php'));
     $controller = file_get_contents(app_path('app/Controllers/RemoteDbController.php'));
