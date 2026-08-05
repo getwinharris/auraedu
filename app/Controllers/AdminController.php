@@ -52,7 +52,7 @@ final class AdminController extends BaseController {
         } catch (\Throwable $e) {
             // Never swallow the real cause. A generic flash left the owner guessing and
             // gave no log trail when a save failed for a reason other than validation.
-            error_log('Admin order status update failed: ' . $e->getMessage());
+            error_log(sprintf('Admin order status update failed for order %s: %s%s%s', $id, $e->getMessage(), PHP_EOL, $e->getTraceAsString()));
             $this->flash('Unable to update order status: ' . $e->getMessage(),'error');
         }
         $this->redirect('/admin/orders/'.$id);
@@ -174,7 +174,7 @@ final class AdminController extends BaseController {
                 (new \App\Services\SupportTicketService())->reply($id, $reply);
                 $this->flash('Reply saved.','success');
             } catch (\Throwable $e) {
-                error_log('Admin reply save failed: ' . $e->getMessage());
+                error_log(sprintf('Admin reply save failed for ticket %s by admin %s: %s%s%s', $id, $_SESSION['admin']['name'] ?? ($_SESSION['user_id'] ?? 'unknown'), $e->getMessage(), PHP_EOL, $e->getTraceAsString()));
                 $this->flash('Unable to save reply: ' . $e->getMessage(),'error');
             }
         }
