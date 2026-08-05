@@ -2,6 +2,13 @@
 namespace App\Services;
 final class DatabaseService {
     /**
+     * Request-level cache for remote reads. Several services query the same table (a
+     * page, an admin screen, a support context) and each used to make its own HTTP call
+     * back to the remote bridge, so one render could fire the same SELECT many times.
+     * Mutations clear it so nothing goes stale within the request.
+     */
+    private static array $remoteQueryCache = [];
+    /**
      * One PDO per request, shared by every DatabaseService instance. Several services and
      * controllers construct their own DatabaseService and each used to open its own MySQL
      * connection plus a TCP socket probe, so a single page render could open a dozen
@@ -13,7 +20,7 @@ final class DatabaseService {
     private ?\PDO $pdo = null;
     private ?bool $remoteOnly = null;
     private array $cfg = [];
-    public function __construct() {
+    public function __construct(private bool $forceDirect = false) {
         $this->cfg = require app_path('config/database.php');
     }
 
@@ -22,8 +29,10 @@ final class DatabaseService {
     }
 
     private function remoteCall(string $sql, array $params = []): array {
-        $payload = array_filter(['query' => $sql, 'params' => $params, 'password' => $this->cfg['remote_db_password'] ?? '']);
-        $payload = json_encode($payload);
+        $cacheKey = hash('sha256', (string)$this->cfg['remote_url'] . "\0" . $sql . "\0" . serialize($params));
+        if (array_key_exists($cacheKey, self::$remoteQueryCache)) return self::$remoteQueryCache[$cacheKey];
+
+        $payload = json_encode(array_filter(['query' => $sql, 'params' => $params, 'password' => $this->cfg['remote_db_password'] ?? '']), JSON_THROW_ON_ERROR);
         $ch = curl_init($this->cfg['remote_url']);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
@@ -33,11 +42,21 @@ final class DatabaseService {
         ]);
         $body = @curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ($body === false || $code !== 200) {
-            return [];
+        $transportError = $body === false ? curl_error($ch) : '';
+        // Fail loudly instead of returning []. An empty return used to make a DB outage
+        // look like empty tables: every admin page and shop view silently rendered as if
+        // there were no orders, products or users. A thrown error surfaces the real
+        // cause so a broken bridge is visible, not invisible data loss.
+        if ($body === false) throw new \RuntimeException('Remote database transport failed: ' . ($transportError ?: 'unknown cURL error'));
+        $result = json_decode((string)$body, true);
+        if ($code !== 200) {
+            $message = is_array($result) ? trim((string)($result['error'] ?? '')) : '';
+            throw new \RuntimeException('Remote database request failed with HTTP ' . $code . ($message !== '' ? ': ' . $message : '.'));
         }
-        $result = json_decode($body, true);
-        return $result['data'] ?? [];
+        if (!is_array($result) || empty($result['success']) || !isset($result['data']) || !is_array($result['data'])) {
+            throw new \RuntimeException('Remote database returned an invalid response.');
+        }
+        return self::$remoteQueryCache[$cacheKey] = $result['data'];
     }
 
     private function remoteMutation(string $action, string $table, array $payload): array {
@@ -55,6 +74,8 @@ final class DatabaseService {
         if ($body === false || $code < 200 || $code >= 300 || empty($result['success'])) {
             throw new \RuntimeException((string)($result['error'] ?? 'Remote mutation failed.'));
         }
+        // The write changed the data the cache holds; drop it so reads do not go stale.
+        self::$remoteQueryCache = [];
         return $result;
     }
 
@@ -79,9 +100,27 @@ final class DatabaseService {
 
     private function isRemote(): bool {
         if ($this->remoteOnly !== null) return $this->remoteOnly;
+        if ($this->forceDirect) return $this->remoteOnly = false;
         if (empty($this->cfg['remote_url'])) { $this->remoteOnly = false; return false; }
+        // The bridge is for instances that have no database of their own. When
+        // remote_url points back at the host serving this request, taking it would mean
+        // HTTP-requesting ourselves: the inner request hits the same unavailable MySQL,
+        // returns 500, and the outer one reports a confusing nested failure — while
+        // doubling the connection pressure that caused the problem. Stay direct and let
+        // a real MySQL error surface.
+        if ($this->remoteUrlIsSelf()) { $this->remoteOnly = false; return false; }
         try { $this->db(); $this->remoteOnly = false; return false; }
         catch (\Throwable) { $this->remoteOnly = true; return true; }
+    }
+
+    /** True when remote_url resolves to the host currently serving this request. */
+    private function remoteUrlIsSelf(): bool {
+        $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+        if ($host === '') return false;                       // CLI: no self to compare against
+        $remoteHost = strtolower((string)(parse_url((string)$this->cfg['remote_url'], PHP_URL_HOST) ?: ''));
+        if ($remoteHost === '') return false;
+        $host = preg_replace('/:\d+$/', '', $host) ?? $host;
+        return $remoteHost === $host || $remoteHost === 'www.' . $host || 'www.' . $remoteHost === $host;
     }
 
     public function read(string $table): array {
@@ -100,7 +139,11 @@ final class DatabaseService {
         $this->db()->beginTransaction();
         try {
             $clean = preg_replace('/[^a-z_]/', '', $table);
-            $this->db()->exec("TRUNCATE TABLE {$clean}");
+            // DELETE, not a DDL truncate. Truncation is DDL and triggers an implicit
+            // COMMIT in MySQL, ending the transaction opened above — the later
+            // commit()/rollBack() then fails with "There is no active transaction" and
+            // the whole write is lost.
+            $this->db()->exec("DELETE FROM {$clean}");
             $stmt = $this->db()->prepare("INSERT INTO {$clean} (id, _data, _owner, _status, _created_at, _updated_at) VALUES (?, ?, ?, ?, ?, ?)");
             foreach ($records as $rec) {
                 $id = $rec['id'] ?? bin2hex(random_bytes(8));
@@ -111,6 +154,7 @@ final class DatabaseService {
                 $stmt->execute([$id, json_encode($rec), $owner, $status, $created, $updated]);
             }
             $this->db()->commit();
+            self::$remoteQueryCache = [];
         } catch (\Throwable $e) {
             $this->db()->rollBack();
             throw $e;

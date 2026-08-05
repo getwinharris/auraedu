@@ -56,7 +56,7 @@ final class RemoteDbController {
         }
 
         try {
-            $db = new DatabaseService();
+            $db = new DatabaseService(true);
             $result = $db->query($sql, $params);
             http_response_code(200);
             echo json_encode(['success' => true, 'data' => $result]);
@@ -68,7 +68,7 @@ final class RemoteDbController {
 
     private function initSchema(): void {
         try {
-            $db = new DatabaseService();
+            $db = new DatabaseService(true);
             $pdo = $db->connection();
             $schema = require app_path('storage/schema/collections.php');
             $created = 0;
@@ -103,7 +103,7 @@ final class RemoteDbController {
             return;
         }
         try {
-            $store = new DatabaseService();
+            $store = new DatabaseService(true);
             if ($action === 'upsert') {
                 $record = $input['record'] ?? null;
                 if (!is_array($record) || empty($record['id'])) throw new \InvalidArgumentException('Record id is required.');
