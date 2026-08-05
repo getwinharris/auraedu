@@ -33,7 +33,7 @@ summary:
   service: 42
   controller: 15
   schema: 19
-  skill: 1
+  skill: 9
   image: 15
 concepts:
   - id: doc:docs-README
@@ -1751,11 +1751,59 @@ concepts:
     title: secrets
     resource: storage/schema/collections.php
 
+  - id: skill:admin-ui
+    type: skill
+    title: admin-ui
+    description: "Use when editing owner/admin pages, CRUD forms, media library, environment editor, permissions, audit log, integrations, or admin navigation."
+    resource: ".agents/skills/admin-ui/SKILL.md"
+
+  - id: skill:backend-php-mysql
+    type: skill
+    title: backend-php-mysql
+    description: "Use when editing PHP controllers, services, hosted MySQL persistence, authentication, agent context, orders, reviews, media metadata, payments, or audit behavior."
+    resource: ".agents/skills/backend-php-mysql/SKILL.md"
+
   - id: skill:bapxphp-cli
     type: skill
     title: bapxphp-cli
-    description: Use bapXaura CLI for ALL file/content/db operations. Never use raw shell/edit/write/find/grep tools directly.
+    description: "Use when running or changing the repository-owned bapXaura CLI, including orientation, validation, maps, knowledge indexes, schema, database, logs, blogs, images, and development-user commands."
     resource: ".agents/skills/bapxphp-cli/SKILL.md"
+
+  - id: skill:deployment
+    type: skill
+    title: deployment
+    description: "Use when editing Hostinger deployment, Git auto-deploy, environment, permissions, cron, or production setup documentation."
+    resource: ".agents/skills/deployment/SKILL.md"
+
+  - id: skill:docs
+    type: skill
+    title: docs
+    description: "Use when editing README, docs, project-map docs, or agent-facing instructions."
+    resource: ".agents/skills/docs/SKILL.md"
+
+  - id: skill:frontend-php
+    type: skill
+    title: frontend-php
+    description: "Use when editing public, account, shop, consultant, temple, cart, checkout, contact, support, or other customer-facing PHP templates."
+    resource: ".agents/skills/frontend-php/SKILL.md"
+
+  - id: skill:git
+    type: skill
+    title: git
+    description: "Use plain Git for local history, branches, pushes, and Hostinger deployment checkouts."
+    resource: ".agents/skills/git/SKILL.md"
+
+  - id: skill:remotedb
+    type: skill
+    title: remotedb
+    description: "Use when reading or writing hosted MySQL through the /remotedb HTTP API — querying records, upserting, deleting, or inspecting schema from outside the live server."
+    resource: ".agents/skills/remotedb/SKILL.md"
+
+  - id: skill:schema
+    type: skill
+    title: schema
+    description: "Use when changing MySQL database collections, fields, admin forms, media fields, or agent context payloads."
+    resource: ".agents/skills/schema/SKILL.md"
 
   - id: image:assets_images_auraedu-favicon_svg
     type: image
