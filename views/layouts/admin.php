@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AuraEdu Admin">
-<link rel="apple-touch-icon" href="/assets/images/auraedu-favicon.svg">
+<link rel="apple-touch-icon" href="/assets/images/brand/favicon.png">
 <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>

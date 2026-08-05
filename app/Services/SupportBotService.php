@@ -174,21 +174,33 @@ final class SupportBotService {
         $site = $context['site'] ?? [];
         $pages = $site['pages'] ?? [];
         $products = array_slice($site['products'] ?? [], 0, 5);
+        $courses = $site['courses'] ?? [];
         if (preg_match('/\b(hi|hello|hey|vanakkam|namaste)\b/i', $message)) {
-            return 'Hello. I can help you browse education products, place an order, manage delivery addresses, or request a consultant appointment.';
+            return 'Hello. I can help you browse education products and courses, place an order, manage delivery addresses, or request a consultant appointment.';
+        }
+        if (preg_match('/\b(course|program|programme|degree|diploma|study|admission|b\.e\.m\.s|electropathy|acupuncture|eligibility)\b/i', $message)) {
+            if ($courses === []) return 'I can share details on our education programmes. Open ' . ($pages['courses'] ?? '/courses') . ' to see the full list.';
+            $list = implode(', ', array_map(fn($c) => ($c['title'] ?? '') . ' (' . ($c['short'] ?? '') . ')', $courses));
+            return 'We offer ' . $list . '. Open ' . ($pages['courses'] ?? '/courses') . ' for duration, eligibility, and how to apply.';
+        }
+        if (preg_match('/\b(blog|article|post|news|read|learn about)\b/i', $message)) {
+            $posts = array_slice($site['blog'] ?? [], 0, 3);
+            $names = array_filter(array_map(fn($p) => trim((string)($p['title'] ?? '')), $posts));
+            $list = $names ? implode(', ', $names) : 'our latest articles';
+            return 'You can read ' . $list . ' in the blog. Open ' . ($pages['blog'] ?? '/blog') . ' for all articles and categories.';
         }
         if (preg_match('/\b(product|available|shop|buy|item|pendant|jewelry|jewellery)\b/i', $message)) {
             $names = array_filter(array_map(fn($p) => trim((string)($p['name'] ?? '')), $products));
             $list = $names ? implode(', ', $names) : 'therapy and wellness products';
             return 'Available products include ' . $list . '. Open ' . ($pages['shop'] ?? '/shop') . ' to browse all products, or add an item to cart from its product page.';
         }
-        if (preg_match('/\b(service|consult|booking|book|astrology|call|message|temple)\b/i', $message)) {
-            return 'Available services include education product sales, scheduled consultant appointments, and temple guidance. Open ' . ($pages['consult'] ?? '/consult') . ' to request an appointment.';
+        if (preg_match('/\b(service|consult|booking|book|astrology|call|message|temple|therapist|doctor|hospital)\b/i', $message)) {
+            return 'Available services include scheduled consultant and therapist appointments, education products, and hospital facilities. Open ' . ($pages['consult'] ?? '/consult') . ' to request an appointment.';
         }
         if (preg_match('/\b(recharge|wallet|credit|payment)\b/i', $message)) {
             return 'Product payments are completed securely during checkout. Sign in to reuse saved delivery addresses and view confirmed orders.';
         }
-        return 'I can help with products, checkout, delivery addresses, temple guidance, and consultant bookings. For personal order or booking history, please sign in first.';
+        return 'I can help with courses, products, checkout, delivery addresses, consultant bookings, and the blog. For personal order or booking history, please sign in first.';
     }
 
     private function isPrivateAccountQuestion(string $message): bool {
@@ -204,7 +216,7 @@ final class SupportBotService {
     }
 
     private function extractActions(string $reply): array {
-        preg_match_all('/\/(?:shop|cart|checkout|consult|hospitals|contact|blog(?:\/[a-z0-9-]+|\/category\/[a-z0-9-]+)?|product\/[a-z0-9-]+|account\/dashboard(?:\/orders|\/sessions|\/install)?)(?=[\s.,)\/  ]|$)/i', $reply, $matches);
+        preg_match_all('/\/(?:shop|cart|checkout|consult|hospitals|contact|blog(?:\/[a-z0-9-]+|\/category\/[a-z0-9-]+)?|courses(?:\/[a-z0-9-]+)?|product\/[a-z0-9-]+|account\/dashboard(?:\/orders|\/sessions|\/install)?)(?=[\s.,)\/  ]|$)/i', $reply, $matches);
         $seen = [];
         $actions = [];
         foreach ($matches[0] as $path) {
@@ -218,7 +230,9 @@ final class SupportBotService {
                 $path === '/consult' => 'View Consultants',
                 $path === '/contact' => 'Contact Us',
                 $path === '/hospitals' => 'View Hospitals',
+                $path === '/courses' => 'View Courses',
                 $path === '/blog' => 'Read Blog',
+                str_starts_with($path, '/courses/') => 'View ' . strtoupper(trim(str_replace('/courses/', '', $path))),
                 default => 'Open ' . trim(preg_replace('/^\/+/', '', str_replace(['-', '/'], ' ', $path)))
             };
             $actions[] = ['type' => 'navigate', 'label' => $label, 'path' => $path];

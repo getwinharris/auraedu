@@ -40,17 +40,40 @@ final class AgentContextService {
             'price' => $item['offer_price'] ?? $item['price'] ?? null,
             'stock_status' => $item['stock_status'] ?? '',
         ], array_slice($this->store->read('products'), 0, 20));
+        $courses = array_map(fn($c) => [
+            'slug' => $c['slug'] ?? '',
+            'title' => $c['title'] ?? '',
+            'short' => $c['short'] ?? '',
+            'url' => '/courses/' . ($c['slug'] ?? ''),
+            'duration' => $c['duration'] ?? '',
+            'eligibility' => $c['eligibility'] ?? '',
+        ], (new CourseService())->all());
+        $blog = array_map(fn($p) => [
+            'title' => $p['title'] ?? '',
+            'slug' => $p['slug'] ?? '',
+            'category' => $p['category'] ?? '',
+            'url' => '/blog/' . ($p['slug'] ?? ''),
+            'summary' => $p['summary'] ?? $p['excerpt'] ?? '',
+        ], array_slice((new BlogService())->all(), 0, 10));
         return [
             'pages' => [
                 'shop' => '/shop',
                 'cart' => '/cart',
                 'checkout' => '/checkout',
+                'courses' => '/courses',
                 'consult' => '/consult',
+                'hospitals' => '/hospitals',
+                'blog' => '/blog',
                 'contact' => '/contact',
+                'eligibility' => '/eligibility',
+                'scope' => '/scope',
                 'orders' => '/account/dashboard/orders',
                 'sessions' => '/account/dashboard/sessions',
             ],
             'products' => $products,
+            'courses' => $courses,
+            'blog' => $blog,
+            'catalog_note' => 'Courses (B.E.M.S., M.D.E.H., D.Acu, M.Acu, D.H.M.) are education programmes at Aura Medical Institute. Products are physical therapy/wellness items sold on the shop. Consultant appointments are booked via /consult, and consultants can also be reached through /hospitals.',
             'support_scope' => 'Answer only from this JSON context and public site links. Do not access tools, files, admin data, or other users.',
         ];
     }

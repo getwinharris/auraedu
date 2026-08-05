@@ -16,8 +16,8 @@ alwaysApply: true
 
 ## Map and tests
 
-- `map.mmd` is the repository-wide file index. Regenerate it with `php cli/generate-code-map.php` after adding, moving, or removing files.
-- Use `php cli/generate-code-map.php --check`, PHP lint, and `php tests/run.php` before opening a pull request.
+- `map.mmd` is the repository-wide file index. Regenerate it with `php cli/generate-code-map.php` (or `bapXaura update`) after adding, moving, or removing files.
+- Use `php cli/generate-code-map.php --check`, PHP lint, and `php tests/run.php` (or `bapXaura ci`) before opening a pull request.
 - Inspect the source path that owns a behaviour before changing it; do not create parallel controllers, services, or templates.
 
 ## GitHub workflow

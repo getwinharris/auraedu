@@ -11,7 +11,7 @@
 <?php
 $__settings = (new \App\Services\SettingsService())->public();
 $__logo = $__settings['logo_url'] ?? '/assets/images/brand/logo.png';
-$__favicon = $__settings['favicon_url'] ?? '/assets/images/auraedu-favicon.svg';
+$__favicon = $__settings['favicon_url'] ?? '/assets/images/brand/favicon.png';
 $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png';
 ?>
 <link rel="icon" type="<?= e($__faviconMime) ?>" href="<?= e($__favicon) ?>">
@@ -20,7 +20,7 @@ $__faviconMime = str_contains($__favicon,'.svg') ? 'image/svg+xml' : 'image/png'
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AuraEdu">
-<link rel="apple-touch-icon" href="/assets/images/auraedu-favicon.svg">
+<link rel="apple-touch-icon" href="/assets/images/brand/favicon.png">
 <link rel="canonical" href="https://<?= e($_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']) ?>">
 <meta property="og:type" content="<?= e($seo['og_type'] ?? 'website') ?>">
 <meta property="og:site_name" content="<?= e($seo['og_site_name'] ?? 'AuraEdu') ?>">

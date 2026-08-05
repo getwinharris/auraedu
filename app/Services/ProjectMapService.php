@@ -658,6 +658,11 @@ final class ProjectMapService {
         return str_replace(['\\', '"'], ['\\\\', '\"'], $value);
     }
 
+    private static function relPath(string $path): string {
+        $root = app_path() . '/';
+        return str_starts_with($path, $root) ? substr($path, strlen($root)) : $path;
+    }
+
     private static function nodeId(string $prefix, string $value): string {
         $stable = preg_replace('/[^a-zA-Z0-9]/', '_', $value);
         $stable = preg_replace('/_+/', '_', $stable);

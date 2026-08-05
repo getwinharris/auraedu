@@ -223,16 +223,17 @@ $tests['admin project map view renders'] = function (): void {
     assertTrue(str_contains($contents, 'Routes'), 'Project map should show routes');
 };
 
-$tests['CLI has REPL mode and AI chat'] = function (): void {
+$tests['CLI is web-first essentials'] = function (): void {
     $cli = file_get_contents(app_path('cli/bapXaura'));
-    assertTrue(str_contains($cli, 'cmd_repl()'), 'CLI should have cmd_repl');
-    assertTrue(str_contains($cli, 'ai:'), 'REPL should support ai: prefix');
-    assertTrue(str_contains($cli, 'read -r -e -p'), 'REPL should read user input with bash readline');
+    assertTrue(str_contains($cli, 'cmd_map()'), 'CLI should have map command');
+    assertTrue(str_contains($cli, 'cmd_ci()'), 'CLI should have ci command');
+    assertTrue(!str_contains($cli, 'cmd_repl()'), 'REPL orchestration should be removed');
+    assertTrue(!str_contains($cli, 'cmd_handoff()'), 'handoff orchestration should be removed');
 };
 
 $tests['CLI has map and schema commands'] = function (): void {
     $cli = file_get_contents(app_path('cli/bapXaura'));
-    foreach (['cmd_map', 'cmd_schema', 'cmd_ci', 'cmd_update', 'cmd_hooks'] as $cmd) {
+    foreach (['cmd_map', 'cmd_schema', 'cmd_ci', 'cmd_update', 'cmd_db'] as $cmd) {
         assertTrue(str_contains($cli, $cmd . '()'), "CLI should expose {$cmd}");
     }
 };
@@ -270,7 +271,7 @@ $tests['WORKSPACE route is registered'] = function (): void {
 $tests['AGENTS.md is canonical'] = function (): void {
     assertTrue(is_file(app_path('AGENTS.md')), 'AGENTS.md should exist');
     $agents = file_get_contents(app_path('AGENTS.md'));
-    assertTrue(str_contains($agents, 'Diagnose, Then Issue'), 'AGENTS.md should include diagnose rule');
+    assertTrue(str_contains($agents, 'Lazy Developer'), 'AGENTS.md should include engineering principles');
     assertTrue(str_contains($agents, 'bapXaura update'), 'AGENTS.md should reference CLI update');
     assertTrue(str_contains($agents, 'bapXaura ci'), 'AGENTS.md should reference CLI CI');
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(app_path(), FilesystemIterator::SKIP_DOTS));
@@ -283,13 +284,11 @@ $tests['AGENTS.md is canonical'] = function (): void {
     foreach (['CLAUDE.md', '.codex'] as $path) assertTrue(!file_exists(app_path($path)), "{$path} should not exist");
 };
 
-$tests['systematic map artifacts exist'] = function (): void {
-    assertTrue(is_file(app_path('docs/systematic-map.mmd')), 'Systematic map should exist');
-    assertTrue(is_file(app_path('docs/map.mmd')), 'docs/map.mmd should exist');
+$tests['repository map artifacts exist'] = function (): void {
     assertTrue(is_file(app_path('map.mmd')), 'root map.mmd should exist');
-    $sys = file_get_contents(app_path('docs/systematic-map.mmd'));
-    foreach (['ADMIN Routes', 'Controllers', 'Services', 'Schema Collections', 'Gaps & Missing Links'] as $needle) {
-        assertTrue(str_contains($sys, $needle), "Systematic map should include {$needle}");
+    $map = file_get_contents(app_path('map.mmd'));
+    foreach (['app', 'views', 'controllers', 'services'] as $needle) {
+        assertTrue(str_contains($map, $needle), "map.mmd should include {$needle} section");
     }
 };
 

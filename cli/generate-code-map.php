@@ -57,6 +57,23 @@ foreach ($indexed as $group => $members) {
     $lines[] = '';
 }
 
+// Break out the primary code surface into explicit sections so the
+// map reads as a web product (routes → controllers → services → views).
+$webFirst = [
+    'controllers' => 'app/Controllers',
+    'services'    => 'app/Services',
+    'views'       => 'views',
+];
+foreach ($webFirst as $section => $dir) {
+    $prefix = $dir . '/';
+    $members = array_values(array_filter($paths, static fn(string $path): bool => str_starts_with($path, $prefix)));
+    if (!$members) continue;
+    $lines[] = '## ' . $section;
+    $lines[] = '';
+    foreach ($members as $path) $lines[] = '- `' . $path . '`';
+    $lines[] = '';
+}
+
 $contents = implode("\n", $lines) . "\n";
 if (($argv[1] ?? '') === '--check') {
     if (!is_file($output) || file_get_contents($output) !== $contents) {
