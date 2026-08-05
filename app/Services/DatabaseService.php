@@ -40,43 +40,58 @@ final class DatabaseService {
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12,
         ]);
-        $body = @curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $transportError = $body === false ? curl_error($ch) : '';
-        // Fail loudly instead of returning []. An empty return used to make a DB outage
-        // look like empty tables: every admin page and shop view silently rendered as if
-        // there were no orders, products or users. A thrown error surfaces the real
-        // cause so a broken bridge is visible, not invisible data loss.
-        if ($body === false) throw new \RuntimeException('Remote database transport failed: ' . ($transportError ?: 'unknown cURL error'));
-        $result = json_decode((string)$body, true);
-        if ($code !== 200) {
-            $message = is_array($result) ? trim((string)($result['error'] ?? '')) : '';
-            throw new \RuntimeException('Remote database request failed with HTTP ' . $code . ($message !== '' ? ': ' . $message : '.'));
+        try {
+            $ch = curl_init($this->cfg['remote_url']);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12,
+            ]);
+            $body = @curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $transportError = $body === false ? curl_error($ch) : '';
+            // Fail loudly instead of returning []. An empty return used to make a DB outage
+            // look like empty tables: every admin page and shop view silently rendered as if
+            // there were no orders, products or users. A thrown error surfaces the real
+            // cause so a broken bridge is visible, not invisible data loss.
+            if ($body === false) throw new \RuntimeException('Remote database transport failed: ' . ($transportError ?: 'unknown cURL error'));
+            $result = json_decode((string)$body, true);
+            if ($code !== 200) {
+                $message = is_array($result) ? trim((string)($result['error'] ?? '')) : '';
+                throw new \RuntimeException('Remote database request failed with HTTP ' . $code . ($message !== '' ? ': ' . $message : '.'));
+            }
+            if (!is_array($result) || empty($result['success']) || !isset($result['data']) || !is_array($result['data'])) {
+                throw new \RuntimeException('Remote database returned an invalid response.');
+            }
+            return self::$remoteQueryCache[$cacheKey] = $result['data'];
+        } finally {
+            if (isset($ch)) curl_close($ch);
         }
-        if (!is_array($result) || empty($result['success']) || !isset($result['data']) || !is_array($result['data'])) {
-            throw new \RuntimeException('Remote database returned an invalid response.');
-        }
-        return self::$remoteQueryCache[$cacheKey] = $result['data'];
     }
 
     private function remoteMutation(string $action, string $table, array $payload): array {
         $payload['password'] = $this->cfg['remote_db_password'] ?? '';
         $body = json_encode(['action' => $action, 'collection' => preg_replace('/[^a-z_]/', '', $table)] + $payload);
-        $ch = curl_init($this->cfg['remote_url']);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12,
-        ]);
-        $body = @curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $result = json_decode((string)$body, true) ?: [];
-        if ($body === false || $code < 200 || $code >= 300 || empty($result['success'])) {
-            throw new \RuntimeException((string)($result['error'] ?? 'Remote mutation failed.'));
+        try {
+            $ch = curl_init($this->cfg['remote_url']);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12,
+            ]);
+            $body = @curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $result = json_decode((string)$body, true) ?: [];
+            if ($body === false || $code < 200 || $code >= 300 || empty($result['success'])) {
+                throw new \RuntimeException((string)($result['error'] ?? 'Remote mutation failed.'));
+            }
+            // The write changed the data the cache holds; drop it so reads do not go stale.
+            self::$remoteQueryCache = [];
+            return $result;
+        } finally {
+            if (isset($ch)) curl_close($ch);
         }
-        // The write changed the data the cache holds; drop it so reads do not go stale.
-        self::$remoteQueryCache = [];
-        return $result;
     }
 
     private function db(): \PDO {
