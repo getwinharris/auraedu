@@ -54,7 +54,16 @@ final class SecretService {
             }
         }
         $provider = 'openai';
-        if (str_contains($endpoint, 'anthropic')) $provider = 'anthropic';
+        if (str_contains($endpoint, 'googleapis') && !str_contains($endpoint, '/openai/')) {
+            $provider = 'google';
+            // Google's generateContent lives under /models/. Saving the endpoint without
+            // that segment builds .../v1beta/<model>:generateContent, which 404s with
+            // "the model or endpoint does not exist". Accept either form.
+            $trimmed = rtrim($endpoint, '/');
+            if (!str_ends_with($trimmed, '/models')) $endpoint = $trimmed . '/models';
+            else $endpoint = $trimmed;
+        }
+        elseif (str_contains($endpoint, 'anthropic')) $provider = 'anthropic';
         return compact('provider', 'model', 'endpoint', 'apiKey') + ['configured' => $apiKey !== ''];
     }
     private function decodeRecord(array $record): array {

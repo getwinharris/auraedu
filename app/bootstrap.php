@@ -29,6 +29,17 @@ spl_autoload_register(function (string $class): void {
 function app_path(string $path = ''): string { return dirname(__DIR__) . ($path ? '/' . ltrim($path, '/') : ''); }
 function storage_path(string $path = ''): string { return app_path('storage' . ($path ? '/' . ltrim($path, '/') : '')); }
 function e(string $value): string { return htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); }
+/**
+ * Singular form of an admin collection label. rtrim($title,'s') produced "Categorie"
+ * from "Categories" — it strips the trailing s without handling -ies.
+ */
+function singular_label(string $plural): string {
+    $plural = trim($plural);
+    if (preg_match('/ies$/i', $plural)) return preg_replace('/ies$/i', 'y', $plural);
+    if (preg_match('/(ses|xes|zes|ches|shes)$/i', $plural)) return preg_replace('/es$/i', '', $plural);
+    if (preg_match('/s$/i', $plural) && !preg_match('/ss$/i', $plural)) return preg_replace('/s$/i', '', $plural);
+    return $plural;
+}
 function placeholder_img(string $label = ''): string {
     $label = $label ?: 'AuraEdu';
     $label = htmlspecialchars($label, ENT_QUOTES | ENT_XML1, 'UTF-8');
