@@ -1,0 +1,14 @@
+# Directory index — docs/modules
+  files:
+    - docs/modules/admin.md
+    - docs/modules/auth.md
+    - docs/modules/booking.md
+    - docs/modules/catalog.md
+    - docs/modules/consultations.md
+    - docs/modules/google-oauth.md
+    - docs/modules/gst-commerce.md
+    - docs/modules/orders.md
+    - docs/modules/pwa.md
+    - docs/modules/razorpay.md
+    - docs/modules/remote-db.md
+    - docs/modules/temples.md

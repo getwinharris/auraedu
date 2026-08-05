@@ -1,3 +1,9 @@
+---
+type: attribution
+title: Image Attributions
+description: License and source attributions for photographs in the institute image folder.
+category: assets
+---
 # Image Attributions
 
 All photographs in this folder are sourced from Wikimedia Commons under free licenses
