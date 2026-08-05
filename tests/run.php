@@ -384,6 +384,56 @@ $tests['one MySQL connection is shared and no socket probe remains'] = function 
 };
 
 
+$tests['courier tracking uses the seven fixed courier links and requires a courier to ship'] = function (): void {
+    $shipping = new \App\Services\ShippingService();
+    $couriers = $shipping->couriers();
+    $expected = [
+        'dtdc'      => 'https://www.dtdc.com/track-your-shipment/',
+        'bluedart'  => 'https://www.bluedart.com/tracking',
+        'indiapost' => 'http://www.indiapost.gov.in/tracking',
+        'fedex'     => 'https://www.fedex.com/en-in/tracking.html',
+        'stcourier' => 'https://stcourier.com/track/shipment',
+        'tpcglobe'  => 'https://tpcglobe.com/',
+        'franc'     => 'https://franchexpress.com/courier-tracking/',
+    ];
+    assertSame(7, count($couriers), 'There must be exactly seven couriers');
+    foreach ($expected as $code => $base) {
+        assertTrue(isset($couriers[$code]) && $couriers[$code] === [$shipping->label($code), $base] && $couriers[$code][1] === $base, "Courier {$code} must map to its fixed base URL");
+    }
+    // No free-text URL: the tracking ID is appended to the fixed link.
+    assertSame('https://www.bluedart.com/tracking/AB123', $shipping->trackingUrl('bluedart', '  AB123 '), 'Tracking ID must be appended to the courier base URL');
+    assertSame('', $shipping->trackingUrl('unknown', 'AB123'), 'Unknown courier must produce no link');
+    assertSame('', $shipping->trackingUrl('dtdc', ''), 'Empty tracking ID must produce no link');
+
+    // Shipping an order enforces the courier + tracking ID rule (before any DB read).
+    $service = new \App\Services\OrderService();
+    foreach ([
+        [['tracking_id' => 'X'], 'Choose a courier to mark an order shipped.'],
+        [['courier' => 'nope', 'tracking_id' => 'X'], 'Unknown courier.'],
+        [['courier' => 'dtdc'], 'A courier tracking ID is required to mark an order shipped.'],
+    ] as [$tracking, $expectedMessage]) {
+        try {
+            $service->updateStatus('order-none', 'shipped', null, $tracking);
+            throw new \RuntimeException('Validation should have rejected, got through');
+        } catch (\InvalidArgumentException $e) {
+            if ($e->getMessage() !== $expectedMessage) throw new \RuntimeException('Wrong validation message: ' . $e->getMessage());
+        }
+    }
+
+    // The admin form is a dropdown, not a free-text tracking URL field.
+    $adminView = file_get_contents(app_path('views/admin/detail.php'));
+    assertTrue(str_contains($adminView, 'name="courier"') && str_contains($adminView, 'name="tracking_id"'), 'Admin order view must have a courier select and a tracking ID input');
+    assertTrue(!str_contains($adminView, 'name="tracking_url"'), 'Admin order view must not have a free-text tracking URL field');
+    assertTrue(substr_count($adminView, 'Select courier') === 1, 'Admin order view must offer the courier dropdown');
+
+    $controller = file_get_contents(app_path('app/Controllers/AdminController.php'));
+    assertTrue(str_contains($controller, "'courier'") && str_contains($controller, "'tracking_id'"), 'Admin status save must pass courier + tracking ID');
+
+    $accountView = file_get_contents(app_path('views/account/orders.php'));
+    assertTrue(str_contains($accountView, 'Track parcel'), 'Customer orders view must expose the courier track link');
+};
+
+
 foreach ($tests as $name => $test) {
     try {
         $test();

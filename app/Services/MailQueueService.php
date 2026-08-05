@@ -72,7 +72,16 @@ final class MailQueueService {
         $to = trim((string)($order['customer_email'] ?? ''));
         if ($to === '') return null;
         $subject = 'AuraEdu order shipped';
+        $trackingUrl = trim((string)($order['tracking_url'] ?? ''));
+        $trackingId = trim((string)($order['tracking_id'] ?? ''));
+        $courier = trim((string)($order['courier_name'] ?? ''));
+        $trackingHtml = $trackingUrl !== ''
+            ? '<p>Courier: <strong>' . e($courier !== '' ? $courier : 'the courier') . '</strong>'
+                . ($trackingId !== '' ? ' (Tracking ID: <code>' . e($trackingId) . '</code>)' : '')
+                . '</p><p style="margin-top:4px;"><a href="' . e($trackingUrl) . '" style="background:#3a0003;color:#d1b368;padding:11px 20px;border-radius:999px;text-decoration:none;font-weight:600;display:inline-block;">Track your parcel</a></p>'
+            : '';
         $html = '<p>Your order ' . e((string)($order['id'] ?? '')) . ' has been shipped.</p>'
+            . $trackingHtml
             . '<p>We will ask for your product review after you have had time to receive and use it.</p>';
         return $this->enqueue('shipment_notification', $to, $subject, $html, null, ['order_id' => $order['id'] ?? '']);
     }

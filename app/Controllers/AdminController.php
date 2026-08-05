@@ -33,9 +33,27 @@ final class AdminController extends BaseController {
         foreach ($orders as $item) {
             if (($item['id'] ?? '') === $id) { $order = $item; break; }
         }
-        $this->render('admin/detail',['pageTitle' => 'Order '.$id, 'title' => 'Order '.$id, 'order' => $order]);
+        $this->render('admin/detail',['pageTitle' => 'Order '.$id, 'title' => 'Order '.$id, 'order' => $order, 'couriers' => (new \App\Services\ShippingService())->couriers()]);
     }
-    public function saveOrderStatus(string $id): void{try{(new OrderService())->updateStatus($id, $_POST['status'] ?? 'confirmed'); (new AuditLogService())->record('save','order.status',$id,['status'=>$_POST['status'] ?? 'confirmed']); $this->flash('Order status updated.','success');}catch(\Throwable){$this->flash('Unable to update order status.','error');} $this->redirect('/admin/orders/'.$id);}
+    public function saveOrderStatus(string $id): void{
+        $status = (string)($_POST['status'] ?? 'confirmed');
+        $tracking = [
+            'courier'     => (string)($_POST['courier'] ?? ''),
+            'tracking_id' => (string)($_POST['tracking_id'] ?? ''),
+        ];
+        try {
+            (new OrderService())->updateStatus($id, $status, null, $tracking);
+            (new AuditLogService())->record('save','order.status',$id,['status'=>$status,'courier'=>$tracking['courier'],'tracking_id'=>$tracking['tracking_id']]);
+            $this->flash('Order status updated.','success');
+        } catch (\InvalidArgumentException $e) {
+            // Surface the real reason — a missing courier/tracking ID used to read as a
+            // generic "Unable to update", leaving the owner guessing.
+            $this->flash($e->getMessage(),'error');
+        } catch (\Throwable) {
+            $this->flash('Unable to update order status.','error');
+        }
+        $this->redirect('/admin/orders/'.$id);
+    }
     public function shipping(): void{$this->render('admin/settings',['pageTitle' => 'Shipping', 'title' => 'Shipping']);}
     public function appointments(): void{$this->list('Sessions','appointments');}
     public function temples(): void{$this->resource('Temples','temples',$this->schemaFields('temples',['name','description','image_url','address','map_url']));}

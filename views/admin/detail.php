@@ -42,8 +42,44 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button class="btn btn-primary" type="submit">Save Status</button>
+                        <button class="btn btn-primary" type="submit">Save Status</button>
+
+            <div id="ship-fields" style="flex:1 1 100%; display:none; gap:var(--space-sm); flex-wrap:wrap; padding:var(--space-md); margin-top:var(--space-sm); background:var(--color-bg-alt); border:1px solid var(--color-border); border-radius:var(--radius-md);">
+                <p style="flex:1 1 100%; margin:0 0 var(--space-xs); font-size:0.82rem; color:var(--color-text-muted);">
+                    Pick the courier and add the tracking number. The customer receives the track link in the shipment email.
+                </p>
+                <div style="flex:1 1 200px;">
+                    <label for="courier" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:var(--space-xs);">Courier *</label>
+                    <select id="courier" name="courier" style="width:100%;">
+                        <option value="">Select courier</option>
+                        <?php foreach(($couriers ?? []) as $code => $courier): ?>
+                            <option value="<?= e($code) ?>" <?= ((string)($order['courier'] ?? '') === $code ? 'selected' : '') ?>><?= e($courier[0]) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div style="flex:1 1 220px;">
+                    <label for="tracking_id" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:var(--space-xs);">Tracking ID *</label>
+                    <input id="tracking_id" name="tracking_id" type="text" placeholder="Courier tracking number" style="width:100%;" value="<?= e((string)($order['tracking_id'] ?? '')) ?>">
+                </div>
+            </div>
         </form>
+        <script>
+        (function () {
+            var sel = document.getElementById('order-status');
+            var box = document.getElementById('ship-fields');
+            var courier = document.getElementById('courier');
+            var id = document.getElementById('tracking_id');
+            function sync() {
+                var shipping = sel.value === 'shipped';
+                box.style.display = shipping ? 'flex' : 'none';
+                // Required only while shipping, so other status changes are not blocked.
+                courier.required = shipping;
+                id.required = shipping;
+            }
+            sel.addEventListener('change', sync);
+            sync();
+        })();
+        </script>
         <h3 style="font-size:1rem; margin:var(--space-lg) 0 var(--space-sm);">Items</h3>
         <div class="table-wrap">
             <table>
