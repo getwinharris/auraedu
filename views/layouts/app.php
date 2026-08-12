@@ -412,7 +412,7 @@ if ($__flash):
                 <h4 class="footer-heading">Customer Support</h4>
                 <ul class="footer-links">
                     <li><a href="tel:+919790221065">+91 97902 21065</a></li>
-                    <li><a href="tel:+919789444038">+91 97894 44038</a></li>
+                    <li><a href="tel:+919364404493">+91 93644 04493</a></li>
                     <li><a href="mailto:auramieh2017@gmail.com">auramieh2017@gmail.com</a></li>
                 </ul>
             </div>
