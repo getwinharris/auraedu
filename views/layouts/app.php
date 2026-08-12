@@ -135,7 +135,7 @@ main{padding-bottom:0}
 .flash--error{background:var(--color-error-soft, #fde8e9);color:var(--color-error)}
 .flash--info{background:var(--color-info-soft, #ebf0fa);color:var(--color-info)}
 @media(max-width:860px){
-nav{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(245,245,245,0.98);flex-direction:column;padding:var(--space-lg);border-bottom:1px solid var(--color-border);box-shadow:var(--shadow-md)}
+nav{display:none;position:absolute;top:100%;left:0;right:0;max-height:calc(100vh - 64px);max-height:calc(100dvh - 64px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:rgba(245,245,245,0.98);flex-direction:column;padding:var(--space-lg);border-bottom:1px solid var(--color-border);box-shadow:var(--shadow-md)}
 nav a{font-size:0.95rem;padding:var(--space-sm) var(--space-md);border-radius:var(--radius-md);height:auto}
 nav.open{display:flex}
 .menu-toggle{display:block}
