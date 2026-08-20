@@ -103,7 +103,30 @@ final class SupportBotService {
         $base = empty($user['email'])
             ? $this->agentContext->forUserEmail('')
             : $this->agentContext->forUserEmail((string)$user['email']);
-        return ['signed_in' => !empty($user['email']), 'cart' => $cart] + $base;
+        // Articles let the agent answer "what is this app?" from real content instead of
+        // falling back to a navigation list. BlogService::all() already withholds
+        // unpublished posts and posts whose module is off.
+        return ['signed_in' => !empty($user['email']), 'cart' => $cart, 'articles' => $this->siteArticles()] + $base;
+    }
+
+    /** Published articles the agent may quote, filtered exactly as the public site is. */
+    private function siteArticles(int $limit = 12): array {
+        try {
+            $out = [];
+            foreach ((new BlogService())->all() as $post) {
+                $out[] = [
+                    'title' => (string)($post['title'] ?? ''),
+                    'url' => '/blog/' . (string)($post['slug'] ?? ''),
+                    'category' => (string)($post['category'] ?? ''),
+                    'summary' => mb_substr(trim((string)($post['excerpt'] ?? $post['summary'] ?? '')), 0, 180),
+                ];
+                if (count($out) >= $limit) break;
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            error_log('Article context failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     private function googleReply(string $message, array $context): ?string {
@@ -139,15 +162,14 @@ final class SupportBotService {
     }
 
     private function cleanReply(string $reply): string {
-        $reply = preg_replace('/<thought\b[^>]*>.*?<\/thought>/is', '', $reply) ?? $reply;
-        $reply = preg_replace('/^\s*[\*\-]\s*/m', '', $reply) ?? $reply;
-        $reply = trim($reply, " \t\n\r\0\x0B`*\"");
-        if ($reply === '') $reply = 'I can help with products, orders, delivery addresses, payments, and consultant bookings. Please ask one specific question.';
-        return strlen($reply) > 900 ? substr($reply, 0, 897) . '...' : $reply;
+        return (new AiReplyCleaner())->clean(
+            $reply,
+            'I can help with products, orders, delivery addresses and payments. Please ask one specific question.'
+        );
     }
 
     private function looksInternal(string $reply): bool {
-        return (bool)preg_match('/\b(role:|constraint|the user said|the bot should|the bot needs|generationconfig|tool call)\b/i', $reply);
+        return (new AiReplyCleaner())->looksInternal($reply);
     }
 
     private function fallbackReply(string $message, array $context): string {

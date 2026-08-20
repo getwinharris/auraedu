@@ -88,18 +88,75 @@ final class AdminController extends BaseController {
             $appointmentCount = count($db->read('appointments'));
             $ticketCount = count($db->read('support_tickets'));
             $revenue = array_sum(array_column($db->read('orders'), 'total'));
+
+            $confirmedOrders = [];
+            foreach ($db->read('orders') as $o) {
+                if (($o['status'] ?? '') === 'confirmed' || ($o['status'] ?? '') === 'delivered') $confirmedOrders[] = $o;
+            }
+            $confirmedRevenue = array_sum(array_column($confirmedOrders, 'total'));
+            $pendingRevenue = array_sum(array_map(fn($o) => in_array($o['status'] ?? '', ['pending','processing'], true) ? (float)($o['total'] ?? 0) : 0, $db->read('orders')));
+            $avgOrderValue = $confirmedOrders ? $confirmedRevenue / count($confirmedOrders) : 0;
+
+            $topUsers = [];
+            foreach ($confirmedOrders as $o) {
+                $email = strtolower(trim((string)($o['customer_email'] ?? '')));
+                if ($email === '') continue;
+                $topUsers[$email] = ($topUsers[$email] ?? 0) + (float)($o['total'] ?? 0);
+            }
+            arsort($topUsers);
+            $topUsersStr = '';
+            foreach (array_slice($topUsers, 0, 5, true) as $email => $amount) {
+                $topUsersStr .= "\n  - {$email}: ₹" . number_format($amount, 2);
+            }
+            // Per-product sales. "Which products sell best?" could not be answered before,
+            // because only a product count reached the model.
+            $unitsBySlug = [];
+            $revenueBySlug = [];
+            foreach ($confirmedOrders as $o) {
+                foreach (($o['items'] ?? []) as $item) {
+                    $key = (string)($item['name'] ?? $item['slug'] ?? '');
+                    if ($key === '') continue;
+                    $qty = (int)($item['qty'] ?? 1);
+                    $unitsBySlug[$key] = ($unitsBySlug[$key] ?? 0) + $qty;
+                    $revenueBySlug[$key] = ($revenueBySlug[$key] ?? 0) + (float)($item['line_total'] ?? 0);
+                }
+            }
+            arsort($unitsBySlug);
+            $topProductsStr = '';
+            foreach (array_slice($unitsBySlug, 0, 5, true) as $name => $units) {
+                $topProductsStr .= "\n  - {$name}: {$units} sold, ₹" . number_format($revenueBySlug[$name] ?? 0, 2);
+            }
+            if ($topProductsStr === '') $topProductsStr = "\n  - no confirmed sales yet";
+
             $attachments = '';
             $tempDir = app_path('.agents/temp');
             if (is_dir($tempDir)) {
                 $files = array_diff(scandir($tempDir), ['.','..']);
                 if (!empty($files)) $attachments = "\n\nAttachments available in .agents/temp/: " . implode(', ', $files);
             }
-            $context = "Site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Appointments: {$practitionerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue (sum of totals): ₹" . number_format($revenue, 2) . $attachments;
-            $answer = (new AiService())->call([
+            $context = "Site data:\n- Users: {$userCount}\n- Orders: {$orderCount}\n- Products: {$productCount}\n- Appointments: {$practitionerCount}\n- Appointments: {$appointmentCount}\n- Support tickets: {$ticketCount}\n- Revenue (sum of totals): ₹" . number_format($revenue, 2) . "\n"
+                . "- Confirmed revenue: ₹" . number_format($confirmedRevenue, 2) . "\n"
+                . "- Pending revenue (unconfirmed): ₹" . number_format($pendingRevenue, 2) . "\n"
+                . "- Average order value: ₹" . number_format($avgOrderValue, 2) . "\n"
+                . "- Top 5 products by units sold:" . $topProductsStr . "\n"
+                . "- Top 5 customers by revenue:" . $topUsersStr
+                . $attachments
+                . "\n\nYou are the admin assistant for this store. Answer the question directly. "
+                . "Give only the final answer. Do not restate your role, the context, the constraints or the question. "
+                . "Do not show your reasoning or a plan. Use short Markdown. "
+                . "Never repeat the data back unless asked for it. "
+                . "Never list customer email addresses unless the question is specifically about customers.";
+            $prompt = [
                 ['role' => 'system', 'content' => $context],
                 ['role' => 'user', 'content' => $message],
-            ], ['max_tokens' => 1024, 'timeout' => 30]);
-            $this->jsonResponse(['answer'=>$answer]);
+            ];
+            $answer = (new AiService())->call($prompt, ['max_tokens' => 1024, 'timeout' => 30]);
+            $cleaner = new \App\Services\AiReplyCleaner();
+            $clean = $cleaner->clean($answer, '');
+            if ($clean === '' || $cleaner->looksInternal($clean)) {
+                $clean = 'I could not produce a clear answer to that. Try asking it a different way.';
+            }
+            $this->jsonResponse(['answer'=>$clean]);
         } catch (\Throwable $e) {
             $this->jsonResponse(['error'=>'Agent error: '.$e->getMessage()],500);
         }
@@ -223,13 +280,25 @@ final class AdminController extends BaseController {
     }
     public function blog(): void{
         $blog = new \App\Services\BlogService();
-        $this->render('admin/blog',['pageTitle'=>'Blog','title'=>'Blog Posts','posts'=>$blog->all(),'categories'=>$blog->categories()]);
+        $this->render('admin/blog',['pageTitle'=>'Blog','title'=>'Blog Posts','posts'=>$blog->all(true),'categories'=>$blog->categories()]);
     }
     public function saveBlog(): void{
         $blog = new \App\Services\BlogService();
         $blog->save($_POST);
         (new AuditLogService())->record('save','blog',$_POST['slug'] ?? '');
         $this->flash('Blog post saved.','success');
+        $this->redirect('/admin/blog');
+    }
+    /** Flip a post between published and hidden without opening the editor. */
+    public function toggleBlog(): void{
+        $slug = trim((string)($_POST['slug'] ?? ''));
+        $blog = new \App\Services\BlogService();
+        $post = $slug !== '' ? $blog->find($slug) : null;
+        if (!$post) { $this->flash('Post not found.','error'); $this->redirect('/admin/blog'); }
+        $post['published'] = empty($post['published']);
+        $blog->save($post);
+        (new AuditLogService())->record('save','blog.published',$slug,['published'=>$post['published']]);
+        $this->flash($post['published'] ? 'Post is now visible on the site.' : 'Post is now hidden from the site.','success');
         $this->redirect('/admin/blog');
     }
     public function deleteBlog(): void{
@@ -302,6 +371,14 @@ final class AdminController extends BaseController {
     private function resource(string $title,string $collection,array $fields): void{$this->render('admin/resource',['pageTitle' => $title, 'title' => $title, 'collection' => $collection, 'fields' => $fields, 'items'=>(new ResourceService($collection))->all(), 'mediaFiles'=>$this->mediaFor($collection)]);}
     private function save(string $collection): void{
         $data=$this->cleanPost();
+        // Saving the blank form created an empty record. Every collection here is
+        // identified by a name or a code, so refuse when neither is present rather than
+        // adding a nameless row the owner then has to hunt down and delete.
+        $identifier = trim((string)($data['name'] ?? $data['code'] ?? $data['title'] ?? ''));
+        if ($identifier === '') {
+            $this->flash('Enter a name before saving.', 'error');
+            $this->redirect('/admin/'.$collection);
+        }
         $data=$this->mergeExistingRecord($collection, $data);
         if(isset($data['working_days']))$data['working_days']=$this->splitList($data['working_days']);
         if(isset($data['modes']))$data['modes']=$this->splitList($data['modes']);
